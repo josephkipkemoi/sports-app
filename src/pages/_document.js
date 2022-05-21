@@ -20,9 +20,8 @@ export default class MyDocument extends Document {
                     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
                 />
 
-                <link
-                    href="//fonts.googleapis.com/css?family=Roboto+Slab:200,300,400,400i,600,700,800&display=swap"
-                    rel="stylesheet"
+                <link 
+                href="https://fonts.googleapis.com/css2?family=Roboto+Serif:opsz@8..144&display=swap" rel="stylesheet"
                 />
 
                 </Head>

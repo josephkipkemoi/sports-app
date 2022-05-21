@@ -170,23 +170,23 @@ const promotionLinks = [
 const socialLinks = [
     {
         name: 'Facebook',
-        path: 'www.facebook.com/pageurl',
+        path: '/www.facebook.com/pageurl',
     },
     {
         name: 'Twitter',
-        path: 'www.twitter.com/pageurl',
+        path: '/www.twitter.com/pageurl',
     },
     {
         name: 'Youtube',
-        path: 'www.youtube.com/pageurl',
+        path: '/www.youtube.com/pageurl',
     },
     {
         name: 'Instagram',
-        path: 'www.instagram.com/pageurl',
+        path: '/www.instagram.com/pageurl',
     }, 
     {
         name: 'WhatsApp',
-        path: 'www.whatsapp.com/pageurl',
+        path: '/www.whatsapp.com/pageurl',
     }
 ]
 export default function Footer(){

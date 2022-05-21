@@ -13,6 +13,7 @@ import 'swagger-ui-react/swagger-ui.css';
 import Theme, { ThemeContext } from '../utils/Theme';
 import Head from "../components/Head";
 import NavWrapper from '../components/NavWrapper';
+import Script from "next/script";
 
 if(typeof document !== 'undefined') {
     if(!window.sayHello) {
@@ -23,9 +24,18 @@ if(typeof document !== 'undefined') {
 
 const GlobalStyles = createGlobalStyle`
  html, body {
-    font-family: 'Roboto Slab';
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto Serif', serif;
     font-size: 14px;
+    box-sizing: border-box;
  }
+
+ @media screen and (max-width: 570px) {
+    body {
+        font-size: 12px;
+    }
+}
 `
 
 function ThemeProvider({ children }) {
@@ -56,9 +66,9 @@ export default function MyApp({ Component, pageProps }) {
                 }}
             /> */}
 
-{/* Twitter API 
-<Script src="https://platform.twitter.com/widgets.js" async defer /> */}
-
+        {/* Twitter API 
+        <Script src="https://platform.twitter.com/widgets.js" async defer /> */}
+        <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"/>
         <GlobalStyles/>
         <NavWrapper>
             <Component {...pageProps}/>

@@ -1,8 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
 
-
-// import NavBar from './NavBar';
+import NavBar from './NavBar';
 import Footer from './Footer';
 
 const PageStyles = styled('div')`
@@ -16,10 +15,10 @@ font-weight: 200;
 `
 
 export default function NavWrapper({ children }) {
-    
+ 
     return (
         <PageStyles>
-            {/* <NavBar/> */}
+            <NavBar/>   
             <ContentStyled>{children}</ContentStyled>
             <Footer/>
         </PageStyles>
