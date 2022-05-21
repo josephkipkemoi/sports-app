@@ -4,21 +4,19 @@ import Link from "next/link";
 import Row  from "react-bootstrap/Row";
 import Col  from "react-bootstrap/Col";
 import styledComponents from "styled-components";
-
+import styled from "styled-components";
  
 const StyledFooter = styledComponents.div`
     background-color: #444;
     color: #fff;
     width: 100%;
-    border-top: 1px solid #367a65;
 `
 
-const StyledCopyright = styledComponents.div`
+const StyledCopyright = styledComponents.span`
     background-color: #000;
     text-align: center;
     padding: 6px;
     display: block;
- 
 `
 
 const StyledMenuHeader = styledComponents.div`
@@ -319,7 +317,7 @@ export default function Footer(){
                 </Col>
             </Row>
         </div>
-        <StyledCopyright>       
+        <StyledCopyright>      
            <span>Copyright &copy; 2022 - All Rights Reserved &reg;</span>
            <span className="d-block">Version: 1</span>
         </StyledCopyright>
