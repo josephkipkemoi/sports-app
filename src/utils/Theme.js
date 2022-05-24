@@ -1,10 +1,16 @@
 import React from 'react'
 import Color from './Color'
 
-const primary = '#0C6A8A'
+const primary = '#c3d0d6'
+const h5Color = '#58d7af'
+const headerColor = '#585858'
+const btnColor = '#505050';
 
 const colorOptions = {
+  h5Color,
   primary,
+  headerColor,
+  btnColor,
   primaryLight: Color(primary)
     .lighten(7)
     .toString(),

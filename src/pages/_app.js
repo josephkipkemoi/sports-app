@@ -29,8 +29,19 @@ const GlobalStyles = createGlobalStyle`
     font-family: 'Roboto Serif', serif;
     font-size: 14px;
     box-sizing: border-box;
+    overflow-x: hidden;
  }
-
+ ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: ${props => props.theme.colors.h5Color};
+  }
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 8px;
+  }
+ 
  @media screen and (max-width: 570px) {
     body {
         font-size: 12px;
