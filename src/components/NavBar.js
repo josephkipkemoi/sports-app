@@ -1,7 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import styledComponents from "styled-components";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import useClickOutside from "../hooks/useClickOutside";
 
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
@@ -134,11 +135,11 @@ const bottomNavLinks = [
             {
                 name: 'Join',
                 path: '/register',
-                class: 'join'
+                class: 'join',
             },
             {
                 name:'Log In',
-                path: '/login'
+                path: '/login',
             }
         ]
     }
@@ -172,6 +173,7 @@ const StyleBottomNavBar = styledComponents.div`
     .nav-link  {
         margin-left: 24px;
     }
+ 
     @media screen and (max-width: 570px) {
         .custom-mx-auto {
              margin: 0 !important;
@@ -180,16 +182,27 @@ const StyleBottomNavBar = styledComponents.div`
             margin-left: 12px;
         }
     }
-   
+  
 `
+
+ 
 const BottomNavBar = () => {
-   
+    const [isModalOpen, setModalOpen] = React.useState(false);
+
+    const closeMenu = () => setModalOpen(false)
+
+    const openModal = (e) => {
+        e.preventDefault()
+        setModalOpen(true)
+    }
+
     const BottomNavLinkItem = (link, i) => (
         <div key={i} >
             <Link href={link.path} key={i} prefetch={false}>
                 <a
                  itemProp="url"
                  className={"nav-link " + link.class}
+                 onClick={link.name === 'Log In' ? openModal : ''}
                 >
                     {link.name === "search" ? <i className="bi bi-search"></i> : link.name}
                 </a>
@@ -199,13 +212,42 @@ const BottomNavBar = () => {
             )}
         </div>
     )
+
+    const linkBarRef = React.useRef()
+
+    useClickOutside(linkBarRef, closeMenu)
+   
     return (
         <StyleBottomNavBar>  
-        <nav className="p-4">
+        <nav className="p-4" ref={linkBarRef}>
             <div className="custom-mx-auto d-flex justify-content-center w-50 mx-auto">
                 {bottomNavLinks.map(BottomNavLinkItem)}
             </div>           
         </nav>
+             <Modal show={isModalOpen} className="mt-5 pt-5">
+                 <Modal.Body id="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+                        <Form id="modal-ref">
+                            <Form.Group id="modal-ref" className="mb-3">
+                                <Form.Control id="modal-ref" type="text" className="shadow-sm p-3" placeholder="Email or Phone Number"></Form.Control>
+                            </Form.Group>
+                            <Form.Group id="modal-ref" className="mb-3">
+                                <Form.Control id="modal-ref" type="password" className="shadow-sm p-3" placeholder="Password"></Form.Control>
+                            </Form.Group>
+                            <Button style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} className="w-100 p-3 mb-3 fw-bold shadow-sm" type="submit">
+                                Log In
+                            </Button>
+                            <Link href="/forgot-password">
+                                <a 
+                                 itemProp="url"
+                                 className="d-flex justify-content-center text-decoration-none "
+                                 style={{ color: '#126e51' }}
+                                >
+                                    Forgot Password?
+                                </a>
+                            </Link>
+                        </Form>
+                    </Modal.Body>                            
+                </Modal>
         </StyleBottomNavBar>
     )
 }

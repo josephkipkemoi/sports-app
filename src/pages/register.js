@@ -41,7 +41,7 @@ export default function Register() {
     return (
         <StyleRegistration>
             <Container className='custom-box '>
-                <Form >
+                <Form>
                     <h3 className='mb-4'>Open Account</h3>
                     <small className='d-block mb-4'>
                         Get help - 
@@ -49,36 +49,35 @@ export default function Register() {
                         <a itemProp='url'> Contact Us</a>
                     </Link>
                     </small>
-                    <small>Country of residence</small>
+                    <small className='d-block mb-2'>Country of residence</small>
                     <Select options={countryOptions}  className="mb-5 shadow-sm"/>
                     <hr/>
                     <h6 className='mt-4 mb-4'>Contact information</h6>
                     <Form.Group className='mb-3' controlId="formBasicEmail">
-                        <Form.Label><small>Enter Email</small></Form.Label>
-                        <Form.Control type='email' placeholder='Email address' className='shadow-sm'></Form.Control>
+                        <Form.Label><small className='d-block'>Enter Email</small></Form.Label>
+                        <Form.Control type='email' placeholder='Email address' className='shadow-sm' autoComplete='username'/>
                     </Form.Group>
                     <Form.Group className='mb-5' controlId="formBasicPhoneNumber">
-                    <Form.Label><small>Contact Number</small></Form.Label>
-                        <Form.Control type='number' placeholder='Phone Number' className='shadow-sm'></Form.Control>
+                    <Form.Label><small className='d-block'>Contact Number</small></Form.Label>
+                        <Form.Control type='number' placeholder='Phone number' className='shadow-sm'/>
                     </Form.Group>
                     <hr/>
                     <h6 className='mt-4 mb-4'>Create login</h6>
                     <Form.Group className='mb-3' controlId='formBasicPassword'>
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control type='password' placeholder='Password' className='shadow-sm'/>
+                        <Form.Label><small className='d-block'>Password</small></Form.Label>
+                        <Form.Control type='password' placeholder='Password' className='shadow-sm' autoComplete='new-password'/>
                     </Form.Group>
                     <Form.Group className='mb-5' controlId='formBasicPassword2'>
-                        <Form.Label>Confirm Password</Form.Label>
-                        <Form.Control type='password' placeholder='Confirm Password' className='shadow-sm'/>
+                        <Form.Label><small className='d-block'>Confirm password</small></Form.Label>
+                        <Form.Control type='password' placeholder='Confirm password' className='shadow-sm' autoComplete='new-password'/>
                     </Form.Group>
                     <Form.Group className='mb-3' controlId='formBasicCheckbox'>
                         <Form.Check type="checkbox" label="I have read and agree to the Terms & Conditions"/>
                     </Form.Group>
-                    <Button variant='primary' type="submit" className='w-100'>
+                    <Button style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} type="submit" className='w-100'>
                         Join SportsApp
                     </Button>
-                </Form>
-               
+                </Form>               
             </Container>           
         </StyleRegistration>
     )
