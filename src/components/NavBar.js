@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import styledComponents from "styled-components";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import useClickOutside from "../hooks/useClickOutside";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 
+import useClickOutside from "../hooks/useClickOutside";
+ 
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
     display: inline-flex;
@@ -71,7 +74,8 @@ const topNavLinks = [
         ]
     }
 ]
-export default function NavBar() {
+
+export default function NavBar({ user, logout, login }) {
 
     const TopNavLinkElements = (link, i) => (        
         <div itemProp="name" key={i} className="nav-item">        
@@ -108,15 +112,17 @@ export default function NavBar() {
                 </div>
         </nav>
         </StyledTopRightNav>
-        <BottomNavBar/>
+        <BottomNavBar user={user} logout={logout} login={login}/>
         </>
     )
 }
 
+
 const bottomNavLinks = [
     {
         name: 'Sports',
-        path: '/sports'
+        path: '/sports',
+        class: 'sports'
     },
     {
         name: 'Live Games',
@@ -182,12 +188,52 @@ const StyleBottomNavBar = styledComponents.div`
             margin-left: 12px;
         }
     }
-  
+    @media screen and (max-width: 320px) {      
+        .sports {
+            display: none;
+        }
+        .live-games {
+            display: none;
+        }
+        .align-right {
+            top: 56px;
+        }
+    }
 `
+const StyleAuthenticated = styledComponents.div`
+ span {
+     color: ${props => props.theme.colors.primaryLight};
+     margin-right: 3px;
+ }
+ a {
+    line-height: 18px; 
+ }
 
+.log-out {
+    margin-right: -5px;
+}
+`
  
-const BottomNavBar = () => {
-    const [isModalOpen, setModalOpen] = React.useState(false);
+const BottomNavBar = ({ user, logout, login }) => {
+    const [isModalOpen, setModalOpen] = useState(false);
+
+    const [userDetails, setUserDetails] = useState({
+        email: '',
+        password: '',
+    })
+
+    const { email, password } = userDetails;
+
+    const [errors, setErrors] = useState([]);
+    const [status, setStatus] = useState([]);
+
+    const handleUser = (e) => setUserDetails(prev => ({ ...prev, [e.target.name] : e.target.value }))
+
+    const loginUser = (e) => {
+        e.preventDefault()
+
+        login({setErrors, setStatus, email, password})
+    }
 
     const closeMenu = () => setModalOpen(false)
 
@@ -195,6 +241,33 @@ const BottomNavBar = () => {
         e.preventDefault()
         setModalOpen(true)
     }
+
+    const logoutUser = (e) => {
+        e.preventDefault()
+        logout()
+    }
+
+    const AuthenticatedItems = () => (
+        <>
+            <StyleAuthenticated>
+                <span className="btn btn-secondary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                    </svg>                    
+                    {user.phone_number}
+                </span>
+                <Link href="/logout">
+                    <a 
+                    itemProp="url" 
+                    className="text-decoration-none btn btn-warning btn-sm log-out text-dark fw-bold"
+                    onClick={logoutUser}
+                    >
+                        Logout
+                    </a>
+                </Link>
+            </StyleAuthenticated>            
+        </>
+    )
 
     const BottomNavLinkItem = (link, i) => (
         <div key={i} >
@@ -205,10 +278,11 @@ const BottomNavBar = () => {
                  onClick={link.name === 'Log In' ? openModal : ''}
                 >
                     {link.name === "search" ? <i className="bi bi-search"></i> : link.name}
+          
                 </a>
             </Link>
             {link.links && (
-                <div className="align-right">{link.links.map(BottomNavLinkItem)}</div>
+                <div className="align-right">{!user ? link.links.map(BottomNavLinkItem) : <AuthenticatedItems/>}</div> 
             )}
         </div>
     )
@@ -228,12 +302,33 @@ const BottomNavBar = () => {
                  <Modal.Body id="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
                         <Form id="modal-ref">
                             <Form.Group id="modal-ref" className="mb-3">
-                                <Form.Control id="modal-ref" type="text" className="shadow-sm p-3" placeholder="Email or Phone Number"></Form.Control>
+                                <Form.Control 
+                                id="modal-ref" 
+                                name="email"
+                                type="text" 
+                                className="shadow-sm p-3" 
+                                placeholder="Email or Phone Number"
+                                onChange={handleUser}
+                                >
+                                </Form.Control>
                             </Form.Group>
                             <Form.Group id="modal-ref" className="mb-3">
-                                <Form.Control id="modal-ref" type="password" className="shadow-sm p-3" placeholder="Password"></Form.Control>
+                                <Form.Control 
+                                id="modal-ref" 
+                                name="password"
+                                type="password" 
+                                className="shadow-sm p-3" 
+                                placeholder="Password"
+                                onChange={handleUser}
+                                >
+                                </Form.Control>
                             </Form.Group>
-                            <Button style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} className="w-100 p-3 mb-3 fw-bold shadow-sm" type="submit">
+                            <Button 
+                            style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 
+                            className="w-100 p-3 mb-3 fw-bold shadow-sm" 
+                            type="submit"
+                            onClick={loginUser}
+                            >
                                 Log In
                             </Button>
                             <Link href="/forgot-password">

@@ -14,11 +14,10 @@ font-style: normal;
 font-weight: 200;
 `
 
-export default function NavWrapper({ children }) {
- 
+export default function NavWrapper({ children, user, logout, login }) {
     return (
         <PageStyles>
-            <NavBar/>   
+            <NavBar user={user} logout={logout} login={login}/>   
             <ContentStyled>{children}</ContentStyled>
             <Footer/>
         </PageStyles>
