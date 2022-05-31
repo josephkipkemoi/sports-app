@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
 import useClickOutside from "../hooks/useClickOutside";
+import { useGetBalanceByUserIdQuery } from "../hooks/balance";
  
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
@@ -148,6 +149,17 @@ const bottomNavLinks = [
                 path: '/login',
             }
         ]
+    },
+    {
+        name: '',
+        path: '#',
+        class: 'hide',
+        authLinks: [
+            {
+                name: 'Log out',
+                path: '/logout'
+            }
+        ]
     }
 ]
 
@@ -188,7 +200,7 @@ const StyleBottomNavBar = styledComponents.div`
             margin-left: 12px;
         }
     }
-    @media screen and (max-width: 320px) {      
+    @media screen and (max-width: 570px) {      
         .sports {
             display: none;
         }
@@ -214,7 +226,8 @@ const StyleAuthenticated = styledComponents.div`
 }
 `
  
-const BottomNavBar = ({ user, logout, login }) => {
+const BottomNavBar = ({ user, login }) => {
+ 
     const [isModalOpen, setModalOpen] = useState(false);
 
     const [userDetails, setUserDetails] = useState({
@@ -242,29 +255,38 @@ const BottomNavBar = ({ user, logout, login }) => {
         setModalOpen(true)
     }
 
-    const logoutUser = (e) => {
-        e.preventDefault()
-        logout()
-    }
+    const ErrorElement = () => errors.map(error => <div id="modal-ref" className="d-block text-danger text-center fw-bold" key={error}>{error}</div>)
 
     const AuthenticatedItems = () => (
         <>
             <StyleAuthenticated>
-                <span className="btn btn-secondary btn-sm">
+                <button className="btn btn-warning btn-sm">
+                <i className="bi bi-bell"></i>
+                </button>
+                <Link href="/profile" prefetch={true}>
+                    <a 
+                        itemProp="url"
+                        className="btn btn-secondary btn-sm" 
+                        style={{ marginLeft: 5 }}
+                    >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
                         <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                    </svg>                    
-                    {user.phone_number}
-                </span>
-                <Link href="/logout">
-                    <a 
-                    itemProp="url" 
-                    className="text-decoration-none btn btn-warning btn-sm log-out text-dark fw-bold"
-                    onClick={logoutUser}
+                    </svg>  
+                        Profile      
+                    </a>                
+                               
+                </Link>
+                <Link href="/history" prefetch={true}>
+                    <a
+                        itemProp="url"
+                        className="btn btn-primary btn-sm"
+                        style={{ marginLeft: 5 }}
                     >
-                        Logout
+                        <i className="bi bi-card-list" style={{ marginRight: 3 }}></i>
+                        My Bets
                     </a>
                 </Link>
+                <button className="btn btn-warning btn-sm" style={{ marginLeft: 5 }}>Deposit</button>
             </StyleAuthenticated>            
         </>
     )
@@ -281,9 +303,10 @@ const BottomNavBar = ({ user, logout, login }) => {
           
                 </a>
             </Link>
-            {link.links && (
-                <div className="align-right">{!user ? link.links.map(BottomNavLinkItem) : <AuthenticatedItems/>}</div> 
+             {(link.links) && (
+                <div className="align-right">{!user ? link.links.map(BottomNavLinkItem) :  <AuthenticatedItems/>}</div> 
             )}
+  
         </div>
     )
 
@@ -305,9 +328,9 @@ const BottomNavBar = ({ user, logout, login }) => {
                                 <Form.Control 
                                 id="modal-ref" 
                                 name="email"
-                                type="text" 
+                                type="email" 
                                 className="shadow-sm p-3" 
-                                placeholder="Email or Phone Number"
+                                placeholder="Email"
                                 onChange={handleUser}
                                 >
                                 </Form.Control>
@@ -322,8 +345,10 @@ const BottomNavBar = ({ user, logout, login }) => {
                                 onChange={handleUser}
                                 >
                                 </Form.Control>
-                            </Form.Group>
+                            </Form.Group>                         
+
                             <Button 
+                            id="modal-ref" 
                             style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 
                             className="w-100 p-3 mb-3 fw-bold shadow-sm" 
                             type="submit"
@@ -331,16 +356,19 @@ const BottomNavBar = ({ user, logout, login }) => {
                             >
                                 Log In
                             </Button>
+
+                            <ErrorElement/>
+
                             <Link href="/forgot-password">
                                 <a 
                                  itemProp="url"
-                                 className="d-flex justify-content-center text-decoration-none "
+                                 className="d-flex justify-content-center text-decoration-none mt-3"
                                  style={{ color: '#126e51' }}
                                 >
                                     Forgot Password?
                                 </a>
-                            </Link>
-                        </Form>
+                            </Link>                          
+                        </Form>                       
                     </Modal.Body>                            
                 </Modal>
         </StyleBottomNavBar>

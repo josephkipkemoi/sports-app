@@ -23,7 +23,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         await csrf()
 
         setErrors([])
-      
+
         axios
             .post('api/register', props)
             .then(() => mutate())
@@ -96,7 +96,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                     .then(() => mutate())
         }
 
-        window.location.pathname = '/register'
+        window.location.pathname = '/'
     }
 
     useEffect(() => {

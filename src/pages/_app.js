@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 // import { tw } from 'twin.macro';
 // import Script from "next/script";
- 
+import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
+import { Provider } from "react-redux";
+import { store } from "../store/store";
 import {
     createGlobalStyle,
     ThemeProvider as StyledThemeProvider
@@ -59,35 +61,45 @@ function ThemeProvider({ children }) {
 }
 
 export default function MyApp({ Component, pageProps }) {
+    
+    const [queryClient] = useState(() => new QueryClient())
 
-    const { user, logout, login } = useAuth({ middleware: 'guest' });
- 
+    const { user,login } = useAuth({ middleware: 'guest' });
+  
     return (
-        <ThemeProvider>
-            <Head title="Best Sports App in E. Africa">
-                <meta charset="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            </Head>
-            {/* Add Google Tag Manager
-                <Script
-                dangerouslySetInnerHTML={{
-                __html: `
-                        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.defer=true;j.src=
-                            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                            })(window,document,'script','dataLayer','GTM-PPH2PX');
-                        `,
-                }}
-            /> */}
+            <ThemeProvider>
+                <Head title="Best Sports App in E. Africa">
+                    <meta charset="utf-8" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                </Head>
+                {/* Add Google Tag Manager
+                    <Script
+                    dangerouslySetInnerHTML={{
+                    __html: `
+                            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.defer=true;j.src=
+                                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                                })(window,document,'script','dataLayer','GTM-PPH2PX');
+                            `,
+                    }}
+                /> */}
 
-        {/* Twitter API 
-        <Script src="https://platform.twitter.com/widgets.js" async defer /> */}
-        <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"/>
-        <GlobalStyles/>
-        <NavWrapper user={user} logout={logout} login={login}>
-            <Component {...pageProps}/>
-        </NavWrapper>
-        </ThemeProvider>
+            {/* Twitter API 
+            <Script src="https://platform.twitter.com/widgets.js" async defer /> */}
+            <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"/>
+            <GlobalStyles/>
+            <QueryClientProvider client={queryClient}>
+                <Hydrate state={pageProps.dehydratedState}>
+                    <NavWrapper user={user} login={login}>
+                        <Provider store={store}>
+                            <Component user={user} {...pageProps}/>
+                        </Provider>
+                    </NavWrapper>
+                </Hydrate>
+            </QueryClientProvider>       
+            </ThemeProvider>
     )
 }
+ 
+ 
