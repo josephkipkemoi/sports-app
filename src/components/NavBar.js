@@ -264,7 +264,7 @@ const BottomNavBar = ({ user, login }) => {
                 <button className="btn btn-warning btn-sm">
                 <i className="bi bi-bell"></i>
                 </button>
-                <Link href="/profile" prefetch={true}>
+                <Link href="/profile" prefetch={false}>
                     <a 
                         itemProp="url"
                         className="btn btn-secondary btn-sm" 
@@ -277,7 +277,7 @@ const BottomNavBar = ({ user, login }) => {
                     </a>                
                                
                 </Link>
-                <Link href="/history" prefetch={true}>
+                <Link href="/history" prefetch={false}>
                     <a
                         itemProp="url"
                         className="btn btn-primary btn-sm"

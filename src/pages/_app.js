@@ -29,7 +29,7 @@ const GlobalStyles = createGlobalStyle`
  html, body {
     margin: 0;
     padding: 0;
-    font-family: 'Roboto Serif', serif;
+    font-family: 'Readex Pro', sans-serif;
     font-size: 14px;
     box-sizing: border-box;
     overflow-x: hidden;
