@@ -228,7 +228,7 @@ const StyleAuthenticated = styledComponents.div`
  
 const BottomNavBar = ({ user, login }) => {
  
-    const [isModalOpen, setModalOpen] = useState(false);
+    const [isModalOpen, setModalOpen] = useState(!!user);
 
     const [userDetails, setUserDetails] = useState({
         email: '',
@@ -245,8 +245,9 @@ const BottomNavBar = ({ user, login }) => {
     const loginUser = (e) => {
         e.preventDefault()
 
-        login({setErrors, setStatus, email, password})
+        login({setErrors, setStatus, email, password})     
     }
+
 
     const closeMenu = () => setModalOpen(false)
 
@@ -346,7 +347,6 @@ const BottomNavBar = ({ user, login }) => {
                                 >
                                 </Form.Control>
                             </Form.Group>                         
-
                             <Button 
                             id="modal-ref" 
                             style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 

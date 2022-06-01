@@ -49,6 +49,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
                 setErrors(Object.values(e.response.data.errors).flat())
             }) 
+        
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {

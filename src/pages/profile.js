@@ -23,7 +23,8 @@ export default function Profile({ user }) {
     const user_id = user && user.id;    
  
     const { data } = useGetBalanceByUserIdQuery(user_id)
-
+ 
+    
     const logoutUser = (e) => {
         e.preventDefault()
         logout()
