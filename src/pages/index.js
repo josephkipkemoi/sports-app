@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from '../components/Head';
 import styled from 'styled-components';
 import Row  from 'react-bootstrap/Row';
 import Col  from 'react-bootstrap/Col';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from 'next/link';
-import axios from 'axios';
 import OddsData from '../data/odds.json';
 import FixtureData from '../data/fixtures.json';
+import { useGetCustomFixturesQuery, useGetCustomOddsQuery, useGetFixturesQuery, useGetOddsFixtureQuery } from '../hooks/fixture';
+import useCustomFixture from '../hooks/customFixture';
+import useCustomOdds from '../hooks/odds';
 
 import  { 
   faStar, 
@@ -26,11 +28,11 @@ import  {
 
 
 import { 
-  H1, H5, Input, 
+  H1, H5, Input, Small, 
 } from '../components/Html';
-
-   
-
+import { usePostCustomFixtureQuery } from '../hooks/customFixture';
+import axios from 'axios';
+  
 const ThemedBody = styled('div')`
  background-color: #585858;
 
@@ -43,7 +45,7 @@ const StyleGameData = styled('div')`
 .custom-grid-box-main, .custom-grid-hide {
   background: ${props => props.theme.colors.headerColor};
   color: #c3c3c3;
-  margin-right: 6px;
+ 
 }
 .header {
   color: #c3c3c3;
@@ -84,34 +86,179 @@ overflow-x: hidden;
 export default function App( { data } ) {
 
   const { response } = OddsData;
-
-  const GameOdds = (data, i) => (
-         <div key={i} className="col custom-grid-box">           
-              <div className='header'> {data.value}</div>  
-              <button className='btn-custom'>{data.odd}</button>               
-         </div>
-  )
-
-  const GameTeamNames = ({teams: {home, away}}, i) => (
-    <div key={i}>
-      <span>{home.name}</span>
-      <span>{away.name}</span>
-    </div>
-  )
  
-  const GamesData = (data, i) => {
+ 
+  const Games = () => {
+    
+    const { postFixture } = useCustomFixture();
    
-    const bet365Odds = data.bookmakers.filter(({name}) => name === 'Bet365').map(data => data.bets)[0].filter(d => d.id === 1)[0].values;
+    const { data, error, isLoading } = useGetFixturesQuery();
+
+    if(isLoading) {
+      return <span>loading...</span>
+    }
+
+    if(error){
+      return <span>Error</span>
+    }
+
+    const { response } = data;
+
+    let fixtureIdData = []
+    let dateData = []
+    let countryData = []
+    let leagueNameData = []
+    let homeTeamData = []
+    let awayTeamData = []
+    let logoData = []
+
+    response.map(data => {
+       const { fixture: { id, date }, league: { country, name, logo }, teams: { away, home } } = data;
+
+       fixtureIdData.push(id)
+       dateData.push(date)
+       countryData.push(country)
+       leagueNameData.push(name)
+       homeTeamData.push(home.name)
+       awayTeamData.push(away.name)
+       logoData.push(logo)
+    })
  
+    const sendFixtureData = async (e) => {
+      e.preventDefault()
+      
+     postFixture({
+        'fixture_id': fixtureIdData,
+        'fixture_date': dateData,
+        'fixture_country': countryData,
+        'fixture_league_name': leagueNameData,
+        'fixture_logo': logoData,
+        'home_team': homeTeamData,
+        'away_team': awayTeamData
+      })
+ 
+    }
+ 
+    // return (
+    //   <>
+    //     <button onClick={sendFixtureData}>Click Me</button>
+    //   </>
+    // )
+   }
+ 
+   const GameElement = () => {
+    // const { getOdds } = useCustomOdds()
+    const { data, error, isLoading } = useGetCustomOddsQuery()
+    const fixture = useGetCustomFixturesQuery()
+
+    const [fixtureData, setFixtureData] = useState([])
+   
+    if(error)
+    {
+      return <span>Errors</span>
+    }
+
+    if(isLoading)
+    {
+      return <span>loading...</span>
+    }
+ 
+    let newMarket = []
+
+    if(fixture.status === 'fulfilled')
+    {
+      data.data.filter(([d]) => {
+        if(JSON.parse(fixture?.data?.fixture_id).indexOf(d?.fixture.id) !== -1)
+        {
+          const ids = JSON.parse(fixture?.data?.fixture_id).indexOf(d?.fixture.id) 
+          const home = JSON.parse(fixture?.data?.home_team)[ids] 
+          const away = JSON.parse(fixture?.data?.away_team)[ids] 
+     
+
+          let oddsMarket = {
+            home_team: home,
+            away_team: away,
+            league: d.league.name,
+            fixture_id: d.fixture.id,
+            market_odds: d.bookmakers
+          }
+  
+          newMarket.push(oddsMarket)
+        }
+         
+      })
+    }
+    const sendBetslip = (e)  => {
+      const homeTeam = e.target.getAttribute('home_team');
+      const awayTeam =  e.target.getAttribute('away_team');
+      const odds = e.target.getAttribute('odds');
+      const market = e.target.getAttribute('market'); 
+      const picked = e.target.getAttribute('picked');
+      console.log(homeTeam, awayTeam, odds, market, picked)
+    }
     return (
-    <Row key={i} className="custom-grid">     
-      <Col lg={8} sm={8} className="custom-grid-box-main">
-        <h5 className='header'>                 
-          {data.league.name}
-        </h5>
-        
-      </Col>
-       {bet365Odds.map(GameOdds)}    
+      <>
+        {newMarket.map((data,i) => {
+          return (
+            <React.Fragment key={i + data.league}>
+            <Col lg={8} sm={8} className="custom-grid-box-main">   
+              <h5 className='header'>{data.league}</h5>
+              <Row>
+                <Col lg={1} md={1} sm={1}>
+                  <Link href={`fixture/${data.fixture_id}`}>
+                  <a
+                    itemProp='url'
+                    className='text-decoration-none text-light'
+                    
+                  >
+                    <Small>
+                      {data.market_odds[0].bets.length}
+                      <i class="bi bi-arrow-right-short"></i>
+                    </Small>
+                  </a>
+                  </Link>  
+                </Col>
+                <Col>
+                  <span className='d-block'>{data.home_team}</span>
+                  <span className='d-block'>{data.away_team}</span>
+                </Col>
+                <Col></Col>
+              </Row>
+                     
+            </Col>
+            <Col lg={4} sm={4} className="d-flex">
+              {data.market_odds[0].bets.map(odd => {             
+                return odd.id === 1 && odd.values.map(val => {
+                   return (
+                     <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
+                        <span className='header text-center'>{val.value}</span>
+                  
+                        <button 
+                        className='btn-custom' 
+                        odds={val.odd} 
+                        home_team={data.home_team} 
+                        market={odd.name} 
+                        away_team={data.away_team} 
+                        picked={val.value}
+                        onClick={sendBetslip}>{val.odd}</button>
+                     </div>
+                   )
+                 })
+              })}
+            </Col>
+              <hr/>
+          </React.Fragment>
+          )
+          
+        })}
+      </>
+    )  
+  }
+
+  const GamesData = () => {
+    return (
+    <Row  className="custom-grid">     
+       <GameElement />
     </Row>
   )}
   return (
@@ -122,6 +269,9 @@ export default function App( { data } ) {
               description="Africa's Best Online Sports Betting App"
             />
             <main>
+            {/* <FixtureOdds/> */}
+             {/* <FixtureIdElement/> */}
+              {/* <Games/> */}
               <Row>
                
                   <Col lg={9} md={12} sm={12}>
@@ -129,8 +279,7 @@ export default function App( { data } ) {
                    <TopNavBar/>
                    <h2> Filter</h2>
                    <StyleGameData>
-                     {response.map(GamesData)}
-                    
+                      <GamesData/>
                    </StyleGameData>   
                    </StyledMain>            
                   </Col>
@@ -139,36 +288,12 @@ export default function App( { data } ) {
                    <Betslip/>
                   </Col>
               </Row>
-               
+              
             </main>
         </div>     
     </ThemedBody>
   );
 }
-
-// export async function getServerSideProps() {
-//   const options = {
-//     method: 'GET',
-//     url: 'https://api-football-v1.p.rapidapi.com/v3/fixtures?date=2022-05-24',
-//     params: {league: '492' , season: '2021'},
-//     headers: {
-//       'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
-//       'X-RapidAPI-Key': 'b2c138608fmsh6567bc9b793b465p1a4945jsnb15afccb7248'
-//     }
-//   };
-  
-//   const res = await axios.request(options)
- 
-//   axios.request(options).then(function ({data}) {
-   
-  
-//   }).catch(function (error) {
-//     console.error(error);
-//   });
-
-//   return { props: { data: res.data } }
-
-// }
 
 const StyleSideNav = styled.div`
 background-color: #383838;
@@ -336,7 +461,7 @@ const StyleBetslip = styled.div`
 `
 
 
-const Betslip = () => {
+export const Betslip = () => {
   return (
     <StyleBetslip className='mx-auto'>
       <div className='d-flex justify-content-between'>
@@ -359,7 +484,7 @@ const Betslip = () => {
             <Input className="form-control " placeholder="Bet Code"/>           
             </Col>
             <Col sm={4} md={4} className='text-center inpt-xsm' lg={4}>
-              <button className='btn btn-secondary  '>Add</button>
+              <button className='btn btn-secondary'>Add</button>
             </Col>           
           </Row>
          

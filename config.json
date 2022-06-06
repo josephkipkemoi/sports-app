@@ -3,5 +3,7 @@
     "MINIMUM_DEPOSIT_AMOUNT": 50,
     "MINIMUM_WITHDRAW_AMOUNT": 50,
     "MAXIMUM_WITHDRAW_AMOUNT": 140000,
-    "SPORTS_APP_KEY": "8afb3240-f39f-4bc6-b697-b2faacea3199"
+    "SPORTS_APP_KEY": "8afb3240-f39f-4bc6-b697-b2faacea3199",
+    "SPORTS_RADAR_HOST": "api-football-v1.p.rapidapi.com",
+    "SPORTS_RADAR_KEY": "b2c138608fmsh6567bc9b793b465p1a4945jsnb15afccb7248"
 }
