@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import { tw } from 'twin.macro';
 // import Script from "next/script";
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
@@ -65,7 +65,9 @@ export default function MyApp({ Component, pageProps }) {
     const [queryClient] = useState(() => new QueryClient())
 
     const { user,login } = useAuth({ middleware: 'guest' });
-  
+
+    
+    
     return (
             <ThemeProvider>
                 <Head title="Best Sports App in E. Africa">

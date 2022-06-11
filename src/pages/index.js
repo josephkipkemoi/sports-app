@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Head from '../components/Head';
 import styled from 'styled-components';
 import Row  from 'react-bootstrap/Row';
 import Col  from 'react-bootstrap/Col';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from 'next/link';
-import OddsData from '../data/odds.json';
-import FixtureData from '../data/fixtures.json';
 import { useGetCustomFixturesQuery, useGetCustomOddsQuery, useGetFixturesQuery, useGetOddsFixtureQuery } from '../hooks/fixture';
 import useCustomFixture from '../hooks/customFixture';
 import useCustomOdds from '../hooks/odds';
+import configData from '../../config.json';
 
 import  { 
   faStar, 
@@ -28,10 +27,14 @@ import  {
 
 
 import { 
-  H1, H5, Input, Small, 
+  H1, H5, Input, InputNumber, Small, Span, 
 } from '../components/Html';
 import { usePostCustomFixtureQuery } from '../hooks/customFixture';
-import axios from 'axios';
+import useCustomBetslip from '../hooks/customBetslip';
+import { useGetBetslipQuery } from '../hooks/betslip';
+import axios from '../lib/axios';
+import { useRouter } from 'next/router';
+import { useDispatch } from 'react-redux';
   
 const ThemedBody = styled('div')`
  background-color: #585858;
@@ -83,15 +86,24 @@ max-height: 100vh;
 overflow-y: scroll;
 overflow-x: hidden;
 `
-export default function App( { data } ) {
+ function App({ betslip  }) {
+  const [sessionId, setSesstionId] = useState('');
+  const [clicked, setClicked] = useState(false)
+  useEffect(() => {
 
-  const { response } = OddsData;
+    const currentSession = sessionStorage.getItem('session_id')
  
- 
+    if(!!currentSession === false) {
+      sessionStorage.setItem('session_id', Date.now())
+    }  
+    setSesstionId(currentSession)
+   
+  },[clicked])
+
   const Games = () => {
     
     const { postFixture } = useCustomFixture();
-   
+  
     const { data, error, isLoading } = useGetFixturesQuery();
 
     if(isLoading) {
@@ -123,10 +135,10 @@ export default function App( { data } ) {
        awayTeamData.push(away.name)
        logoData.push(logo)
     })
- 
     const sendFixtureData = async (e) => {
       e.preventDefault()
-      
+     
+
      postFixture({
         'fixture_id': fixtureIdData,
         'fixture_date': dateData,
@@ -137,22 +149,26 @@ export default function App( { data } ) {
         'away_team': awayTeamData
       })
  
+        
     }
  
-    // return (
-    //   <>
-    //     <button onClick={sendFixtureData}>Click Me</button>
-    //   </>
-    // )
+  
+    return (
+      <>
+        <button onClick={sendFixtureData}>Click Me</button>
+      </>
+    )
    }
  
    const GameElement = () => {
+    const { postBetslip } = useCustomBetslip()
     // const { getOdds } = useCustomOdds()
+ 
     const { data, error, isLoading } = useGetCustomOddsQuery()
     const fixture = useGetCustomFixturesQuery()
-
+ 
     const [fixtureData, setFixtureData] = useState([])
-   
+ 
     if(error)
     {
       return <span>Errors</span>
@@ -167,14 +183,16 @@ export default function App( { data } ) {
 
     if(fixture.status === 'fulfilled')
     {
+  
       data.data.filter(([d]) => {
+        
         if(JSON.parse(fixture?.data?.fixture_id).indexOf(d?.fixture.id) !== -1)
         {
           const ids = JSON.parse(fixture?.data?.fixture_id).indexOf(d?.fixture.id) 
           const home = JSON.parse(fixture?.data?.home_team)[ids] 
           const away = JSON.parse(fixture?.data?.away_team)[ids] 
      
-
+      
           let oddsMarket = {
             home_team: home,
             away_team: away,
@@ -182,20 +200,32 @@ export default function App( { data } ) {
             fixture_id: d.fixture.id,
             market_odds: d.bookmakers
           }
-  
+        
           newMarket.push(oddsMarket)
         }
          
       })
     }
-    const sendBetslip = (e)  => {
+
+    const sendBetslip = async (e)  => {
       const homeTeam = e.target.getAttribute('home_team');
       const awayTeam =  e.target.getAttribute('away_team');
       const odds = e.target.getAttribute('odds');
       const market = e.target.getAttribute('market'); 
       const picked = e.target.getAttribute('picked');
-      console.log(homeTeam, awayTeam, odds, market, picked)
+      const fixtureId = e.target.getAttribute('fixtureid');
+
+      postBetslip({
+        fixture_id: fixtureId+sessionId,
+        session_id: sessionId,
+        betslip_teams: homeTeam + ' v ' + awayTeam,
+        betslip_market: market,
+        betslip_picked: picked,
+        betslip_odds: odds 
+      })
+      setClicked(prev => !prev)
     }
+
     return (
       <>
         {newMarket.map((data,i) => {
@@ -213,7 +243,7 @@ export default function App( { data } ) {
                   >
                     <Small>
                       {data.market_odds[0].bets.length}
-                      <i class="bi bi-arrow-right-short"></i>
+                      <i className="bi bi-arrow-right-short"></i>
                     </Small>
                   </a>
                   </Link>  
@@ -231,8 +261,7 @@ export default function App( { data } ) {
                 return odd.id === 1 && odd.values.map(val => {
                    return (
                      <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
-                        <span className='header text-center'>{val.value}</span>
-                  
+                        <span className='header text-center'>{val.value}</span>                 
                         <button 
                         className='btn-custom' 
                         odds={val.odd} 
@@ -240,7 +269,9 @@ export default function App( { data } ) {
                         market={odd.name} 
                         away_team={data.away_team} 
                         picked={val.value}
-                        onClick={sendBetslip}>{val.odd}</button>
+                        fixtureid={data.fixture_id}
+                        onClick={sendBetslip}
+                        >{val.odd}</button>
                      </div>
                    )
                  })
@@ -269,9 +300,7 @@ export default function App( { data } ) {
               description="Africa's Best Online Sports Betting App"
             />
             <main>
-            {/* <FixtureOdds/> */}
-             {/* <FixtureIdElement/> */}
-              {/* <Games/> */}
+              <Games/>
               <Row>
                
                   <Col lg={9} md={12} sm={12}>
@@ -285,7 +314,7 @@ export default function App( { data } ) {
                   </Col>
                  
                   <Col lg={3} md={12} sm={12}>
-                   <Betslip/>
+                   <Betslip session_id={sessionId} clicked={clicked}/>
                   </Col>
               </Row>
               
@@ -460,35 +489,209 @@ const StyleBetslip = styled.div`
   }
 `
 
-
-export const Betslip = () => {
-  return (
-    <StyleBetslip className='mx-auto'>
-      <div className='d-flex justify-content-between'>
-        <H5>BETSLIP</H5>
-        <i className="bi bi-three-dots-vertical text-light"></i>
-      </div>
-      <hr />
-  
-        <div className='betslip-child'>
+const StyleBetCart = styled.div`
+  color: #fff;
+  margin-bottom: 24px;
+  .share-btn {
+    border: none;
+    color: #0f0f0f;
+    background-color: #fff;
+  }
+  .close-btn {
+    border: none;
+    background: none;
+    color: #fff;
+  }
+  .custom-input {
+    width: 82px;
+    text-align: center;
+    border-radius: 0px;
+    border-left: 1px solid; 
+    border-right: 1px solid;
+  }
+  .custom-sm-btn {
+    border: none;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    color: #000;
+  }
+  .custom-sm-btn-right {
+    border: none;
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+    color: #000;
+  }
+ .position-tooltip {
+   right: 55px;
+   background: #fff;
+   border-radius: 6px;
+   width: auto;
+   color: #000;
+   padding-top: 5px;
+   padding-bottom: 3px;
+   padding-right: 3px;
+   padding-left: 3px;
+   margin-bottom: 85px;
+ }
+ .close-tooltip {
+   display: none;
+ }
+ .custom-label {
+   padding: 4px;
+   font-weight: bolder;
+ }
+`
+const BetslipCart = ({ data }) => {
+ 
+  const EmptyCart = () => {
+     return (
+       <>
+         <div className='d-flex justify-content-between'>
+          <H5>BETSLIP</H5>
+          <i className="bi bi-three-dots-vertical text-light"></i>
+        </div>
+        <hr />
+      <div className='betslip-child'>
         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" className="bi bi-app-indicator text-muted d-block mx-auto m-3" viewBox="0 0 16 16">
           <path d="M5.5 2A3.5 3.5 0 0 0 2 5.5v5A3.5 3.5 0 0 0 5.5 14h5a3.5 3.5 0 0 0 3.5-3.5V8a.5.5 0 0 1 1 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-5A4.5 4.5 0 0 1 1 10.5v-5A4.5 4.5 0 0 1 5.5 1H8a.5.5 0 0 1 0 1H5.5z"/>
           <path d="M16 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
         </svg>
-          <span className='d-block fw-bold text-center'>You have not selected any bet</span>
-          <span className='d-block text-center'>Make your first pick to start playing.</span>
+        <span className='d-block fw-bold text-center'>You have not selected any bet</span>
+        <span className='d-block text-center'>Make your first pick to start playing.</span>
+        <hr/>
+        <span className='d-block m-3'>Or introduce your bet code:</span>
+        <Row className='m-1 align-items-center'>
+          <Col sm={8} md={8} lg={8} className="inpt-xsm">
+          <Input className="form-control " placeholder="Bet Code"/>           
+          </Col>
+          <Col sm={4} md={4} className='text-center inpt-xsm' lg={4}>
+            <button className='btn btn-secondary'>Add</button>
+          </Col>           
+        </Row>
+    </div>
+       </>
+     )
+  }
+
+  const BetCart = () => {
+  
+    const [betAmount, setBetAmount] = useState(50);
+
+    const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
+
+    const decrementBetAmount = () => {
+      if(betAmount <= 50) {
+        return
+      }
+      setBetAmount(prev => prev -= configData.INCREMENT_DECREMENT_AMOUNT)
+    }
+
+    const updateBetAmount = (e) => {
+      const amount = Number(e.target.value);
+      setBetAmount(amount)
+    }
+ 
+    const BetCartElements = (link, i) => {
+
+    
+      return (
+        <React.Fragment key={i}>
+          <div className='d-flex align-items-center justify-content-between'>
+            <div className='mt-2'>
+                <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
+                <Small>{link.betslip_teams}</Small>
+            </div>
+            <button className='close-btn fw-bold'>x</button>
+          </div>
+          <Small>{link.betslip_market}</Small>
+          <div className='d-flex align-items-center justify-content-between'>      
+              <Small>Your Pick: {link.betslip_picked}</Small>
+              <Small className='fw-bold'>{link.betslip_odds}</Small>
+          </div>
           <hr/>
-          <span className='d-block m-3'>Or introduce your bet code:</span>
-          <Row className='m-1 align-items-center'>
-            <Col sm={8} md={8} lg={8} className="inpt-xsm">
-            <Input className="form-control " placeholder="Bet Code"/>           
-            </Col>
-            <Col sm={4} md={4} className='text-center inpt-xsm' lg={4}>
-              <button className='btn btn-secondary'>Add</button>
-            </Col>           
-          </Row>
-         
+       
+        </React.Fragment>
+      )
+    }
+ 
+    return (
+      <StyleBetCart>
+        <div className='d-flex align-items-center justify-content-between p-2 bg-secondary'>
+          {data.data.length > 1 ? <h6>Multi Bet ({data.data.length})</h6> : <h6>Single Bet ({data.data.length})</h6>} 
+          <div className='btn btn-light btn-sm text-dark'>
+            <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
+            <button className='share-btn'>Share</button>
+          </div>         
         </div>
+      
+        {data.data.map(BetCartElements)}
+
+           <div className='d-flex align-items-center justify-content-between'>
+              <Small>Total Odds:</Small>
+              <Small className='fw-bold'>10.00</Small>
+          </div>
+          <div className='d-flex align-items-center justify-content-between'>
+          <Small>Amount (Kshs)</Small>
+          <div className='d-flex'>
+            <button className='custom-sm-btn fw-bold' onClick={decrementBetAmount}>-</button>
+            <InputNumber 
+            className="form-control custom-input" 
+            value={betAmount} 
+            onChange={updateBetAmount}
+            />
+            <button className='custom-sm-btn-right fw-bold' onClick={incrementBetAmount}>+</button>
+          </div>
+          <div className={`position-absolute position-tooltip ${betAmount >= 50 ? 'close-tooltip' : ''}`}>
+            <i 
+            className="bi bi-info bg-secondary text-light fw-bold rounded-circle custom-label" 
+            style={{ marginRight: '3px' }}></i>
+            <Small>Minimum stake <b className='fw-bold'>Ks 50.00</b></Small>
+          </div>
+        </div>
+
+        <div className='d-flex align-items-center justify-content-between'>
+            <Small>Possible Payout (Kshs):</Small>
+            <Small className='fw-bold text-warning'>1000.00</Small>
+        </div>
+        <div className='d-flex align-items-center justify-content-between'>
+          <button className='btn btn-danger btn-sm text-light w-100' style={{ marginRight: '3px' }}>REMOVE ALL</button>
+          <button className='btn btn-light btn-sm text-dark w-100'>PLACE BET</button>
+        </div>
+
+      </StyleBetCart>
+    ) 
+  }
+
+  return (
+    <>
+      {data?.data?.length > 0 ? <BetCart/> : <EmptyCart/>}      
+    </>
+  )
+}
+
+export const Betslip = ({ session_id, clicked }) => {
+  const [slip, setSlip] = useState([])
+
+  useEffect(() => {
+      axios.get(`api/betslips/${session_id}`)
+                       .then(d => setSlip(d.data))
+                       .catch(e => console.error(e.message))
+
+  },[clicked])
+ 
+  const { data, error, isLoading } =  useGetBetslipQuery(session_id)
+
+  if(error){
+    return <span>Error</span>
+  }
+
+  if(isLoading) {
+    return <span>Loading...</span>
+  }
+
+  return (
+    <StyleBetslip className='mx-auto'>
+      <BetslipCart data={slip}/>
       <AddedFeatures/>
       <Offers/>
     </StyleBetslip>
@@ -516,6 +719,7 @@ svg {
 `
 
 const AddedFeatures = () => {
+  
   return (
     <StyledFeatures>
       <h5>
@@ -573,3 +777,17 @@ const Offers = () => {
     </StyledFeatures>
   )
 }
+
+
+export async function getStaticProps() {
+  
+
+  return {
+    props: {
+      betslip:  'L'
+ 
+    }
+  }
+}
+
+export default App;
