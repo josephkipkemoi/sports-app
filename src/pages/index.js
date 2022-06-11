@@ -101,6 +101,20 @@ overflow-x: hidden;
    
   },[clicked])
 
+  const removeBetslipCart = () => {
+    const sessionId = sessionStorage.getItem('session_id') 
+    axios.delete(`api/betslips/sessions/${sessionId}`)  
+    setClicked(prev => !prev)
+  }
+
+  const removeSingleBetslipFixture = (fixture_id) => {
+ 
+    const res = axios.delete(`api/betslips/fixtures/${fixture_id}`)
+ 
+    setClicked(prev => !prev)
+  
+  }
+
   const Games = () => {
     
     const { postFixture } = useCustomFixture();
@@ -226,6 +240,7 @@ overflow-x: hidden;
       })
       setClicked(prev => !prev)
     }
+ 
 
     return (
       <>
@@ -315,7 +330,12 @@ overflow-x: hidden;
                   </Col>
                  
                   <Col lg={3} md={12} sm={12}>
-                   <Betslip session_id={sessionId} clicked={clicked}/>
+                   <Betslip 
+                   session_id={sessionId} 
+                   clicked={clicked} 
+                   removeBetslipCart={removeBetslipCart} 
+                   removeSingleBetslipFixture={removeSingleBetslipFixture}
+                   />
                   </Col>
               </Row>
               
@@ -542,8 +562,12 @@ const StyleBetCart = styled.div`
    font-weight: bolder;
  }
 `
-const BetslipCart = ({ data , odds_total }) => {
+const BetslipCart = ({ data , odds_total, removeBetslipCart, removeSingleBetslipFixture }) => {
  
+  const postBetslipCart = (e) => {
+    e.preventDefault()        
+  } 
+
   const EmptyCart = () => {
      return (
        <>
@@ -596,9 +620,10 @@ const BetslipCart = ({ data , odds_total }) => {
 
     const possibleWin = betAmount * odds_total
 
-    const BetCartElements = (link, i) => {
 
-    
+    const BetCartElements = (link, i) => {
+      const fixId = String(link.fixture_id).slice(0,6) + link.session_id 
+ 
       return (
         <React.Fragment key={i}>
           <div className='d-flex align-items-center justify-content-between'>
@@ -606,7 +631,12 @@ const BetslipCart = ({ data , odds_total }) => {
                 <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
                 <Small>{link.betslip_teams}</Small>
             </div>
-            <button className='close-btn fw-bold'>x</button>
+            <button 
+            className='close-btn fw-bold'
+            onClick={() => removeSingleBetslipFixture(fixId)}
+            >
+              x
+            </button>
           </div>
           <Small>{link.betslip_market}</Small>
           <div className='d-flex align-items-center justify-content-between'>      
@@ -661,11 +691,18 @@ const BetslipCart = ({ data , odds_total }) => {
             </Small>
         </div>
         <div className='d-flex align-items-center justify-content-between'>
-          <button className='btn btn-danger btn-sm text-light w-100' style={{ marginRight: '3px' }}>
+          <button 
+          className='btn btn-danger btn-sm text-light w-100' 
+          style={{ marginRight: '3px' }}
+          onClick={() => removeBetslipCart()}
+          >
             REMOVE ALL
           </button>
-          {}
-          <button className='btn btn-light btn-sm text-dark w-100' disabled={!user}>
+          <button 
+          className='btn btn-light btn-sm text-dark w-100' 
+          disabled={!user}
+          onClick={postBetslipCart}
+          >
             PLACE BET
           </button>
         </div>
@@ -681,7 +718,7 @@ const BetslipCart = ({ data , odds_total }) => {
   )
 }
 
-export const Betslip = ({ session_id, clicked }) => {
+export const Betslip = ({ session_id, clicked, removeBetslipCart, removeSingleBetslipFixture }) => {
   const [slip, setSlip] = useState([])
   const [oddsTotal, setOddsTotal] = useState(0)
 
@@ -718,7 +755,12 @@ export const Betslip = ({ session_id, clicked }) => {
 
   return (
     <StyleBetslip className='mx-auto'>
-      <BetslipCart data={slip} odds_total={oddsTotal}/>
+      <BetslipCart 
+      data={slip} 
+      odds_total={oddsTotal} 
+      removeBetslipCart={removeBetslipCart}
+      removeSingleBetslipFixture={removeSingleBetslipFixture}
+      />
       <AddedFeatures/>
       <Offers/>
     </StyleBetslip>
