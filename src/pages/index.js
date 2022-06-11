@@ -35,6 +35,7 @@ import { useGetBetslipQuery } from '../hooks/betslip';
 import axios from '../lib/axios';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
+import useAuth from '../hooks/auth';
   
 const ThemedBody = styled('div')`
  background-color: #585858;
@@ -541,7 +542,7 @@ const StyleBetCart = styled.div`
    font-weight: bolder;
  }
 `
-const BetslipCart = ({ data }) => {
+const BetslipCart = ({ data , odds_total }) => {
  
   const EmptyCart = () => {
      return (
@@ -574,7 +575,9 @@ const BetslipCart = ({ data }) => {
   }
 
   const BetCart = () => {
-  
+
+    const { user } = useAuth({ middleware: 'guest' })
+
     const [betAmount, setBetAmount] = useState(50);
 
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
@@ -585,12 +588,14 @@ const BetslipCart = ({ data }) => {
       }
       setBetAmount(prev => prev -= configData.INCREMENT_DECREMENT_AMOUNT)
     }
-
+    
     const updateBetAmount = (e) => {
       const amount = Number(e.target.value);
-      setBetAmount(amount)
+      setBetAmount(amount)   
     }
- 
+
+    const possibleWin = betAmount * odds_total
+
     const BetCartElements = (link, i) => {
 
     
@@ -628,7 +633,7 @@ const BetslipCart = ({ data }) => {
 
            <div className='d-flex align-items-center justify-content-between'>
               <Small>Total Odds:</Small>
-              <Small className='fw-bold'>10.00</Small>
+              <Small className='fw-bold'>{odds_total}</Small>
           </div>
           <div className='d-flex align-items-center justify-content-between'>
           <Small>Amount (Kshs)</Small>
@@ -651,11 +656,18 @@ const BetslipCart = ({ data }) => {
 
         <div className='d-flex align-items-center justify-content-between'>
             <Small>Possible Payout (Kshs):</Small>
-            <Small className='fw-bold text-warning'>1000.00</Small>
+            <Small className='fw-bold text-warning'>
+              {Number(possibleWin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </Small>
         </div>
         <div className='d-flex align-items-center justify-content-between'>
-          <button className='btn btn-danger btn-sm text-light w-100' style={{ marginRight: '3px' }}>REMOVE ALL</button>
-          <button className='btn btn-light btn-sm text-dark w-100'>PLACE BET</button>
+          <button className='btn btn-danger btn-sm text-light w-100' style={{ marginRight: '3px' }}>
+            REMOVE ALL
+          </button>
+          {}
+          <button className='btn btn-light btn-sm text-dark w-100' disabled={!user}>
+            PLACE BET
+          </button>
         </div>
 
       </StyleBetCart>
@@ -671,11 +683,26 @@ const BetslipCart = ({ data }) => {
 
 export const Betslip = ({ session_id, clicked }) => {
   const [slip, setSlip] = useState([])
+  const [oddsTotal, setOddsTotal] = useState(0)
+
+  const fetchBetslips = () => {
+    axios
+      .get(`api/betslips/${session_id}`)
+      .then(d => setSlip(d.data))
+      .catch(e => console.error(e.message))
+  }
+
+  const fetchBetslipOddsTotal = () => {
+    axios
+      .get(`api/betslips/sessions/${session_id}/odds-total`)
+      .then(d => setOddsTotal(Number(d.data.odds_total).toFixed(2)))
+      .catch(e => console.error(e.message))
+  }
 
   useEffect(() => {
-      axios.get(`api/betslips/${session_id}`)
-                       .then(d => setSlip(d.data))
-                       .catch(e => console.error(e.message))
+      
+    fetchBetslips()
+    fetchBetslipOddsTotal()
 
   },[clicked])
  
@@ -691,7 +718,7 @@ export const Betslip = ({ session_id, clicked }) => {
 
   return (
     <StyleBetslip className='mx-auto'>
-      <BetslipCart data={slip}/>
+      <BetslipCart data={slip} odds_total={oddsTotal}/>
       <AddedFeatures/>
       <Offers/>
     </StyleBetslip>
@@ -778,16 +805,5 @@ const Offers = () => {
   )
 }
 
-
-export async function getStaticProps() {
-  
-
-  return {
-    props: {
-      betslip:  'L'
- 
-    }
-  }
-}
 
 export default App;
