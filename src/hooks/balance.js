@@ -21,3 +21,4 @@ export const BalanceApi = createApi({
 export const {
     useGetBalanceByUserIdQuery
 } = BalanceApi
+

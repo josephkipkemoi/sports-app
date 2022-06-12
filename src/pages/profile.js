@@ -1,5 +1,5 @@
 import Link from "next/link"
-import React from "react"
+import React, { useState } from "react"
 import { Button, Container } from "react-bootstrap"
 import styled from "styled-components"
 import useAuth from "../hooks/auth"
@@ -10,6 +10,7 @@ import {
     Span,
     Small 
 } from "../components/Html";
+import axios from "../lib/axios"
 
 const StyleProfile = styled.div`
     background-color: #ebeded;
@@ -53,7 +54,7 @@ export default function Profile({ user }) {
                
                 
                 <BalanceComponent data={data}/>
-                <DepositComponent/>
+                <DepositComponent userId={user_id}/>
                 <WithdrawComponent/>
 
                 <div className="p-4">
@@ -112,19 +113,100 @@ const BalanceComponent = ({ data }) => {
     )
 }
 
-const DepositComponent = () => {
+const DepositComponent = ({ userId }) => {
 
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
 
+    const [depositAmount, setDepositAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
+
+    const updateDepositAmount = (e) => {
+        e.preventDefault()
+        const depositAmt = Number(e.target.value)
+        setDepositAmount(depositAmt)
+    }
+
+    const incrementDepositAmount = (e) => {
+        const incrementAmt = Number(e.target.getAttribute('inc'))
+        
+        if(incrementAmt === 100) {
+          setDepositAmount(depositAmount + configData.INCREMENT_DEPOSIT_100)
+        }
+        if(incrementAmt === 250) {
+          setDepositAmount(depositAmount + configData.INCREMENT_DEPOSIT_250)
+        }
+        if(incrementAmt === 500) {
+          setDepositAmount(depositAmount + configData.INCREMENT_DEPOSIT_500)
+        }
+        if(incrementAmt === 1000) {
+          setDepositAmount(depositAmount + configData.INCREMENT_DEPOSIT_1000)
+        }
+        if(incrementAmt === 5000) {
+          setDepositAmount(depositAmount + configData.INCREMENT_DEPOSIT_5000)
+        }
+      }
+
+    const depositAmountToDb = () => {
+       const res = axios.post(`api/users/${userId}/balance`, {
+        'amount': depositAmount
+       } ,{
+            headers: {
+                'x-sportsapp-key': configData.SPORTS_APP_KEY
+            }        
+        })
+    console.log(res)
+    }
+    
     return (
         <div className="shadow-sm p-4 mb-4">
             <h5>Deposit</h5>
-            <Span>Send money into your {APP_NAME} account</Span>
-            <InputNumber className="d-block form-control p-3" placeholder="Enter amount"/>
+            <Span className="d-block">Send money into your {APP_NAME} account</Span>
+            <button 
+            inc={configData.INCREMENT_DEPOSIT_100} 
+            onClick={incrementDepositAmount} modalId="modal-ref" 
+            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+            >
+              + {configData.INCREMENT_DEPOSIT_100}
+            </button>       
+            <button 
+            inc={configData.INCREMENT_DEPOSIT_250} 
+            modalId="modal-ref" 
+            onClick={incrementDepositAmount} 
+            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+            >
+              + {configData.INCREMENT_DEPOSIT_250}
+            </button>       
+            <button 
+            inc={configData.INCREMENT_DEPOSIT_500} 
+            modalId="modal-ref" 
+            onClick={incrementDepositAmount} 
+            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+            >
+              + {configData.INCREMENT_DEPOSIT_500}
+            </button>       
+            <button 
+            inc={configData.INCREMENT_DEPOSIT_1000} 
+            modalId="modal-ref" 
+            onClick={incrementDepositAmount} 
+            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+            >
+              + {configData.INCREMENT_DEPOSIT_1000}
+            </button>      
+            <button 
+            inc={configData.INCREMENT_DEPOSIT_5000} 
+            modalId="modal-ref" onClick={incrementDepositAmount} 
+            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+            >
+              + {configData.INCREMENT_DEPOSIT_5000}
+            </button>     
+            <InputNumber 
+            className="d-block form-control p-3" 
+            value={depositAmount}
+            onChange={updateDepositAmount}
+            />
             <Small className="d-block text-danger">
                 Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Small>
-            <Button variant="warning">
+            <Button variant="warning" onClick={depositAmountToDb}>
                 Deposit
             </Button>
         </div>

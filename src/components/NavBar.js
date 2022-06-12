@@ -322,12 +322,12 @@ const BottomNavBar = ({ user, login }) => {
                 {bottomNavLinks.map(BottomNavLinkItem)}
             </div>           
         </nav>
-             <Modal show={isModalOpen} className="mt-5 pt-5">
-                 <Modal.Body id="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
-                        <Form id="modal-ref">
-                            <Form.Group id="modal-ref" className="mb-3">
+             <Modal show={isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
+                 <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+                        <Form modalId="modal-ref">
+                            <Form.Group modalId="modal-ref" className="mb-3">
                                 <Form.Control 
-                                id="modal-ref" 
+                                modalId="modal-ref" 
                                 name="email"
                                 type="email" 
                                 className="shadow-sm p-3" 
@@ -336,9 +336,9 @@ const BottomNavBar = ({ user, login }) => {
                                 >
                                 </Form.Control>
                             </Form.Group>
-                            <Form.Group id="modal-ref" className="mb-3">
+                            <Form.Group modalId="modal-ref" className="mb-3">
                                 <Form.Control 
-                                id="modal-ref" 
+                                modalId="modal-ref" 
                                 name="password"
                                 type="password" 
                                 className="shadow-sm p-3" 
@@ -348,7 +348,7 @@ const BottomNavBar = ({ user, login }) => {
                                 </Form.Control>
                             </Form.Group>                         
                             <Button 
-                            id="modal-ref" 
+                            modalId="modal-ref" 
                             style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 
                             className="w-100 p-3 mb-3 fw-bold shadow-sm" 
                             type="submit"
