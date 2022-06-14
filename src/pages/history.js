@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import Container from 'react-bootstrap/Container';
 import styled from 'styled-components';
 import { Span } from '../components/Html';
 import useAuth from '../hooks/auth';
 import axios from '../lib/axios';
 
 const StyledHistory = styled.div`
-    background-color: #fff;
+    background-color: #ebeded;
     height: 100vh;
+    .history-header {
+        padding-top: 40px;
+    }
 `
 export default function History() {
 
@@ -18,14 +22,12 @@ export default function History() {
             const response = await axios.get(`api/users/${user.id}/betslips`)
             setHistory(response?.data?.data)
         }
-
     }
 
     const BetHistoryElements = (name, i) => {
         const FixtureElements = (link, ii) => {
-            console.log(link)
             return (
-                <React.Fragment key={ii}>
+                <React.Fragment key={ii} >
                     <div>
                         <Span>Teams: </Span>
                         <Span>{link.betslip_teams}</Span>
@@ -81,8 +83,26 @@ export default function History() {
 
     return (
         <StyledHistory>
-            <h1>History</h1>
-            {history.map(BetHistoryElements)}            
+            <Container>
+                <div className='history-header mb-3'>
+                    <button className='btn btn-secondary btn-sm rounded-pill d-block'>
+                    All
+                    <i className="bi bi-caret-down" style={{ marginLeft: 20 }}></i>
+                    </button>
+                </div>
+         
+            {!!history.length ? history.map(BetHistoryElements): <NoBetslipHistory/>} 
+            </Container>                      
         </StyledHistory>
+    )
+}
+
+const NoBetslipHistory = () => {
+    return (
+        <>
+        <div className="text-center mt-5">
+            <Span>You do not have any sportsbook bets</Span>
+        </div>
+        </>
     )
 }
