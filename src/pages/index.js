@@ -592,13 +592,15 @@ export const Betslip = ({ session_id, clicked, removeBetslipCart, removeSingleBe
   }
 
   const getBalance = async () => {
-    const res = await axios.get(`api/users/${user?.id}/balance`, {
-      headers: {
-        'x-sportsapp-key': configData.SPORTS_APP_KEY
-      }
-    })
-
-    setBalance(res?.data?.amount)
+    if(!!user) {
+      const res = await axios.get(`api/users/${user?.id}/balance`, {
+        headers: {
+          'x-sportsapp-key': configData.SPORTS_APP_KEY
+        }
+      })
+  
+      setBalance(res?.data?.amount)
+    }  
   }
 
   useEffect(() => {
