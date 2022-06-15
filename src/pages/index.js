@@ -728,6 +728,7 @@ export const Betslip = ({ data, clicked }) => {
       setBetAmount(Number(e.target.value));  
     }
     const removeBetslipCart = () => {
+      const sessionId = sessionStorage.getItem('session_id')
       axios.delete(`api/betslips/sessions/${sessionId}`)  
       setClicked(prev => !prev)
     }
@@ -784,7 +785,7 @@ export const Betslip = ({ data, clicked }) => {
               <Small className='fw-bold'>{oddsTotal}</Small>
          </div>
         }
-        {!!user ? 
+        {!!user && slip?.data?.length !== 0 ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
             <Small>Balance:</Small>
             <Small className='fw-bold'>
@@ -802,6 +803,8 @@ export const Betslip = ({ data, clicked }) => {
           </div>
           : ''
         }
+         {slip?.data?.length !== 0 &&
+         <>
          <div className='d-flex align-items-center justify-content-between'>
           <Small>Amount (Kshs)</Small>
           <div className='d-flex'>
@@ -853,6 +856,8 @@ export const Betslip = ({ data, clicked }) => {
               PLACE BET
             </button>
         </div>
+        </>
+        }
         </>
     )
   }
