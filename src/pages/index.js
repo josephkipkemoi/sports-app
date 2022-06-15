@@ -690,13 +690,7 @@ export const Betslip = ({ data, clicked }) => {
   
     return (
       <React.Fragment key={i}>
-         <div className='d-flex align-items-center justify-content-between p-2 bg-secondary'>
-          {slip?.data?.length > 1 ? <h6>Multi Bet ({slip?.data?.length})</h6> : <h6>Single Bet ({slip?.data?.length})</h6>} 
-          <div className='btn btn-light btn-sm text-dark'>
-            <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
-            <button className='share-btn'>Share</button>
-          </div>         
-        </div>
+        
         <div className='d-flex align-items-center justify-content-between'>
           <div className='mt-2'>
               <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
@@ -874,6 +868,17 @@ export const Betslip = ({ data, clicked }) => {
   return (
     <StyleBetslip className='mx-auto'>
       <StyleBetCart>
+      {slip?.data?.length !== 0 &&
+      <div className='d-flex align-items-center justify-content-between p-2 bg-secondary'>
+      {slip?.data?.length > 1 ? <h6>Multi Bet ({slip?.data?.length})</h6> : <h6>Single Bet ({slip?.data?.length})</h6>} 
+      <div className='btn btn-light btn-sm text-dark'>
+        <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
+        <button className='share-btn'>Share</button>
+      </div>         
+    </div>
+
+      
+      }
         
         {slip?.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
         {slip?.data?.length === 0 && <EmptyCart/>}
