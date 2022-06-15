@@ -560,8 +560,17 @@ const StyleSpinner = styled.div`
 export const Betslip = ({ data, clicked }) => {
   const [slip, setSlip] = useState([])
   const [oddsTotal, setOddsTotal] = useState(0)
-  const [finalPayout, setFinalPayout] = useState(0)
+  const [balance, setBalance] = useState(0)
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false);
+  const [clickedd, setClicked] = useState(false)
   const { user } = useAuth({ middleware: 'guest' })
+  const linkBarRef = React.useRef();
+  const congratulationsLinkBarRef = React.useRef();
+
+  const closeMenu = () => setModalOpen(false)
+  const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
+
   const fetchBetslips = (session) => {
     axios
       .get(`api/betslips/${session}`)
@@ -577,7 +586,66 @@ export const Betslip = ({ data, clicked }) => {
       .catch(e => console.error(e.message))
   }
   
+  const getBalance = async () => {
+    if(!!user) {
+      const res = await axios.get(`api/users/${user?.id}/balance`, {
+        headers: {
+          'x-sportsapp-key': configData.SPORTS_APP_KEY
+        }
+      })
+  
+      setBalance(res?.data?.amount)
+    }  
+    }
 
+  const BalanceModal = () => {
+    return (
+      <Modal show={isModalOpen} className="mt-5 pt-5">
+        <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+           <Span modalId="modal-ref" className='fw-bold p-2 d-block mb-2' onClick={closeMenu} style={{ cursor: 'pointer', width: 32 }}>X</Span>  
+           <div className='m-3' modalId="modal-ref">
+            <span className='fw-bold d-block mb-2' modalId="modal-ref">Insufficient Funds</span>    
+            <span modalId="modal-ref" className='alert alert-danger d-block' style={{ padding: 5 }} >
+              Your current balance is too low to place this bet. Deposit now.              
+            </span>
+            <div className='alert alert-secondary'>
+              <p>|--- GO TO LIPA NA MPESA</p>     
+              <p>|--- ENTER PAYBILL BUSINESS NO.: <b>123123</b></p>
+              <p>|--- ENTER ACCOUNT NO.: <b>0{user?.phone_number}</b></p>
+              <p>|--- ENTER AMOUNT & SEND</p>
+              <p>|--- ONCE YOU RECEIVE MPESA NOTIFICATION, GO AHEAD AND PLACE YOUR BET</p>
+            </div>            
+           </div>   
+        </Modal.Body>                            
+     </Modal>
+    )
+  }
+
+  const CongratulationModal = () => {
+    return (
+      <Modal show={isCongratulationModalOpen} className="mt-5 pt-5">
+      <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+        <Span 
+        modalId="modal-ref" 
+        className='fw-bold p-2 d-block mb-2' 
+        onClick={closeCongratulationsMenu} 
+        style={{ cursor: 'pointer', width: 32 }}
+        >
+          X
+        </Span>  
+        <h1 modalId="modal-ref">Congratulations Bet placed</h1>
+        <Link href='/history'>
+          <a
+            itemProp='url'
+            className='btn btn-warning btn-sm fw-bold'
+          >
+            View History
+          </a>
+        </Link>
+      </Modal.Body>                            
+   </Modal>
+    )
+  }
 
   const EmptyCart = () => {
     return (
@@ -612,9 +680,23 @@ export const Betslip = ({ data, clicked }) => {
   const CartElements = (link, i) => {
  
    const fixId = String(link.fixture_id).slice(0,6) + link.session_id 
+   const removeSingleBetslipFixture = (fixture_id) => {
+   
+    axios.delete(`api/betslips/fixtures/${fixture_id}`)
  
+    setClicked(prev => !prev)
+  
+  }
+  
     return (
       <React.Fragment key={i}>
+         <div className='d-flex align-items-center justify-content-between p-2 bg-secondary'>
+          {slip?.data?.length > 1 ? <h6>Multi Bet ({slip?.data?.length})</h6> : <h6>Single Bet ({slip?.data?.length})</h6>} 
+          <div className='btn btn-light btn-sm text-dark'>
+            <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
+            <button className='share-btn'>Share</button>
+          </div>         
+        </div>
         <div className='d-flex align-items-center justify-content-between'>
           <div className='mt-2'>
               <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
@@ -655,26 +737,34 @@ export const Betslip = ({ data, clicked }) => {
       axios.delete(`api/betslips/sessions/${sessionId}`)  
       setClicked(prev => !prev)
     }
-  
-    const removeSingleBetslipFixture = (fixture_id) => {
-   
-      axios.delete(`api/betslips/fixtures/${fixture_id}`)
-   
-      setClicked(prev => !prev)
-    
-    }
-    const possibleWin = betAmount * oddsTotal
 
-    const linkBarRef = React.useRef();
-    const congratulationsLinkBarRef = React.useRef();
-    const removeSingleBetslipFixture = (fixture_id) => {
- 
-      axios.delete(`api/betslips/fixtures/${fixture_id}`)
-   
-      setClicked(prev => !prev)
+    const possibleWin = betAmount * oddsTotal 
+
+    const postBetslipCartToDb = (session_id, user_id, bet_amount, total_odds, final_payout) => {
     
+      axios.post('api/checkout', {
+        session_id,
+        user_id,
+        total_odds,
+        final_payout,
+        stake_amount: bet_amount
+      })
     }
-    
+
+    const postBalanceAfterPlacing = (balance_after_placing) => {
+      axios.post(`api/users/${user?.id}/balance`, {
+        'amount': balance_after_placing
+      } ,
+      {
+        headers: {
+          'x-sportsapp-key': configData.SPORTS_APP_KEY
+        }
+      })
+    }
+
+    const setNewSessionStorage = () => {
+     sessionStorage.setItem('session_id', Date.now())
+    }
     const postBetslipCart = (e) => {
       e.preventDefault()   
       
@@ -686,10 +776,10 @@ export const Betslip = ({ data, clicked }) => {
       }   
       const sessionId = sessionStorage.getItem('session_id');
   
-      // postBetslipCartToDb(sessionId, user.id, betAmount, Number(oddsTotal), finalPayout)
-      // postBalanceAfterPlacing(balanceAfterPlacing)
-      // setCongratulationModalOpen(true)
-      // setNewSessionStorage()
+      postBetslipCartToDb(sessionId, user.id, betAmount, Number(oddsTotal), possibleWin)
+      postBalanceAfterPlacing(balanceAfterPlacing)
+      setCongratulationModalOpen(true)
+      setNewSessionStorage()
   
     } 
     return (
@@ -778,17 +868,21 @@ export const Betslip = ({ data, clicked }) => {
     const currentSession = sessionStorage.getItem('session_id')
     fetchBetslips(currentSession)
     fetchBetslipOddsTotal(currentSession)
-  }, [clicked])
+    getBalance()
+  }, [clicked, clickedd, user])
 
   return (
     <StyleBetslip className='mx-auto'>
       <StyleBetCart>
+        
         {slip?.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
         {slip?.data?.length === 0 && <EmptyCart/>}
         {slip?.data?.length !== 0 && slip.data?.map(CartElements)}
+       
         <BetCartFormElements/>
       </StyleBetCart>
-
+      <CongratulationModal/>
+      <BalanceModal/>
       {/* <BetslipCart /> */}
       <AddedFeatures/>
       <Offers/>
