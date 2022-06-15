@@ -778,11 +778,12 @@ export const Betslip = ({ data, clicked }) => {
     } 
     return (
         <>
+        {slip?.data?.length !== 0 &&
          <div className='d-flex align-items-center justify-content-between'>
               <Small>Total Odds:</Small>
               <Small className='fw-bold'>{oddsTotal}</Small>
          </div>
-
+        }
         {!!user ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
             <Small>Balance:</Small>
