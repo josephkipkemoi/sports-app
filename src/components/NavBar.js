@@ -4,7 +4,7 @@ import styledComponents from "styled-components";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-
+import Spinner from "react-bootstrap/Spinner";
 import useClickOutside from "../hooks/useClickOutside";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
  
@@ -227,8 +227,8 @@ const StyleAuthenticated = styledComponents.div`
 `
  
 const BottomNavBar = ({ user, login }) => {
- 
-    const [isModalOpen, setModalOpen] = useState(!!user);
+
+    const [isModalOpen, setModalOpen] = useState(false);
 
     const [userDetails, setUserDetails] = useState({
         email: '',
@@ -238,19 +238,19 @@ const BottomNavBar = ({ user, login }) => {
     const { email, password } = userDetails;
 
     const [errors, setErrors] = useState([]);
-    const [status, setStatus] = useState([]);
+    const [isLoading, setIsLoading] = useState(null);
 
     const handleUser = (e) => setUserDetails(prev => ({ ...prev, [e.target.name] : e.target.value }))
 
     const loginUser = (e) => {
         e.preventDefault()
 
-        login({setErrors, setStatus, email, password})     
+        login({setErrors, setIsLoading, email, password})   
+      
     }
-
-
-    const closeMenu = () => setModalOpen(false)
-
+ 
+    const closeMenu = () => setModalOpen(false) 
+ 
     const openModal = (e) => {
         e.preventDefault()
         setModalOpen(true)
@@ -313,8 +313,8 @@ const BottomNavBar = ({ user, login }) => {
 
     const linkBarRef = React.useRef()
 
-    useClickOutside(linkBarRef, closeMenu)
-   
+    useClickOutside(linkBarRef, closeMenu)    
+           
     return (
         <StyleBottomNavBar>  
         <nav className="p-4" ref={linkBarRef}>
@@ -322,7 +322,8 @@ const BottomNavBar = ({ user, login }) => {
                 {bottomNavLinks.map(BottomNavLinkItem)}
             </div>           
         </nav>
-             <Modal show={isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
+    
+             <Modal show={!!user ? false : isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
                  <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
                         <Form modalId="modal-ref">
                             <Form.Group modalId="modal-ref" className="mb-3">
@@ -351,12 +352,21 @@ const BottomNavBar = ({ user, login }) => {
                             modalId="modal-ref" 
                             style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 
                             className="w-100 p-3 mb-3 fw-bold shadow-sm" 
-                            type="submit"
+                            type="submit"                 
                             onClick={loginUser}
                             >
-                                Log In
+                                {isLoading ? 
+                                <Spinner
+                                animation="grow"
+                                role="status"
+                                aria-hidden="true"
+                                size="sm"
+                                >                                    
+                                </Spinner> : 
+                                ''}                              
+                                
+                                {isLoading ? 'Loading...' :'Log In'}
                             </Button>
-
                             <ErrorElement/>
 
                             <Link href="/forgot-password">

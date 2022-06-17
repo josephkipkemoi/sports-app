@@ -53,7 +53,7 @@ const countryOptions = [
 export default function Register() {
     const { register } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: '/dashboard'
+        redirectIfAuthenticated: '/'
     })
  
     const [numberValidationMessage, setNumberValidationMessage] = useState('')

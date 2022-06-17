@@ -52,11 +52,11 @@ const ThemedBody = styled('div')`
 
 const StyleGameData = styled('div')`
 .custom-grid-box-main, .custom-grid-hide {
-  background: ${props => props.theme.colors.headerColor};
-  color: #c3c3c3;
- 
+  background: ${props => props.theme.colors.btnColor};
+  color: #c3c3c3; 
 }
 .header {
+  background: ${props => props.theme.colors.btnColor};
   color: #c3c3c3;
  }
 .custom-grid-box {
@@ -66,10 +66,17 @@ const StyleGameData = styled('div')`
 }
 .btn-custom {
   border: none;
-  padding: 24px 12px;
+  cursor: pointer;
+ padding: 24px 12px;
   width: 100%;
   background: ${props => props.theme.colors.btnColor};
+  transition: .3s ease-out;
 }
+ 
+.btn-custom:hover {
+  background: ${props => props.theme.colors.headerColor};
+}
+ 
 @media screen and (max-width: 576px) {
   .custom-grid {
     display: flex;
@@ -88,15 +95,14 @@ const StyleGameData = styled('div')`
 `
 
 const StyledMain = styled.div`
+background-color: ${props => props.theme.colors.btnColor};
 max-height: 100vh;
 overflow-y: scroll;
 overflow-x: hidden;
 `
- function App() {
-  const [sessionId, setSesstionId] = useState('');
+function App() {
   const [clicked, setClicked] = useState(false)
  
-
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -104,7 +110,6 @@ overflow-x: hidden;
     if(!!currentSession === false) {
       sessionStorage.setItem('session_id', Date.now())
     }  
-    setSesstionId(currentSession)
 
   },[clicked])
 
@@ -210,7 +215,7 @@ overflow-x: hidden;
           }
         
           newMarket.push(oddsMarket)
-        }
+        } 
          
       })
     }
@@ -223,7 +228,7 @@ overflow-x: hidden;
       const picked = e.target.getAttribute('picked');
       const fixtureId = e.target.getAttribute('fixtureid');
       const session_id = sessionStorage.getItem('session_id')
-
+ 
       postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
@@ -272,16 +277,17 @@ overflow-x: hidden;
                    return (
                      <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
                         <span className='header text-center'>{val.value}</span>                 
-                        <button 
-                        className='btn-custom' 
+                       
+                       <button 
                         odds={val.odd} 
+                        className='btn-custom'
                         home_team={data.home_team} 
                         market={odd.name} 
                         away_team={data.away_team} 
                         picked={val.value}
                         fixtureid={data.fixture_id}
                         onClick={sendBetslip}
-                        >{val.odd}</button>
+                        >{val.odd}</button>                     
                      </div>
                    )
                  })
@@ -557,7 +563,7 @@ const StyleSpinner = styled.div`
  margin: 50% auto;
  width: 1rem;
 `
-export const Betslip = ({ data, clicked }) => {
+export const Betslip = ({ clicked }) => {
   const [slip, setSlip] = useState([])
   const [oddsTotal, setOddsTotal] = useState(0)
   const [balance, setBalance] = useState(0)
@@ -568,25 +574,24 @@ export const Betslip = ({ data, clicked }) => {
   const linkBarRef = React.useRef();
   const congratulationsLinkBarRef = React.useRef();
 
-  const closeMenu = () => setModalOpen(false)
-  const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
+const closeMenu = () => setModalOpen(false)
+const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
 
-  const fetchBetslips = (session) => {
+const fetchBetslips = (session) => {
     axios
       .get(`api/betslips/${session}`)
       .then(d => setSlip(d.data))
       .catch(e => console.error(e.message))
-  }
+}
 
-
-  const fetchBetslipOddsTotal = (session) => {
+const fetchBetslipOddsTotal = (session) => {
     axios
       .get(`api/betslips/sessions/${session}/odds-total`)
       .then(d => setOddsTotal(Number(d.data.odds_total).toFixed(2)))
       .catch(e => console.error(e.message))
-  }
+}
   
-  const getBalance = async () => {
+const getBalance = async () => {
     if(!!user) {
       const res = await axios.get(`api/users/${user?.id}/balance`, {
         headers: {
@@ -596,9 +601,9 @@ export const Betslip = ({ data, clicked }) => {
   
       setBalance(res?.data?.amount)
     }  
-    }
+}
 
-  const BalanceModal = () => {
+const BalanceModal = () => {
     return (
       <Modal show={isModalOpen} className="mt-5 pt-5">
         <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
@@ -619,9 +624,9 @@ export const Betslip = ({ data, clicked }) => {
         </Modal.Body>                            
      </Modal>
     )
-  }
+}
 
-  const CongratulationModal = () => {
+const CongratulationModal = () => {
     return (
       <Modal show={isCongratulationModalOpen} className="mt-5 pt-5">
       <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
@@ -645,9 +650,9 @@ export const Betslip = ({ data, clicked }) => {
       </Modal.Body>                            
    </Modal>
     )
-  }
+}
 
-  const EmptyCart = () => {
+const EmptyCart = () => {
     return (
       <>
         <div className='d-flex justify-content-between'>
@@ -675,9 +680,9 @@ export const Betslip = ({ data, clicked }) => {
    </div>
       </>
     )
- }
+}
 
-  const CartElements = (link, i) => {
+const CartElements = (link, i) => {
  
    const fixId = String(link.fixture_id).slice(0,6) + link.session_id 
    const removeSingleBetslipFixture = (fixture_id) => {
@@ -711,8 +716,9 @@ export const Betslip = ({ data, clicked }) => {
         <hr/>     
       </React.Fragment>
     )
-  }
-  const BetCartFormElements = () => {
+}
+
+const BetCartFormElements = () => {
     const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
 
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
@@ -860,9 +866,23 @@ export const Betslip = ({ data, clicked }) => {
         }
         </>
     )
-  }
+}
 
- 
+const BetslipCartHeader = () => {
+  return (
+    <>
+     {slip?.data?.length !== 0 &&
+      <div className='d-flex align-items-center justify-content-between p-2 bg-secondary'>
+      {slip?.data?.length > 1 ? <h6>Multi Bet ({slip?.data?.length})</h6> : <h6>Single Bet ({slip?.data?.length})</h6>} 
+      <div className='btn btn-light btn-sm text-dark'>
+        <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
+        <button className='share-btn'>Share</button>
+      </div>         
+    </div>
+      }
+    </>
+  )
+}
 
   useEffect(() => {
     const currentSession = sessionStorage.getItem('session_id')
@@ -874,380 +894,22 @@ export const Betslip = ({ data, clicked }) => {
   return (
     <StyleBetslip className='mx-auto'>
       <StyleBetCart>
-      {slip?.data?.length !== 0 &&
-      <div className='d-flex align-items-center justify-content-between p-2 bg-secondary'>
-      {slip?.data?.length > 1 ? <h6>Multi Bet ({slip?.data?.length})</h6> : <h6>Single Bet ({slip?.data?.length})</h6>} 
-      <div className='btn btn-light btn-sm text-dark'>
-        <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
-        <button className='share-btn'>Share</button>
-      </div>         
-    </div>
-
-      
-      }
+      <BetslipCartHeader/>
         
-        {slip?.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
-        {slip?.data?.length === 0 && <EmptyCart/>}
-        {slip?.data?.length !== 0 && slip.data?.map(CartElements)}
+      {slip?.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
+      {slip?.data?.length === 0 && <EmptyCart/>}
+      {slip?.data?.length !== 0 && slip.data?.map(CartElements)}
        
-        <BetCartFormElements/>
+      <BetCartFormElements/>
       </StyleBetCart>
       <CongratulationModal/>
       <BalanceModal/>
-      {/* <BetslipCart /> */}
       <AddedFeatures/>
       <Offers/>
     </StyleBetslip>
   )
 }
  
-
-const BetslipCart = ({}) => {
-
-  const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false);
-  const [finalPayout, setFinalPayout] = useState(0)
-  const [oddsTotal, setOddsTotal] = useState(0)
-  const [balance, setBalance] = useState(0)
-  const { user } = useAuth({ middleware: 'guest' })
-  const [clickedd, setClicked] = useState(false)
-  const [sessionId, setSessionId] = useState('')
-
-
-  const fetchBetslipOddsTotal = () => {
-    axios
-      .get(`api/betslips/sessions/${sessionId}/odds-total`)
-      .then(d => setOddsTotal(Number(d.data.odds_total).toFixed(2)))
-      .catch(e => console.error(e.message))
-  }
-
-
-  const removeBetslipCart = () => {
-    axios.delete(`api/betslips/sessions/${sessionId}`)  
-    setClicked(prev => !prev)
-  }
-
-  const removeSingleBetslipFixture = (fixture_id) => {
- 
-    axios.delete(`api/betslips/fixtures/${fixture_id}`)
- 
-    setClicked(prev => !prev)
-  
-  }
-
-  const getBalance = async () => {
-    if(!!user) {
-      const res = await axios.get(`api/users/${user?.id}/balance`, {
-        headers: {
-          'x-sportsapp-key': configData.SPORTS_APP_KEY
-        }
-      })
-  
-      setBalance(res?.data?.amount)
-    }  
-  }
-
-  const postBalanceAfterPlacing = (balance_after_placing) => {
-    axios.post(`api/users/${user?.id}/balance`, {
-      'amount': balance_after_placing
-    } ,
-    {
-      headers: {
-        'x-sportsapp-key': configData.SPORTS_APP_KEY
-      }
-    })
-  }
-
-  const setNewSessionStorage = () => {
-    sessionStorage.setItem('session_id', Date.now())
-  }
-
-  const postBetslipCartToDb = (session_id, user_id, bet_amount, total_odds, final_payout) => {
-    
-    axios.post('api/checkout', {
-      session_id,
-      user_id,
-      total_odds,
-      final_payout,
-      stake_amount: bet_amount
-    })
-  }
-
-  const postBetslipCart = (e) => {
-    e.preventDefault()   
-    
-    const balanceAfterPlacing = balance - betAmount
-
-    if(balance < betAmount || balanceAfterPlacing < 0) {
-      setModalOpen(true)
-      return
-    }   
-    const sessionId = sessionStorage.getItem('session_id');
-
-    postBetslipCartToDb(sessionId, user.id, betAmount, Number(oddsTotal), finalPayout)
-    postBalanceAfterPlacing(balanceAfterPlacing)
-    setCongratulationModalOpen(true)
-    setNewSessionStorage()
-
-  } 
-
-  const closeMenu = () => setModalOpen(false)
-  const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
-
-  const linkBarRef = React.useRef();
-  const congratulationsLinkBarRef = React.useRef();
-
-  useClickOutside(linkBarRef, closeMenu)
-  useClickOutside(congratulationsLinkBarRef, closeCongratulationsMenu)
-
-  const BalanceModal = () => {
-    return (
-      <Modal show={isModalOpen} className="mt-5 pt-5">
-        <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
-           <Span modalId="modal-ref" className='fw-bold p-2 d-block mb-2' onClick={closeMenu} style={{ cursor: 'pointer', width: 32 }}>X</Span>  
-           <div className='m-3' modalId="modal-ref">
-            <span className='fw-bold d-block mb-2' modalId="modal-ref">Insufficient Funds</span>    
-            <span modalId="modal-ref" className='alert alert-danger d-block' style={{ padding: 5 }} >
-              Your current balance is too low to place this bet. Deposit now.              
-            </span>
-            <div className='alert alert-secondary'>
-              <p>|--- GO TO LIPA NA MPESA</p>     
-              <p>|--- ENTER PAYBILL BUSINESS NO.: <b>123123</b></p>
-              <p>|--- ENTER ACCOUNT NO.: <b>0{user?.phone_number}</b></p>
-              <p>|--- ENTER AMOUNT & SEND</p>
-              <p>|--- ONCE YOU RECEIVE MPESA NOTIFICATION, GO AHEAD AND PLACE YOUR BET</p>
-            </div>            
-           </div>   
-        </Modal.Body>                            
-     </Modal>
-    )
-  }
-
-  const CongratulationModal = () => {
-    return (
-      <Modal show={isCongratulationModalOpen} className="mt-5 pt-5">
-      <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
-        <Span 
-        modalId="modal-ref" 
-        className='fw-bold p-2 d-block mb-2' 
-        onClick={closeCongratulationsMenu} 
-        style={{ cursor: 'pointer', width: 32 }}
-        >
-          X
-        </Span>  
-        <h1 modalId="modal-ref">Congratulations Bet placed</h1>
-        <Link href='/history'>
-          <a
-            itemProp='url'
-            className='btn btn-warning btn-sm fw-bold'
-          >
-            View History
-          </a>
-        </Link>
-      </Modal.Body>                            
-   </Modal>
-    )
-  }
-
-  const EmptyCart = () => {
-     return (
-       <>
-         <div className='d-flex justify-content-between'>
-          <H5>BETSLIP</H5>
-          <i className="bi bi-three-dots-vertical text-light"></i>
-        </div>
-        <hr />
-      <div className='betslip-child'>
-        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" className="bi bi-app-indicator text-muted d-block mx-auto m-3" viewBox="0 0 16 16">
-          <path d="M5.5 2A3.5 3.5 0 0 0 2 5.5v5A3.5 3.5 0 0 0 5.5 14h5a3.5 3.5 0 0 0 3.5-3.5V8a.5.5 0 0 1 1 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-5A4.5 4.5 0 0 1 1 10.5v-5A4.5 4.5 0 0 1 5.5 1H8a.5.5 0 0 1 0 1H5.5z"/>
-          <path d="M16 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-        </svg>
-        <span className='d-block fw-bold text-center'>You have not selected any bet</span>
-        <span className='d-block text-center'>Make your first pick to start playing.</span>
-        <hr/>
-        <span className='d-block m-3'>Or introduce your bet code:</span>
-        <Row className='m-1 align-items-center'>
-          <Col sm={8} md={8} lg={8} className="inpt-xsm">
-          <Input className="form-control " placeholder="Bet Code"/>           
-          </Col>
-          <Col sm={4} md={4} className='text-center inpt-xsm' lg={4}>
-            <button className='btn btn-secondary'>Add</button>
-          </Col>           
-        </Row>
-    </div>
-       </>
-     )
-  }
-
- 
-  const BetCart = () => {
-
-    const [slip, setSlip] = useState([])
-
-    const fetchBetslips = () => {
-      axios
-        .get(`api/betslips/${sessionId}`)
-        .then(d => setSlip(d.data))
-        .catch(e => console.error(e.message))
-    }
-  
-
-    const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
-
-    const decrementBetAmount = () => {
-      if(betAmount <= 50) {
-        return
-      }
-      setBetAmount(prev => prev -= configData.INCREMENT_DECREMENT_AMOUNT)
-    }
-    
-    const updateBetAmount = (e) => {
-      const amount = Number(e.target.value);
-      setBetAmount(amount)   
-    }
-
-    const possibleWin = betAmount * oddsTotal
-
-    setFinalPayout(possibleWin);
-
-    useEffect(() => {
-      fetchBetslips()
-      getBalance()
-      fetchBetslipOddsTotal()
-  
-      const sessionId = sessionStorage.getItem('session_id')
-      setSessionId(sessionId)
-    }, [1, clickedd])
-
-    const BetCartElements = (link, i) => {
-      const fixId = String(link.fixture_id).slice(0,6) + link.session_id 
- 
-      return (
-        <React.Fragment key={i}>
-          <div className='d-flex align-items-center justify-content-between'>
-            <div className='mt-2'>
-                <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
-                <Small>{link.betslip_teams}</Small>
-            </div>
-            <button 
-            className='close-btn fw-bold'
-            onClick={() => removeSingleBetslipFixture(fixId)}
-            >
-              x
-            </button>
-          </div>
-          <Small>{link.betslip_market}</Small>
-          <div className='d-flex align-items-center justify-content-between'>      
-              <Small>Your Pick: {link.betslip_picked}</Small>
-              <Small className='fw-bold'>{link.betslip_odds}</Small>
-          </div>
-          <hr/>
-       
-        </React.Fragment>
-      )
-    }
-
-    return (
-      <StyleBetCart>
-        <div className='d-flex align-items-center justify-content-between p-2 bg-secondary'>
-          {/* {slip?.data?.length > 1 ? <h6>Multi Bet ({slip?.data?.length})</h6> : <h6>Single Bet ({slip?.data?.length})</h6>}  */}
-          <div className='btn btn-light btn-sm text-dark'>
-            <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
-            <button className='share-btn'>Share</button>
-          </div>         
-        </div>
-
-        {!Array.isArray(slip) && slip.data.map(BetCartElements)}
-
-          <div className='d-flex align-items-center justify-content-between'>
-              <Small>Total Odds:</Small>
-              <Small className='fw-bold'>{oddsTotal}</Small>
-          </div>
-          {!!user ? 
-            <div className='d-flex align-items-center justify-content-between mb-1'>
-              <Small>Balance:</Small>
-              <Small className='fw-bold'>
-              <span class="glyphicon glyphicon-refresh"></span>
-                <FontAwesomeIcon 
-                icon={faRefresh} 
-                style={{ 
-                  cursor: 'pointer',
-                  paddingRight: 8, 
-                  paddingLeft: 8,
-                 }}
-                />
-                KES {balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-              </Small>
-            </div>
-            : ''
-          }
-          <div className='d-flex align-items-center justify-content-between'>
-          <Small>Amount (Kshs)</Small>
-          <div className='d-flex'>
-            <button className='custom-sm-btn fw-bold' onClick={decrementBetAmount}>-</button>
-            <InputNumber 
-            className="form-control custom-input" 
-            value={betAmount} 
-            onChange={updateBetAmount}
-            />
-            <button className='custom-sm-btn-right fw-bold' onClick={incrementBetAmount}>+</button>
-          </div>
-          <div className={`position-absolute position-tooltip ${betAmount >= 50 ? 'close-tooltip' : ''}`}>
-            <i 
-            className="bi bi-info bg-secondary text-light fw-bold rounded-circle custom-label" 
-            style={{ marginRight: '3px' }}></i>
-            <Small>Minimum stake <b className='fw-bold'>Ks 50.00</b></Small>
-          </div>
-        </div>
-
-        <div className='d-flex align-items-center justify-content-between'>
-            <Small>Possible Payout (Kshs):</Small>
-            <Small className='fw-bold text-warning'>
-              {Number(possibleWin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </Small>
-        </div>
-        <div className='d-flex align-items-center justify-content-between' ref={congratulationsLinkBarRef}>
-          <button 
-          className='btn btn-danger btn-sm text-light w-100 ' 
-          style={{ marginRight: '3px' }}
-          onClick={() => removeBetslipCart()}
-          >
-            REMOVE ALL
-          </button>
-            <button 
-            ref={linkBarRef}      
-            disabled={!user}
-            className=' text-dark w-100'
-            onClick={postBetslipCart}
-            style={{ 
-              border: 'none', 
-              color: 'rgba(0,0,0,0.6)',
-              cursor: `${!user ? 'not-allowed' : 'cursor'}`,
-              padding: '0.25rem 0.5rem',
-              borderRadius: 4,
-              fontSize: '0.875rem',
-              lineHeight: '1.5rem'
-            }}
-            >
-              PLACE BET
-            </button>
-        </div>
-
-      </StyleBetCart>
-    ) 
-  }
-
-  return (
-    <>
-    <BetCart/>
-      {/* {1 > 0 ? <BetCart/> : <EmptyCart/>}   */}
-      <BalanceModal/>   
-      <CongratulationModal/> 
-    </>
-  )
-}
-
 const StyledFeatures = styled.div`
 .feature-box {
   padding: 8px;
@@ -1327,6 +989,5 @@ const Offers = () => {
     </StyledFeatures>
   )
 }
-
 
 export default App;

@@ -4,8 +4,6 @@ export default function useClickOutside(elRef, callback) {
     // Keep track of latest version of callback
     const latestCallback = React.useRef()
     latestCallback.current = callback
- 
-   
     // When the element ref changes, run our effect
     React.useEffect(() => {
     // Handle the document click event
@@ -27,6 +25,7 @@ export default function useClickOutside(elRef, callback) {
             latestCallback.current(e)
         }
     }
+    console.log(handleClickOutside)
      // Add listener to the document
      document.addEventListener('click', handleClickOutside, true)
 
