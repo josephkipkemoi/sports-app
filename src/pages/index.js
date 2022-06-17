@@ -229,7 +229,7 @@ function App() {
       const fixtureId = e.target.getAttribute('fixtureid');
       const session_id = sessionStorage.getItem('session_id')
  
-      postBetslip({
+       postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
         betslip_teams: homeTeam + ' v ' + awayTeam,
@@ -237,6 +237,7 @@ function App() {
         betslip_picked: picked,
         betslip_odds: odds 
       })
+ 
       setClicked(prev => !prev)
     }
  
@@ -246,15 +247,15 @@ function App() {
         {newMarket.map((data,i) => {
           return (
             <React.Fragment key={i + data.league}>
-            <Col lg={8} sm={8} className="custom-grid-box-main">   
+            <Col lg={8} sm={8} className="custom-grid-box-main p-2">  
+      
+              <Row style={{ marginLeft: 2 }}>
               <h5 className='header'>{data.league}</h5>
-              <Row>
                 <Col lg={1} md={1} sm={1}>
                   <Link href={`fixture/${data.fixture_id}`}>
                   <a
                     itemProp='url'
-                    className='text-decoration-none text-light'
-                    
+                    className='text-decoration-none text-light'                    
                   >
                     <Small>
                       {data.market_odds[0].bets.length}
@@ -264,7 +265,7 @@ function App() {
                   </Link>  
                 </Col>
                 <Col>
-                  <span className='d-block'>{data.home_team}</span>
+                  <span className='d-block'>{data.home_team} - </span>
                   <span className='d-block'>{data.away_team}</span>
                 </Col>
                 <Col></Col>
@@ -323,7 +324,7 @@ function App() {
                   <Col lg={9} md={12} sm={12}>
                   <StyledMain>
                    <TopNavBar/>
-                   <h2> Filter</h2>
+                   <CustomFilter/>
                    <StyleGameData>
                       <GamesData/>
                    </StyleGameData>   
@@ -342,6 +343,57 @@ function App() {
   );
 }
 
+const StyleButton = styled.div`
+button {
+  background: none;
+  border: none;
+}
+button:hover {
+  color: #fff;
+}
+`
+const StyleSearch = styled.div`
+ background: none;
+ border: none;
+ margin-left: -5px;
+ max-width: 240px;
+ input[type=search] {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+ }
+ button {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+ }
+`
+const CustomFilter = () => {
+  return (
+    <Row className="gy-2 p-2">
+      <Col  className="d-flex align-content-center">
+        <h3 className='text-light fw-bold'>Highlights</h3>
+      </Col>
+      <Col lg="6" md="6" sm="6" className="d-flex align-items-center">
+        <StyleButton className='mx-auto d-flex'>
+        <button className='btn'>
+          <i className="bi bi-printer"></i>
+        </button>        
+        <button className='background-none'>
+          <i className="bi bi-arrow-clockwise text-light p-1"></i>
+          <small className='text-light'>Refresh</small>
+        </button>
+        </StyleButton>      
+      </Col>
+      <Col lg="3" md="3" sm="3" className='px-3'> 
+        <StyleSearch className='d-flex mx-auto'>
+          <input type="search" placeholder="Search" className="form-control"/>
+          <button className='btn btn-secondary d-flex p-2'>
+          <i className="bi bi-search"></i>
+          </button>
+        </StyleSearch>       
+      </Col>
+    </Row>    
+  )
+}
 const StyleSideNav = styled.div`
 background-color: #383838;
 width: 100%;
@@ -573,6 +625,7 @@ export const Betslip = ({ clicked }) => {
   const { user } = useAuth({ middleware: 'guest' })
   const linkBarRef = React.useRef();
   const congratulationsLinkBarRef = React.useRef();
+  const [loading, setLoading] = useState(null)
 
 const closeMenu = () => setModalOpen(false)
 const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
@@ -644,7 +697,7 @@ const CongratulationModal = () => {
             itemProp='url'
             className='btn btn-warning btn-sm fw-bold'
           >
-            View History
+            View Bet
           </a>
         </Link>
       </Modal.Body>                            
@@ -720,7 +773,7 @@ const CartElements = (link, i) => {
 
 const BetCartFormElements = () => {
     const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
-
+ 
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
 
     const decrementBetAmount = () => {
@@ -741,15 +794,20 @@ const BetCartFormElements = () => {
 
     const possibleWin = betAmount * oddsTotal 
 
-    const postBetslipCartToDb = (session_id, user_id, bet_amount, total_odds, final_payout) => {
-    
-      axios.post('api/checkout', {
+    const postBetslipCartToDb = async (session_id, user_id, bet_amount, total_odds, final_payout) => {
+     
+      const res = await axios.post('api/checkout', {
         session_id,
         user_id,
         total_odds,
         final_payout,
         stake_amount: bet_amount
       })
+
+      if(res.status === 200) {
+        setLoading(false)
+        setCongratulationModalOpen(true)
+      }
     }
 
     const postBalanceAfterPlacing = (balance_after_placing) => {
@@ -768,18 +826,20 @@ const BetCartFormElements = () => {
     }
     const postBetslipCart = (e) => {
       e.preventDefault()   
-      
+      setLoading(true)
+
       const balanceAfterPlacing = balance - betAmount
   
       if(balance < betAmount || balanceAfterPlacing < 0) {
         setModalOpen(true)
+        setLoading(false)
         return
       }   
+
       const sessionId = sessionStorage.getItem('session_id');
   
       postBetslipCartToDb(sessionId, user.id, betAmount, Number(oddsTotal), possibleWin)
       postBalanceAfterPlacing(balanceAfterPlacing)
-      setCongratulationModalOpen(true)
       setNewSessionStorage()
   
     } 
@@ -846,7 +906,7 @@ const BetCartFormElements = () => {
           </button>
             <button 
             ref={linkBarRef}      
-            disabled={!user}
+            disabled={!user || loading}
             className=' text-dark w-100'
             onClick={postBetslipCart}
             style={{ 
@@ -859,7 +919,16 @@ const BetCartFormElements = () => {
               lineHeight: '1.5rem'
             }}
             >
-              PLACE BET
+              {loading ? 
+               <Spinner
+               animation="grow"
+               size="sm"
+               style={{ marginRight: 5 }}
+             >
+             </Spinner>
+                      :
+              ''}             
+             {loading ? 'Loading...' : 'PLACE BET'}
             </button>
         </div>
         </>

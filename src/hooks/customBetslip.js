@@ -13,11 +13,12 @@ const useCustomBetslip = () => {
 
     const postBetslip = async (props) => {
  
-        axios
-            .post('api/betslips', props)
-            .then(d => d)
-            .catch(e => console.error(e.message))
-
+       const res = await axios.post('api/betslips', props)
+    //    axios
+    //         .post('api/betslips', props)
+    //         .then(d => d)
+    //         .catch(e => console.error(e.message))
+        return res.status
     }
 
     const getBetslip =  (session_id) => {
