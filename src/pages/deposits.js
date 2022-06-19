@@ -39,7 +39,7 @@ const DepositsProfile = ({ data }) => {
     const DepositElements = (link, i) => {
         return (
             <React.Fragment key={i}>
-                <Span>{link.amount}</Span>
+                <Span className='d-block'>{link.amount}</Span>
             </React.Fragment>
         )
        
@@ -84,6 +84,10 @@ const userProfileLinks = [
         name: 'Withdraw',
         path: '/withdrawals'
     },
+    {
+        name: 'Bet History',
+        path: '/history?tab=all'
+    }
 ]
 const UserProfile = ({ user, balance }) => {
 

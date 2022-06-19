@@ -68,6 +68,10 @@ const userProfileLinks = [
         name: 'Withdraw',
         path: '/withdrawals'
     },
+    {
+        name: 'Bet History',
+        path: '/history?tab=all'
+    }
 ]
 const UserProfile = ({ user, balance }) => {
 

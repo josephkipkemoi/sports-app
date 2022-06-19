@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Modal from 'react-bootstrap/Modal';
 import styled from 'styled-components';
 import { Span } from '../components/Html';
 import useAuth from '../hooks/auth';
@@ -42,7 +43,7 @@ function HistoryProfile() {
     const fetchBetHistory = async () => {
         if(!!user) {
             const response = await axios.get(`api/users/${user.id}/betslips`)
-            // console.log(response.data)
+ 
             setHistory(response?.data?.data)
         }
     }
@@ -154,18 +155,80 @@ function HistoryProfile() {
                     {(tab === 'settled' && !!settledHistory?.data?.length) && <SettledHistory data={settledHistory?.data}/>}
                     {(tab === 'unsettled' && unsettledHistory?.data?.length === 0) && <NoBetslipHistory/>}     
                     {(tab === 'unsettled' && !!unsettledHistory?.data?.length) && <UnsettledHistory data={unsettledHistory?.data}/>}
+                    {tab === 'search' && <SearchFilterResults user_id={user?.id}/>}
                 </Col>
             </Row>           
         </StyledHistory>
     )
 }
 
+const SearchFilterResults = ({ user_id }) => {
+    const router = useRouter()
+    const { from, to } = router.query;
+    const [searchHistory, setSearchHistory] = useState([])
+
+    const fetchSearch = async () => {
+        const res = await axios.get(`api/users/betslips/search?user_id=${user_id}&from_date=${from}&to_date=${to}`);
+        setSearchHistory(res?.data?.data)
+    }
+
+    const SearchHistoryItems = (name, i) => {
+        return (
+            <React.Fragment key={i}>
+                 <div className="card p-3 m-2 cursor-pointer">
+                    <div className='d-flex'>
+                        <Span className='text-secondary'>
+                            {new Date(name.created_at).getDate()}/
+                            {new Date(name.created_at).getMonth()}/
+                            {new Date(name.created_at).getFullYear()}
+                        </Span>
+                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                            {new Date(name.created_at).getHours()}:
+                            {new Date(name.created_at).getMinutes()}
+                        </Span>
+                    </div>
+                    <div>
+                        <small>Bet ID:</small>
+                        <small>{name.session_id}</small>
+                    </div>
+                    <div 
+                    className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                    >   
+                    <span>Bet Status</span>
+                        {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
+                        <Span className="text-warning">{name.betslip_status}</Span>
+                    </div>
+                    <div className='d-sm-flex justify-content-between mt-2 p-1'>
+                        <div>
+                            <Span>Stake Amount: </Span>
+                            <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                        </div>
+                        <div>
+                            <Span>Final Payout: </Span>
+                            <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                        </div>  
+                    </div>                               
+                </div>
+            </React.Fragment>
+        )
+    }
+
+    useEffect(() => {
+        fetchSearch()
+    }, [from , to])
+    return (
+        <>
+           {searchHistory?.data?.length === 0 ? <span>No results</span> : searchHistory?.data?.map(SearchHistoryItems) }
+        </>     
+    )
+}
+
 const SettledHistory = ({ data }) => {
-    console.log(data)
+
     const SettledItems = (name , i) => {
         return (
             <React.Fragment key={i}>
-<div className="card p-3 m-2 cursor-pointer">
+                <div className="card p-3 m-2 cursor-pointer">
                     <div className='d-flex'>
                         <Span className='text-secondary'>
                             {new Date(name.created_at).getDate()}/
@@ -276,6 +339,10 @@ const userProfileLinks = [
         name: 'Withdraw',
         path: '/withdrawals'
     },
+    {
+        name: 'Bet History',
+        path: '/history?tab=all'
+    }
 ]
 const UserProfile = ({ user, balance }) => {
 
@@ -346,8 +413,23 @@ const StyleHeaderNav = styled.div`
 `
 const HistoryFilter = () => {
     const router = useRouter()
+    const [dates, setDates] = useState({
+        from_date: '',
+        to_date: ''
+    });
+    const { from_date, to_date } = dates;
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const { tab } = router.query
- 
+    
+    const openModal = () => {
+        setIsModalOpen(prev => !prev)
+    }
+
+    const closeMenu = () => setIsModalOpen(false)
+
+    const filterDate = (e) => {
+        setDates(prev => ({...prev, [e.target.name]: e.target.value}))
+    }
     return (
         <div className='history-header mb-3 card m-2 p-2'>
             <div>
@@ -389,6 +471,7 @@ const HistoryFilter = () => {
                     <button 
                     type="search" 
                     className='btn btn-outline-secondary d-flex justify-content-between float-end'
+                    onClick={openModal}
                     >
                         <span>All Dates </span>    
                         <i className="bi bi-caret-down"></i>                 
@@ -396,7 +479,42 @@ const HistoryFilter = () => {
                     
                 </StyleSearch>                
             </Col>              
-            </Row>           
+            </Row>     
+            <Modal show={isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
+                <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+                    <h3 onClick={closeMenu}>X</h3>
+                    <Row>
+                        <Col>
+                            <label htmlFor="filterDate">From</label>
+                            <input 
+                            id="filterDate" 
+                            className='form-control' 
+                            type="date" 
+                            name="from_date"
+                            onChange={filterDate}
+                            />  
+                        </Col>
+                        <Col>
+                            <label htmlFor="filterDate">To</label>
+                            <input 
+                            id="filterDate" 
+                            className='form-control' 
+                            type="date" 
+                            name="to_date"
+                            onChange={filterDate}
+                            />  
+                        </Col>
+                        <Link href={`history?tab=search&from=${from_date}&to=${to_date}`}>
+                            <a 
+                                itemProp='url'
+                            >
+                                <button className="btn btn-warning mt-3">Search</button>
+                            </a>
+                        </Link>
+                    </Row>
+                                
+                </Modal.Body>                            
+            </Modal>      
         </div>
     )
 }
@@ -415,8 +533,8 @@ const UpdateHistory = () => {
     const { user } = useAuth({ middleware: 'guest' })
     const user_id = user && user.id
     const updateLost = async () => {
-       const res = await axios.patch(`api/users/betslips/update?user_id=${user_id}&session_id=1655669961037`)
-        console.log(res)
+      await axios.patch(`api/users/betslips/update?user_id=${user_id}&session_id=1655669961037`)
+     
     }
     return (
         <>
