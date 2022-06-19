@@ -9,6 +9,7 @@ import { Card } from 'react-bootstrap';
 import Link from 'next/link';
 import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import { useRouter } from 'next/router';
+import { useGetAllBetHistoryQuery } from '../hooks/betslip';
 
 const StyledHistory = styled.div`
     background-color: #ebeded;
@@ -29,6 +30,9 @@ export default function History(){
 }
 function HistoryProfile() { 
     const [history, setHistory] = useState([])
+    const [unsettledHistory, setUnsettledHistory] = useState([])
+    const [settledHistory, setSettledHistory] = useState([])
+
     const { user } = useAuth();
     const router = useRouter()
     const { tab } = router.query
@@ -38,7 +42,25 @@ function HistoryProfile() {
     const fetchBetHistory = async () => {
         if(!!user) {
             const response = await axios.get(`api/users/${user.id}/betslips`)
+            // console.log(response.data)
             setHistory(response?.data?.data)
+        }
+    }
+
+    const fetchActiveHistory = async () => {
+    
+        if(!!user) {
+            const response = await axios
+                                    .get(`api/users/betslips/status?user_id=${user.id}&bet_status=Active`)
+            setUnsettledHistory(response?.data?.data)
+        }
+    }
+
+    const fetchSettledHistory = async () => {
+        if(!!user) {
+            const response = await axios
+                                    .get(`api/users/betslips/status?user_id=${user.id}&bet_status=Lost`)
+            setSettledHistory(response?.data?.data)
         }
     }
 
@@ -105,30 +127,135 @@ function HistoryProfile() {
                 {/* <div>
                     {name.fixtures.map(FixtureElements)}
                 </div> */}
-                <hr/>
+             
             </React.Fragment>
         )
     }
 
     useEffect(() => {
         fetchBetHistory()
-    },[user])
+        fetchActiveHistory()
+        fetchSettledHistory()
+    },[user, tab])
 
     return (
         <StyledHistory>
             <Row>
                 <Col lg="3" md="3" sm="4">
                     <UserProfile user={user} balance={data?.amount}/>
+                    <UpdateHistory/>
                 </Col>
                 <Col lg="9" md="9" sm="8">
                     <HistoryFilter/> 
                     <hr/>    
-                    {tab === 'all' && !!history.length ? history.map(BetHistoryElements): <NoBetslipHistory/>}     
-                    {tab === 'settled' && <h1>Settled</h1>}
-                    {tab === 'unsettled' && <h1>Unsettled</h1>}
+                    {(tab === 'all' && history.length === 0) && <NoBetslipHistory/>}  
+                    {(tab === 'all' && !!history.length) && history.map(BetHistoryElements)}  
+                    {(tab === 'settled' && settledHistory?.data?.length === 0) && <NoBetslipHistory/>}     
+                    {(tab === 'settled' && !!settledHistory?.data?.length) && <SettledHistory data={settledHistory?.data}/>}
+                    {(tab === 'unsettled' && unsettledHistory?.data?.length === 0) && <NoBetslipHistory/>}     
+                    {(tab === 'unsettled' && !!unsettledHistory?.data?.length) && <UnsettledHistory data={unsettledHistory?.data}/>}
                 </Col>
             </Row>           
         </StyledHistory>
+    )
+}
+
+const SettledHistory = ({ data }) => {
+    console.log(data)
+    const SettledItems = (name , i) => {
+        return (
+            <React.Fragment key={i}>
+<div className="card p-3 m-2 cursor-pointer">
+                    <div className='d-flex'>
+                        <Span className='text-secondary'>
+                            {new Date(name.created_at).getDate()}/
+                            {new Date(name.created_at).getMonth()}/
+                            {new Date(name.created_at).getFullYear()}
+                        </Span>
+                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                            {new Date(name.created_at).getHours()}:
+                            {new Date(name.created_at).getMinutes()}
+                        </Span>
+                    </div>
+                    <div>
+                        <small>Bet ID:</small>
+                        <small>{name.session_id}</small>
+                    </div>
+                    <div 
+                    className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                    >   
+                    <span>Bet Status</span>
+                        {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
+                        <Span className="text-warning">{name.betslip_status}</Span>
+                    </div>
+                    <div className='d-sm-flex justify-content-between mt-2 p-1'>
+                        <div>
+                            <Span>Stake Amount: </Span>
+                            <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                        </div>
+                        <div>
+                            <Span>Final Payout: </Span>
+                            <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                        </div>  
+                    </div>
+                               
+                </div>
+            </React.Fragment>
+        )
+    }
+    return (
+        <>
+        {data.map(SettledItems)}
+        </>
+    )
+}
+
+const UnsettledHistory = ({ data }) => {
+    const UnsettledItems = (name, i) => {
+        return (
+            <React.Fragment key={i}>
+                <div className="card p-3 m-2 cursor-pointer">
+                    <div className='d-flex'>
+                        <Span className='text-secondary'>
+                            {new Date(name.created_at).getDate()}/
+                            {new Date(name.created_at).getMonth()}/
+                            {new Date(name.created_at).getFullYear()}
+                        </Span>
+                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                            {new Date(name.created_at).getHours()}:
+                            {new Date(name.created_at).getMinutes()}
+                        </Span>
+                    </div>
+                    <div>
+                        <small>Bet ID:</small>
+                        <small>{name.session_id}</small>
+                    </div>
+                    <div 
+                    className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                    >   
+                    <span>Bet Status</span>
+                        {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
+                        <Span className="text-warning">{name.betslip_status}</Span>
+                    </div>
+                    <div className='d-sm-flex justify-content-between mt-2 p-1'>
+                        <div>
+                            <Span>Stake Amount: </Span>
+                            <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                        </div>
+                        <div>
+                            <Span>Final Payout: </Span>
+                            <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                        </div>  
+                    </div>
+                               
+                </div>
+            </React.Fragment>
+        )
+    }
+    return (
+        <>
+          {data.map(UnsettledItems)}
+        </>
     )
 }
 
@@ -280,6 +407,20 @@ const NoBetslipHistory = () => {
         <div className="text-center mt-5">
             <Span>You do not have any sportsbook bets</Span>
         </div>
+        </>
+    )
+}
+
+const UpdateHistory = () => {
+    const { user } = useAuth({ middleware: 'guest' })
+    const user_id = user && user.id
+    const updateLost = async () => {
+       const res = await axios.patch(`api/users/betslips/update?user_id=${user_id}&session_id=1655669961037`)
+        console.log(res)
+    }
+    return (
+        <>
+            <button onClick={updateLost}>Lost</button>
         </>
     )
 }

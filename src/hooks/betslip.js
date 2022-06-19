@@ -16,6 +16,9 @@ export const BetslipApi = createApi({
         }),
         removeAllBetlslip: builder.query({
             query: (session_id) => `sessions/${session_id}`
+        }),
+        getAllBetHistory: builder.query({
+            query: (user_id) => `users/${user_id}/betslips`
         })
     })
 })
@@ -24,4 +27,5 @@ export const {
     useGetBetslipQuery,
     useRemoveAllBetlslipQuery,
     useRemoveSingleBetslipQuery,
+    useGetAllBetHistoryQuery,
 } = BetslipApi

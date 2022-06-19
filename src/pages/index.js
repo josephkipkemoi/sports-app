@@ -318,7 +318,7 @@ function App() {
               description="Africa's Best Online Sports Betting App"
             />
             <main>
-              {/* <Games/> */}
+              <Games/>
               <Row>
                
                   <Col lg={9} md={12} sm={12}>
