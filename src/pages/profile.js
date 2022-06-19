@@ -79,7 +79,7 @@ export default function Profile({ user }) {
     )
 }
 
-const BalanceComponent = ({ data }) => {
+ const BalanceComponent = ({ data }) => {
     return (
         <div className="d-sm-flex justify-content-between shadow-sm p-4 mb-4">
             <div >

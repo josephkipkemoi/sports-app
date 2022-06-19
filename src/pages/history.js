@@ -7,6 +7,8 @@ import useAuth from '../hooks/auth';
 import axios from '../lib/axios';
 import { Card } from 'react-bootstrap';
 import Link from 'next/link';
+import {useGetBalanceByUserIdQuery} from '../hooks/balance';
+import { useRouter } from 'next/router';
 
 const StyledHistory = styled.div`
     background-color: #ebeded;
@@ -16,11 +18,23 @@ const StyledHistory = styled.div`
         padding-top: 20px;
     }
 `
-export default function History() {
 
+export default function History(){
+
+    return (
+        <>
+            <HistoryProfile/>
+        </>
+    )
+}
+function HistoryProfile() { 
     const [history, setHistory] = useState([])
     const { user } = useAuth();
-    
+    const router = useRouter()
+    const { tab } = router.query
+ 
+    const { data } = useGetBalanceByUserIdQuery(user && user.id)
+ 
     const fetchBetHistory = async () => {
         if(!!user) {
             const response = await axios.get(`api/users/${user.id}/betslips`)
@@ -53,7 +67,7 @@ export default function History() {
         }
         return (
             <React.Fragment key={i} >
-                <div className="card p-3 m-2">
+                <div className="card p-3 m-2 cursor-pointer">
                     <div className='d-flex'>
                         <Span className='text-secondary'>
                             {new Date(name.created_at).getDate()}/
@@ -103,12 +117,15 @@ export default function History() {
     return (
         <StyledHistory>
             <Row>
-                <Col lg="3" md="3" sm="3">
-                    <UserProfile user={user}/>
+                <Col lg="3" md="3" sm="4">
+                    <UserProfile user={user} balance={data?.amount}/>
                 </Col>
-                <Col lg="9" md="9" sm="9">
-                    <HistoryFilter/>         
-                    {!!history.length ? history.map(BetHistoryElements): <NoBetslipHistory/>} 
+                <Col lg="9" md="9" sm="8">
+                    <HistoryFilter/> 
+                    <hr/>    
+                    {tab === 'all' && !!history.length ? history.map(BetHistoryElements): <NoBetslipHistory/>}     
+                    {tab === 'settled' && <h1>Settled</h1>}
+                    {tab === 'unsettled' && <h1>Unsettled</h1>}
                 </Col>
             </Row>           
         </StyledHistory>
@@ -122,29 +139,28 @@ padding-top: 20px;
 const userProfileLinks = [
     {
         name: 'Transactions',
-        path: '#'
+        path: '/transactions'
     },
     {
         name: 'Deposit',
-        path: '#'
+        path: '/deposits'
     },
     {
         name: 'Withdraw',
-        path: '#'
+        path: '/withdrawals'
     },
 ]
-const UserProfile = ({ user }) => {
-    const { phone_number } = user;
+const UserProfile = ({ user, balance }) => {
 
     const UserProfileLinkElements = (link, i) => {
         return (
             <Link key={i} href={link.path}>
                 <a
                     itemProp='url'
-                    className='text-decoration-none text-dark d-block mb-3'
+                    className='d-flex justify-content-between text-decoration-none text-dark d-block mb-3'
                 >
                     {link.name}
-                    <i className="bi bi-arrow-right-short float-end"></i>
+                    <i className="bi bi-arrow-right-short"></i>
                 </a>
             </Link>
         )
@@ -157,11 +173,11 @@ const UserProfile = ({ user }) => {
                         <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
                         <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                     </svg>
-                    <Span style={{ marginLeft: 10 }}>0{phone_number}</Span>
+                    <Span style={{ marginLeft: 10 }}>0{user?.phone_number}</Span>
                 </Card.Header>
                 <Card.Body>
                     <Span className='d-block'>Balance</Span>
-                    <Span className='d-block fw-bold'>KES 0.15</Span>
+                    <Span className='d-block fw-bold'>KES {balance?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                     <hr/>
 
                     {userProfileLinks.map(UserProfileLinkElements)}
@@ -202,6 +218,9 @@ const StyleHeaderNav = styled.div`
     }
 `
 const HistoryFilter = () => {
+    const router = useRouter()
+    const { tab } = router.query
+ 
     return (
         <div className='history-header mb-3 card m-2 p-2'>
             <div>
@@ -213,15 +232,29 @@ const HistoryFilter = () => {
             <Row className='d-flex p-2 '>
             <Col sm="12" md="9" lg="9">
                 <StyleFilterBtn className="d-flex ">
-                    <button className='btn btn-outline-secondary active'>
-                        All
-                    </button>
-                    <button className='btn btn-outline-secondary'>
-                        Settled
-                    </button>
-                    <button className='btn btn-outline-secondary'>
-                        Unsettled
-                    </button>
+                    <Link href="history?tab=all">
+                        <a itemProp="url">
+ 
+                            <button className={`btn btn-outline-secondary ${tab === 'all' && 'active'}`}>
+                                All
+                            </button>
+                        </a>
+                    </Link>
+                    <Link href="history?tab=settled">
+                        <a itemProp='url'>
+                            <button className={`btn btn-outline-secondary ${tab === 'settled' && 'active'}`}>
+                                Settled
+                            </button>
+                        </a>
+                    </Link>
+                    <Link href="history?tab=unsettled">
+                        <a itemProp='url'>
+                            <button className={`btn btn-outline-secondary ${tab === 'unsettled' && 'active'}`}>
+                                Unsettled
+                            </button>
+                        </a>
+                    </Link>                   
+                    
                 </StyleFilterBtn>               
             </Col>
             <Col sm="12" md="3" lg="3">
