@@ -4,7 +4,7 @@ import styledComponents from "styled-components";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-
+import Spinner from "react-bootstrap/Spinner";
 import useClickOutside from "../hooks/useClickOutside";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
  
@@ -227,8 +227,8 @@ const StyleAuthenticated = styledComponents.div`
 `
  
 const BottomNavBar = ({ user, login }) => {
- 
-    const [isModalOpen, setModalOpen] = useState(!!user);
+
+    const [isModalOpen, setModalOpen] = useState(false);
 
     const [userDetails, setUserDetails] = useState({
         email: '',
@@ -238,19 +238,19 @@ const BottomNavBar = ({ user, login }) => {
     const { email, password } = userDetails;
 
     const [errors, setErrors] = useState([]);
-    const [status, setStatus] = useState([]);
+    const [isLoading, setIsLoading] = useState(null);
 
     const handleUser = (e) => setUserDetails(prev => ({ ...prev, [e.target.name] : e.target.value }))
 
     const loginUser = (e) => {
         e.preventDefault()
 
-        login({setErrors, setStatus, email, password})     
+        login({setErrors, setIsLoading, email, password})   
+      
     }
-
-
-    const closeMenu = () => setModalOpen(false)
-
+ 
+    const closeMenu = () => setModalOpen(false) 
+ 
     const openModal = (e) => {
         e.preventDefault()
         setModalOpen(true)
@@ -264,7 +264,7 @@ const BottomNavBar = ({ user, login }) => {
                 <button className="btn btn-warning btn-sm">
                 <i className="bi bi-bell"></i>
                 </button>
-                <Link href="/profile" prefetch={true}>
+                <Link href="/profile" prefetch={false}>
                     <a 
                         itemProp="url"
                         className="btn btn-secondary btn-sm" 
@@ -277,7 +277,7 @@ const BottomNavBar = ({ user, login }) => {
                     </a>                
                                
                 </Link>
-                <Link href="/history" prefetch={true}>
+                <Link href="/history?tab=all" prefetch={false}>
                     <a
                         itemProp="url"
                         className="btn btn-primary btn-sm"
@@ -313,8 +313,8 @@ const BottomNavBar = ({ user, login }) => {
 
     const linkBarRef = React.useRef()
 
-    useClickOutside(linkBarRef, closeMenu)
-   
+    useClickOutside(linkBarRef, closeMenu)    
+           
     return (
         <StyleBottomNavBar>  
         <nav className="p-4" ref={linkBarRef}>
@@ -322,12 +322,13 @@ const BottomNavBar = ({ user, login }) => {
                 {bottomNavLinks.map(BottomNavLinkItem)}
             </div>           
         </nav>
-             <Modal show={isModalOpen} className="mt-5 pt-5">
-                 <Modal.Body id="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
-                        <Form id="modal-ref">
-                            <Form.Group id="modal-ref" className="mb-3">
+    
+             <Modal show={!!user ? false : isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
+                 <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+                        <Form modalId="modal-ref">
+                            <Form.Group modalId="modal-ref" className="mb-3">
                                 <Form.Control 
-                                id="modal-ref" 
+                                modalId="modal-ref" 
                                 name="email"
                                 type="email" 
                                 className="shadow-sm p-3" 
@@ -336,9 +337,9 @@ const BottomNavBar = ({ user, login }) => {
                                 >
                                 </Form.Control>
                             </Form.Group>
-                            <Form.Group id="modal-ref" className="mb-3">
+                            <Form.Group modalId="modal-ref" className="mb-3">
                                 <Form.Control 
-                                id="modal-ref" 
+                                modalId="modal-ref" 
                                 name="password"
                                 type="password" 
                                 className="shadow-sm p-3" 
@@ -348,15 +349,24 @@ const BottomNavBar = ({ user, login }) => {
                                 </Form.Control>
                             </Form.Group>                         
                             <Button 
-                            id="modal-ref" 
+                            modalId="modal-ref" 
                             style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 
                             className="w-100 p-3 mb-3 fw-bold shadow-sm" 
-                            type="submit"
+                            type="submit"                 
                             onClick={loginUser}
                             >
-                                Log In
+                                {isLoading ? 
+                                <Spinner
+                                animation="grow"
+                                role="status"
+                                aria-hidden="true"
+                                size="sm"
+                                >                                    
+                                </Spinner> : 
+                                ''}                              
+                                
+                                {isLoading ? 'Loading...' :'Log In'}
                             </Button>
-
                             <ErrorElement/>
 
                             <Link href="/forgot-password">

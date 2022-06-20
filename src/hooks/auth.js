@@ -1,5 +1,5 @@
 import axios from '../lib/axios'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
 
@@ -35,21 +35,31 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
 
-    const login = async ({ setErrors, setStatus, ...props }) => {
+    const login = async ({ setErrors, setIsLoading,...props }) => {
         await csrf()
-
+         
         setErrors([])
-        setStatus(null)
+        setIsLoading(true)
 
-        axios
+       axios
             .post('api/login', props)
-            .then(() => mutate())
+            .then((d) => {
+                mutate()
+
+                if(d.status === 204)
+                {
+                    setIsLoading(false)
+                   return true
+                }
+
+            })
             .catch(e => {
                 if(e.response.status !== 422) throw error
 
                 setErrors(Object.values(e.response.data.errors).flat())
+               
+                setIsLoading(false)
             }) 
-        
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
@@ -99,7 +109,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
         window.location.pathname = '/'
     }
-
+ 
     useEffect(() => {
         if (middleware === 'guest' && redirectIfAuthenticated && user) router.push(redirectIfAuthenticated)
         if(middleware === 'auth' && error) logout()
