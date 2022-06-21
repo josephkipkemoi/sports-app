@@ -127,7 +127,7 @@ const bottomNavLinks = [
     },
     {
         name: 'Live Games',
-        path: '/live-games',
+        path: '/live',
         class: 'live-games'
     },
     {
