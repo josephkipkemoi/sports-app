@@ -99,6 +99,12 @@ background-color: ${props => props.theme.colors.btnColor};
 max-height: 100vh;
 overflow-y: scroll;
 overflow-x: hidden;
+
+`
+const StyleActiveButton = styled.div`
+button .active {
+  background: black;
+}
 `
 function App() {
   const [clicked, setClicked] = useState(false)
@@ -228,7 +234,7 @@ function App() {
       const picked = e.target.getAttribute('picked');
       const fixtureId = e.target.getAttribute('fixtureid');
       const session_id = sessionStorage.getItem('session_id')
- 
+    
        postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
@@ -274,21 +280,22 @@ function App() {
             </Col>
             <Col lg={4} sm={4} className="d-flex">
               {data.market_odds[0].bets.map(odd => {             
-                return odd.id === 1 && odd.values.map(val => {
+                return odd.id === 1 && odd.values.map((val, i) => {
                    return (
                      <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
-                        <span className='header text-center'>{val.value}</span>                 
-                       
+                        <span className='header text-center'>{val.value}</span>  
                        <button 
                         odds={val.odd} 
                         className='btn-custom'
+                        btn_id={i}
                         home_team={data.home_team} 
                         market={odd.name} 
                         away_team={data.away_team} 
                         picked={val.value}
                         fixtureid={data.fixture_id}
-                        onClick={sendBetslip}
-                        >{val.odd}</button>                     
+                        onClick={sendBetslip}  
+                        >{val.odd}</button>   
+                                        
                      </div>
                    )
                  })

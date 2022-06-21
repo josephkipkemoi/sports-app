@@ -4,7 +4,7 @@ import configData from '../../config.json';
 export const BalanceApi = createApi({
     reducerPath: 'BalanceApi',
     baseQuery: fetchBaseQuery({ 
-        baseUrl: 'http://localhost:8000/api/',
+        baseUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
         prepareHeaders: (headers) => {
             headers.set('x-sportsapp-key', configData.SPORTS_APP_KEY)
 

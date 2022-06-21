@@ -1,10 +1,10 @@
 import axios from '../lib/axios';
 
 const useCustomFixture = () => {
-    // const csrf = axios.get('/sanctum/csrf-cookie')
+    const csrf = async () => axios.get('/sanctum/csrf-cookie')
 
     const postFixture = async (...props) => {
-        // await csrf()
+        await csrf()
         axios
             .post('api/fixtures', ...props)
             .then(d => d)

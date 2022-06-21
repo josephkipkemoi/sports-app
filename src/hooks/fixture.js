@@ -27,14 +27,14 @@ export const FixtureApi = createApi({
 export const CustomFixtureApi = createApi({
     reducerPath: 'CustomeFixtureApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8000/api/',
+        baseUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
     }),
     endpoints: (builder) => ({
         getCustomFixtures: builder.query({
-            query: () => 'fixtures'
+            query: () => '/api/fixtures'
         }),
         getCustomOdds: builder.query({
-            query: () => 'odds'
+            query: () => '/api/odds'
         })
     })
 })

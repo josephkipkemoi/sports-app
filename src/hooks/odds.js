@@ -32,7 +32,7 @@ const useCustomOdds = () => {
         const [ bookmaker,  ] = response;
   
         axios
-        .post('http://localhost:8000/api/odds', {
+        .post('https://infinite-coast-08848.herokuapp.com/api/odds', {
             data: [bookmaker]
         })
         .then(d => d)
