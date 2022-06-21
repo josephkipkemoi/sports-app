@@ -332,6 +332,7 @@ function App() {
                   <StyledMain>
                    <TopNavBar/>
                    <CustomFilter/>
+                   <hr/>
                    <StyleGameData>
                       <GamesData/>
                    </StyleGameData>   
@@ -564,11 +565,18 @@ const StyleBetslip = styled.div`
       width: 50%;
     }
   }
+  @media screen and (max-width: 990px) {
+    .betcart-mb {
+       display: none;
+    }
+  
+  }
 `
 
 const StyleBetCart = styled.div`
   color: #fff;
   margin-bottom: 24px;
+
   .share-btn {
     border: none;
     color: #0f0f0f;
@@ -617,6 +625,12 @@ const StyleBetCart = styled.div`
    padding: 4px;
    font-weight: bolder;
  }
+ @media screen and (min-width: 990px) {
+  .mobile-down {
+    display: none;
+  }
+ 
+}
 `
 const StyleSpinner = styled.div`
  margin: 50% auto;
@@ -945,20 +959,51 @@ const BetCartFormElements = () => {
 }
 
 const [modalOpen, setIsModalOpen] = useState(false)
-
-const toggleShareBtn = ( ) => setIsModalOpen(prev => !prev)
-
+const [mobileCartHeight, setMobileCartHeight] = useState(0)
+const toggleShareBtn = () => setIsModalOpen(prev => !prev)
+const openMobileBetslip = () => {
+  if(mobileCartHeight === 0) {
+    setMobileCartHeight('auto')
+  }
+  if(mobileCartHeight === 'auto') {
+    setMobileCartHeight(0)
+  }
+}
 const BetslipCartHeader = () => {
   return (
     <>
      {slip?.data?.length !== 0 &&
-      <nav className='d-flex align-items-center justify-content-between p-2 bg-secondary' onClick={toggleShareBtn}>
-      {slip?.data?.length > 1 ? <h6>Multi Bet ({slip?.data?.length})</h6> : <h6>Single Bet ({slip?.data?.length})</h6>} 
-      <nav  className='btn btn-light btn-sm text-dark'>
+      <div 
+      className='d-flex align-items-center justify-content-between p-2 bg-secondary' 
+      onClick={openMobileBetslip}
+      style={{ cursor: 'pointer' }}
+      >
+      {slip?.data?.length > 1 ? 
+      <>
+       <h6>
+        {mobileCartHeight === 0 ? 
+        <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
+        <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
+        }
+        Multi Bet ({slip?.data?.length})
+      </h6>
+      </>
+      :
+      <>      
+       <h6 className='d-flex align-items-center'>
+       {mobileCartHeight === 0 ? 
+        <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
+        <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
+        }
+        Single Bet ({slip?.data?.length})
+       </h6>
+      </>
+      } 
+      <div  className='btn btn-light btn-sm text-dark'  onClick={toggleShareBtn}>
         <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
         <button   className='share-btn'>Share</button>
-      </nav>  
-    </nav>
+      </div>  
+    </div>
       }
     </>
   )
@@ -979,7 +1024,6 @@ const StyleShareContainer = styled.div`
 }
 .social-hover:hover {
   opacity: 1;
- 
 }
 `
 const ShareContainer = () => {
@@ -1036,6 +1080,39 @@ const ShareContainer = () => {
     </Modal>
   )
 }
+const StyleMobileCartItems = styled.div`
+  position: fixed;
+  height: auto;
+  padding: 12px;
+  bottom: 0px;
+  z-index: 3;
+  background-color: #444;
+  width: 100%;
+  margin: 0;
+  @media screen and (min-width: 990px) {
+    display: none;
+  }
+`
+const StyleMobileElements = styled.div`
+  max-height: 320px;
+  overflow-y: scroll;
+  height: ${mobileCartHeight};
+`
+const MobileCartItems = () => {
+  return (
+    <StyleMobileCartItems>
+      <StyleBetCart>
+      <BetslipCartHeader/>
+      <StyleMobileElements>
+        {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
+      </StyleMobileElements>
+      <BetCartFormElements/>
+      </StyleBetCart>
+    
+    </StyleMobileCartItems>
+  )
+}
+
   useEffect(() => {
     const currentSession = sessionStorage.getItem('session_id')
     fetchBetslips(currentSession)
@@ -1044,14 +1121,14 @@ const ShareContainer = () => {
   }, [clicked, clickedd, user])
 
   return (
-    <StyleBetslip className='mx-auto'>
-      <StyleBetCart>
+    <>
+     <StyleBetslip className='mx-auto'>
+      <StyleBetCart className='betcart-mb'>
       <BetslipCartHeader/>
       <ShareContainer/> 
       {slip?.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
       {slip?.data?.length === 0 && <EmptyCart/>}
-      {slip?.data?.length !== 0 && slip.data?.map(CartElements)}
-       
+      {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
       <BetCartFormElements/>
       </StyleBetCart>
       <CongratulationModal/>
@@ -1059,6 +1136,10 @@ const ShareContainer = () => {
       <AddedFeatures/>
       <Offers/>
     </StyleBetslip>
+    <MobileCartItems/>
+
+    </>
+   
   )
 }
  
