@@ -10,7 +10,7 @@ import useCustomFixture from '../hooks/customFixture';
 import useCustomOdds from '../hooks/odds';
 import configData from '../../config.json';
 import  Modal  from 'react-bootstrap/Modal';
-
+import copyToClipboard from '../hooks/copyToClipboard';
 import  { 
   faStar, 
   faSoccerBall,
@@ -27,7 +27,6 @@ import  {
   faRefresh
 }  from "@fortawesome/free-solid-svg-icons";
 
-
 import { 
   H1, H5, Input, InputNumber, Small, Span, 
 } from '../components/Html';
@@ -41,6 +40,7 @@ import { useDispatch } from 'react-redux';
 import useAuth from '../hooks/auth';
 import useClickOutside from '../hooks/useClickOutside';
 import { Spinner } from 'react-bootstrap';
+import useSocialShare from '../hooks/socialShare';
   
 const ThemedBody = styled('div')`
  background-color: #585858;
@@ -103,7 +103,7 @@ overflow-x: hidden;
 `
 function App() {
   const [clicked, setClicked] = useState(false)
- 
+
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -645,11 +645,11 @@ const StyleShareContainer = styled.div`
 }
 .social-hover {
   cursor: pointer;
-  opacity: .7;
+  opacity: 1;
   transition: .2s ease-in;
 }
 .social-hover:hover {
-  opacity: 1;
+  opacity: .71;
 }
 `
 export const Betslip = ({ clicked }) => {
@@ -1025,52 +1025,187 @@ const BetslipCartHeader = () => {
   )
 }
 
+const StlyeInputClipboard = styled.div`
+  input {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  button {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+`
+const StyleCopied = styled.div`
+ position: absolute;
+ right: 0;  
+ margin-top: -20px;
+ margin-right: 25px;
+`
 const ShareContainer = () => {
-  return (
+  const [session, setSession] = useState('')
+  const [isCopied, setIsCopied] = useState(false)
+  const [copiedSmall, setCopiedSmall] = useState('none')
+  const [copiedSmall2, setCopiedSmall2] = useState('none')
+  const [isCodeCopied, setIsCodeCopied] = useState(false)
+  const fullUrl = `https://www.bet360.co.ke?betSession=${session}`
+  const codeSession = session
+
+  const [social, setSocial] = useState({
+    facebook: '',
+    twitter: '',
+    whatsapp: '',
+    telegram: ''
+  })
+  const { getSocialShareLinks } = useSocialShare()
+  const fetchSocialLinks = async (session_id) => {
+    const data = await getSocialShareLinks(session_id)
+   
+    setSocial(prev => ({
+      ...prev,
+      facebook: data.links.facebook,
+      twitter: data.links.twitter,
+      whatsapp: data.links.whatsapp,
+      telegram: data.links.telegram
+    }))
+  }
+
+  const handleClick = () => {
+     copyToClipboard(fullUrl)
+     .then(() => {
+        setIsCopied(true)
+        setCopiedSmall2('')
+        setTimeout(() => {
+          setIsCopied(false)
+          setCopiedSmall2('none')
+        }, 1500)
+     })
+     .catch(e => {
+      console.error(e)
+     })
+  }
+
+  const handleCodeClick = () => {
+    copyToClipboard(fullUrl)
+    .then(() => {
+      setIsCodeCopied(true)
+      setCopiedSmall('')
+       setTimeout(() => {
+        setIsCodeCopied(false)
+        setCopiedSmall('none')
+       }, 1500)
+    })
+    .catch(e => {
+     console.error(e)
+    })
+  }
+
+useEffect(() => {
+  const sessionId = sessionStorage.getItem('session_id')
+  fetchSocialLinks(sessionId)
+  setSession(sessionId)
+}, [])
+
+return (
     <Modal show={modalOpen} className="mt-5">
       <StyleShareContainer>
-      <Modal.Header>
-       <h5 className="fw-bold">Share Bet</h5>
-       <h6 onClick={toggleShareBtn} className="bg-secondary p-2 rounded text-light cursor-pointer h6-close">X</h6>
+      <Modal.Header className='bg-secondary'>
+       <h5 className="fw-bold text-light">Share Bet</h5>
+       <h6 onClick={toggleShareBtn} className="bg-secondary p-2 rounded-pill text-light cursor-pointer h6-close">X</h6>
       </Modal.Header>
       <Modal.Body>
         <span className='d-flex justify-content-center m-2'>Share this bet with friends so that they can bet on it too!</span>
-        <div className='d-sm-flex m-2 justify-content-between mb-2 mt-3 p-3'>
-          <div className="d-flex flex-column  align-items-center social-hover">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-facebook mb-2" viewBox="0 0 16 16">
-              <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
-            </svg>
-            <span>Facebook</span>
-          </div>
-          <div className="d-flex flex-column  align-items-center social-hover">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-whatsapp mb-2" viewBox="0 0 16 16">
-              <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
-            </svg>
-            <span>Whatsapp</span>
-          </div>
-          <div className="d-flex flex-column  align-items-center social-hover">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-twitter mb-2" viewBox="0 0 16 16">
-              <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
-            </svg>
-            <span>Twitter</span>
-          </div>
-          <div className="d-flex flex-column  align-items-center social-hover">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-envelope-plus mb-2" viewBox="0 0 16 16">
-              <path d="M2 2a2 2 0 0 0-2 2v8.01A2 2 0 0 0 2 14h5.5a.5.5 0 0 0 0-1H2a1 1 0 0 1-.966-.741l5.64-3.471L8 9.583l7-4.2V8.5a.5.5 0 0 0 1 0V4a2 2 0 0 0-2-2H2Zm3.708 6.208L1 11.105V5.383l4.708 2.825ZM1 4.217V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v.217l-7 4.2-7-4.2Z"/>
-              <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Zm-3.5-2a.5.5 0 0 0-.5.5v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1a.5.5 0 0 0-.5-.5Z"/>
-            </svg>
-            <span>Mail</span>
-          </div>
+        <div className='mb-2 mt-3 p-3'>
+          <Row>
+            <Col className='d-flex justify-content-around'>
+              <Link href={social.facebook}>
+              <a target="_blank" itemProp='url' className="d-flex flex-column align-items-center social-hover text-decoration-none text-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-facebook mb-2" viewBox="0 0 16 16">
+                  <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
+                </svg>
+                <span>Facebook</span>
+              </a>  
+            </Link>
+            <Link href={social.whatsapp}>
+              <a target="_blank" itemProp='url' className="d-flex flex-column align-items-center social-hover text-decoration-none text-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-whatsapp mb-2" viewBox="0 0 16 16">
+                  <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+                </svg>
+                <span>Whatsapp</span>
+              </a>
+            </Link>
+              
+              <Link href={social.twitter}>
+                <a target="_blank" itemProp='url' className="d-flex flex-column  align-items-center social-hover text-decoration-none text-dark">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-twitter mb-2" viewBox="0 0 16 16">
+                    <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
+                  </svg>
+                  <span>Twitter</span>
+                </a>
+              </Link>
+              <Link target="_blank" href={social.telegram}>
+                <a itemProp='url' className="d-flex flex-column  align-items-center social-hover text-decoration-none text-dark">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" className="bi bi-telegram mb-2" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.23.05-.012.12-.026.166.016.047.041.042.12.037.141-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8.154 8.154 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629.093.06.183.125.27.187.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.426 1.426 0 0 0-.013-.315.337.337 0 0 0-.114-.217.526.526 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09z"/>
+                  </svg>
+                  <span>Telegram</span>
+                </a>
+              </Link>  
+            </Col>
+          </Row>
          
         </div>
         <hr className='text-secondary'/>
         <div className='p-3'>
           <span className='d-block'>Copy the link: </span>
-          <code>https://sportsapp.ke/code</code>
+          <StlyeInputClipboard>
+          <div className='d-flex'>           
+              <input className='form-control' value={fullUrl} readOnly={true}/>
+              <button className='btn btn-secondary' onClick={handleClick}>
+                {isCopied ? 
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clipboard2-check" viewBox="0 0 16 16">
+                    <path d="M9.5 0a.5.5 0 0 1 .5.5.5.5 0 0 0 .5.5.5.5 0 0 1 .5.5V2a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 2v-.5a.5.5 0 0 1 .5-.5.5.5 0 0 0 .5-.5.5.5 0 0 1 .5-.5h3Z"/>
+                    <path d="M3 2.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 0 0-1h-.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1H12a.5.5 0 0 0 0 1h.5a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-12Z"/>
+                    <path d="M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3Z"/>
+                  </svg>
+                          :
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clipboard2" viewBox="0 0 16 16">
+                    <path d="M3.5 2a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-12a.5.5 0 0 0-.5-.5H12a.5.5 0 0 1 0-1h.5A1.5 1.5 0 0 1 14 2.5v12a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-12A1.5 1.5 0 0 1 3.5 1H4a.5.5 0 0 1 0 1h-.5Z"/>
+                    <path d="M10 .5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V2a.5.5 0 0 0 .5.5h5A.5.5 0 0 0 11 2v-.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5Z"/>
+                  </svg>   
+                }        
+              </button>    
+               <StyleCopied style={{ display: `${copiedSmall2}` }}>
+                  <small className='badge badge-info text-dark'>Copied</small>
+                </StyleCopied>       
+          </div>
+          </StlyeInputClipboard>
+
         </div>
         <div className='p-3'>
-          <span className='d-block'>Or copy the bet code: </span>
-          <code>ABCBDDS</code>
+        <span className='d-block'>Or copy the bet code: </span>
+          <StlyeInputClipboard>
+            <div className='d-flex'>
+              <input className='form-control' value={codeSession} readOnly={true}/>
+              <button className='btn btn-secondary' onClick={handleCodeClick}>
+              {isCodeCopied ? 
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clipboard2-check" viewBox="0 0 16 16">
+                    <path d="M9.5 0a.5.5 0 0 1 .5.5.5.5 0 0 0 .5.5.5.5 0 0 1 .5.5V2a.5.5 0 0 1-.5.5h-5A.5.5 0 0 1 5 2v-.5a.5.5 0 0 1 .5-.5.5.5 0 0 0 .5-.5.5.5 0 0 1 .5-.5h3Z"/>
+                    <path d="M3 2.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 0 0-1h-.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1H12a.5.5 0 0 0 0 1h.5a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-12Z"/>
+                    <path d="M10.854 7.854a.5.5 0 0 0-.708-.708L7.5 9.793 6.354 8.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3Z"/>
+                  </svg>
+                          :
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clipboard2" viewBox="0 0 16 16">
+                    <path d="M3.5 2a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-12a.5.5 0 0 0-.5-.5H12a.5.5 0 0 1 0-1h.5A1.5 1.5 0 0 1 14 2.5v12a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 14.5v-12A1.5 1.5 0 0 1 3.5 1H4a.5.5 0 0 1 0 1h-.5Z"/>
+                    <path d="M10 .5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V2a.5.5 0 0 0 .5.5h5A.5.5 0 0 0 11 2v-.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5Z"/>
+                  </svg>   
+                }          
+              </button>  
+                <StyleCopied style={{ display: `${copiedSmall}` }}>
+                  <small className='badge badge-info text-dark'>Copied</small>
+                </StyleCopied>
+            </div>
+          </StlyeInputClipboard>
+
         </div>
       
       </Modal.Body>
