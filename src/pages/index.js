@@ -575,8 +575,6 @@ const StyleBetslip = styled.div`
 
 const StyleBetCart = styled.div`
   color: #fff;
-  margin-bottom: 24px;
-
   .share-btn {
     border: none;
     color: #0f0f0f;
@@ -625,6 +623,7 @@ const StyleBetCart = styled.div`
    padding: 4px;
    font-weight: bolder;
  }
+
  @media screen and (min-width: 990px) {
   .mobile-down {
     display: none;
@@ -635,6 +634,24 @@ const StyleBetCart = styled.div`
 const StyleSpinner = styled.div`
  margin: 50% auto;
  width: 1rem;
+`
+const StyleShareContainer = styled.div`
+.h6-close {
+  cursor: pointer;
+  opacity: .7;
+  transition: .3s ease-in;
+}
+.h6-close:hover {
+  opacity: 1;
+}
+.social-hover {
+  cursor: pointer;
+  opacity: .7;
+  transition: .2s ease-in;
+}
+.social-hover:hover {
+  opacity: 1;
+}
 `
 export const Betslip = ({ clicked }) => {
   const [slip, setSlip] = useState([])
@@ -1008,24 +1025,7 @@ const BetslipCartHeader = () => {
     </>
   )
 }
-const StyleShareContainer = styled.div`
-.h6-close {
-  cursor: pointer;
-  opacity: .7;
-  transition: .3s ease-in;
-}
-.h6-close:hover {
-  opacity: 1;
-}
-.social-hover {
-  cursor: pointer;
-  opacity: .7;
-  transition: .2s ease-in;
-}
-.social-hover:hover {
-  opacity: 1;
-}
-`
+
 const ShareContainer = () => {
   return (
     <Modal show={modalOpen} className="mt-5">
@@ -1105,8 +1105,9 @@ const MobileCartItems = () => {
       <BetslipCartHeader/>
       <StyleMobileElements>
         {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
+        <BetCartFormElements/>
       </StyleMobileElements>
-      <BetCartFormElements/>
+  
       </StyleBetCart>
     
     </StyleMobileCartItems>
