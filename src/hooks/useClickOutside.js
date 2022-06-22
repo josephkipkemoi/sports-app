@@ -25,7 +25,6 @@ export default function useClickOutside(elRef, callback) {
             latestCallback.current(e)
         }
     }
-    console.log(handleClickOutside)
      // Add listener to the document
      document.addEventListener('click', handleClickOutside, true)
 

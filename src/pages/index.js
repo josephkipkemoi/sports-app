@@ -101,11 +101,6 @@ overflow-y: scroll;
 overflow-x: hidden;
 
 `
-const StyleActiveButton = styled.div`
-button .active {
-  background: black;
-}
-`
 function App() {
   const [clicked, setClicked] = useState(false)
  
@@ -258,10 +253,14 @@ function App() {
               <Row style={{ marginLeft: 2 }}>
               <h5 className='header'>{data.league}</h5>
                 <Col lg={1} md={1} sm={1}>
-                  <Link href={`fixture/${data.fixture_id}`}>
+                  <Link href={`fixture/${data.fixture_id}?home=${data.home_team}&away=${data.away_team}`} >
                   <a
                     itemProp='url'
-                    className='text-decoration-none text-light'                    
+                    className='text-decoration-none text-light'  
+                    onClick={() =>{
+                      sessionStorage.setItem('home_team', data.home_team)
+                      sessionStorage.setItem('away_team', data.away_team)                      
+                      }}                  
                   >
                     <Small>
                       {data.market_odds[0].bets.length}
