@@ -51,6 +51,7 @@ const ThemedBody = styled('div')`
 `
 
 const StyleGameData = styled('div')`
+height: 100vh;
 .custom-grid-box-main, .custom-grid-hide {
   background: ${props => props.theme.colors.btnColor};
   color: #c3c3c3; 
@@ -102,6 +103,7 @@ overflow-x: hidden;
 
 `
 function App() {
+
   const [clicked, setClicked] = useState(false)
 
   useEffect(() => {
@@ -654,44 +656,54 @@ const StyleShareContainer = styled.div`
 `
 export const Betslip = ({ clicked }) => {
   const [slip, setSlip] = useState([])
+  const [loadingBetslip, setLoadingBetslip] = useState(false)
   const [oddsTotal, setOddsTotal] = useState(0)
   const [balance, setBalance] = useState(0)
   const [isModalOpen, setModalOpen] = useState(false);
   const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false);
   const [clickedd, setClicked] = useState(false)
-  const { user } = useAuth({ middleware: 'guest' })
+  const { user, isAuthenticated } = useAuth({ middleware: 'guest' })
   const linkBarRef = React.useRef();
   const congratulationsLinkBarRef = React.useRef();
   const [loading, setLoading] = useState(null)
+  const router = useRouter()
+  const { betSession } = router.query
 
-const closeMenu = () => setModalOpen(false)
-const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
+  const closeMenu = () => setModalOpen(false)
+  const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
 
-const fetchBetslips = (session) => {
+  const fetchSessionSlip = () => {
     axios
-      .get(`api/betslips/${session}`)
-      .then(d => setSlip(d.data))
-      .catch(e => console.error(e.message))
-}
+    .get(`api/betslips/${betSession}`)
+    .then(d => setSlip(d.data))
+    .catch(e => console.error(e.message))
+  }
 
-const fetchBetslipOddsTotal = (session) => {
-    axios
-      .get(`api/betslips/sessions/${session}/odds-total`)
-      .then(d => setOddsTotal(Number(d.data.odds_total).toFixed(2)))
-      .catch(e => console.error(e.message))
-}
+  const fetchBetslips = (session) => {
+      axios
+        .get(`api/betslips/${session}`)
+        .then(d => setSlip(d.data))
+        .catch(e => console.error(e.message))
+  }
+
+  const fetchBetslipOddsTotal = (session) => {
+      axios
+        .get(`api/betslips/sessions/${session}/odds-total`)
+        .then(d => setOddsTotal(Number(d.data.odds_total).toFixed(2)))
+        .catch(e => console.error(e.message))
+  }
   
-const getBalance = async () => {
-    if(!!user) {
-      const res = await axios.get(`api/users/${user?.id}/balance`, {
-        headers: {
-          'x-sportsapp-key': configData.SPORTS_APP_KEY
-        }
-      })
-  
-      setBalance(res?.data?.amount)
-    }  
-}
+  const getBalance = async () => {
+      if(!!user) {
+        const res = await axios.get(`api/users/balance?user_id=${user?.id}`, {
+          headers: {
+            'x-sportsapp-key': configData.SPORTS_APP_KEY
+          }
+        })
+    
+        setBalance(res?.data?.amount)
+      }  
+  }
 
 const BalanceModal = () => {
     return (
@@ -743,6 +755,7 @@ const CongratulationModal = () => {
 }
 
 const EmptyCart = () => {
+
     return (
       <>
         <div className='d-flex justify-content-between'>
@@ -761,7 +774,7 @@ const EmptyCart = () => {
        <span className='d-block m-3'>Or introduce your bet code:</span>
        <Row className='m-1 align-items-center'>
          <Col sm={8} md={8} lg={8} className="inpt-xsm">
-         <Input className="form-control " placeholder="Bet Code"/>           
+         <Input className="form-control " value={betSession} placeholder="Bet Code"/>           
          </Col>
          <Col sm={4} md={4} className='text-center inpt-xsm' lg={4}>
            <button className='btn btn-secondary'>Add</button>
@@ -849,6 +862,7 @@ const BetCartFormElements = () => {
 
     const postBalanceAfterPlacing = (balance_after_placing) => {
       axios.post(`api/users/${user?.id}/balance`, {
+        'user_id': user?.id,
         'amount': balance_after_placing
       } ,
       {
@@ -873,7 +887,7 @@ const BetCartFormElements = () => {
         return
       }   
 
-      const sessionId = sessionStorage.getItem('session_id');
+      const sessionId = Number(sessionStorage.getItem('session_id'));
   
       postBetslipCartToDb(sessionId, user.id, betAmount, Number(oddsTotal), possibleWin)
       postBalanceAfterPlacing(balanceAfterPlacing)
@@ -1253,6 +1267,7 @@ const MobileCartItems = () => {
     fetchBetslips(currentSession)
     fetchBetslipOddsTotal(currentSession)
     getBalance()
+    fetchSessionSlip()
   }, [clicked, clickedd, user])
 
   return (
@@ -1261,7 +1276,9 @@ const MobileCartItems = () => {
       <StyleBetCart className='betcart-mb'>
       <BetslipCartHeader/>
       <ShareContainer/> 
-      {slip?.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
+     
+      {/* {slip.length === 0 && <EmptyCart/> } */}
+      {slip.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
       {slip?.data?.length === 0 && <EmptyCart/>}
       {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
       <BetCartFormElements/>

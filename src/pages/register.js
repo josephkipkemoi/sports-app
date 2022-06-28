@@ -87,7 +87,7 @@ export default function Register() {
 
         register({ country_residence, phone_number, email, password, password_confirmation, setErrors })
     }
-    // console.log(errors)
+
     return (
         <StyleRegistration>
             <Container className='custom-box'>

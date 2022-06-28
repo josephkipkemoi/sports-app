@@ -7,6 +7,7 @@ import Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import useClickOutside from "../hooks/useClickOutside";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
+import useAuth from "../hooks/auth";
  
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
@@ -227,9 +228,8 @@ const StyleAuthenticated = styledComponents.div`
 `
  
 const BottomNavBar = ({ user, login }) => {
-
     const [isModalOpen, setModalOpen] = useState(false);
-
+    const { isAuthenticated } = useAuth({ middleware: 'guest' })
     const [userDetails, setUserDetails] = useState({
         email: '',
         password: '',
@@ -305,7 +305,7 @@ const BottomNavBar = ({ user, login }) => {
                 </a>
             </Link>
              {(link.links) && (
-                <div className="align-right">{!user ? link.links.map(BottomNavLinkItem) :  <AuthenticatedItems/>}</div> 
+                <div className="align-right">{!!isAuthenticated === false ? link.links.map(BottomNavLinkItem) :  <AuthenticatedItems/>}</div> 
             )}
   
         </div>

@@ -5,29 +5,42 @@ import useSWR from 'swr'
 
 const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     const router = useRouter();
+    const [userSession, setUserSession] = useState(null)
 
-    const { data: user, error, mutate } = useSWR('/api/user', () => 
-        axios
-            .get('api/user')
-            .then(res => res.data)
-            .catch(e => {
-                if(e.response.status !== 409) throw error
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const { data, error, mutate } = useSWR(`api/user`, async () => {
+        if(!!userSession) {
+            const response = await axios.get(`api/user?us_s=${userSession}`)
+            if(response.data.status === 200) {
+                setIsAuthenticated(true)
+            }
+            return response.data.user[0]
+        }
+      
+        // .then(res => res.data)
+        // .catch(e => {
+        //     if(e.response.status !== 409) throw error
 
-                router.push('/verify-email')
-            }),
+        //     router.push('/verify-email')
+        // })
+
+    }
     )
 
-    const csrf = async () => axios.get('/sanctum/csrf-cookie')
+    const csrf = () => axios.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, ...props }) => {
         await csrf()
-        
         setErrors([])
-
         axios
             .post('api/register', props)
-            .then(() => mutate())
+            .then((d) => {
+                localStorage.removeItem('u_s')
+               localStorage.setItem('u_s',d.data.session_payload)
+                mutate()
+            })
             .catch(e => {
+          
                 if(e.response.status !== 422) throw error
 
                 setErrors(Object.values(e.response.data.errors).flat())
@@ -40,16 +53,18 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
          
         setErrors([])
         setIsLoading(true)
-
-       axios
+             axios
             .post('api/login', props)
             .then((d) => {
                 mutate()
-
-                if(d.status === 204)
+                if(d.status === 200)
                 {
-                    setIsLoading(false)
-                   return true
+                localStorage.removeItem('u_s')
+                localStorage.removeItem('u_i')
+                localStorage.setItem('u_s',d.data.session_cookie)
+                localStorage.setItem('u_i', d.data.session_uid)
+                setIsLoading(false)
+                return true
                 }
 
             })
@@ -60,6 +75,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                
                 setIsLoading(false)
             }) 
+ 
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
@@ -101,28 +117,44 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
     const logout = async () => {
+        await csrf()
         if (! error) {
             await axios
                     .post('api/logout')
-                    .then(() => mutate())
+                    .then(() =>{
+                        mutate()
+                        })
         }
 
+        localStorage.removeItem('u_s')
         window.location.pathname = '/'
     }
- 
+    
+    function checkIfAuthenticated() {
+
+        if(!!localStorage.getItem('u_s')) {
+            setIsAuthenticated(true)
+        }
+    }
     useEffect(() => {
-        if (middleware === 'guest' && redirectIfAuthenticated && user) router.push(redirectIfAuthenticated)
+        // if( user === null) localStorage.removeItem('u_s')
+        if (middleware === 'guest' && redirectIfAuthenticated && data?.user) router.push(redirectIfAuthenticated)
         if(middleware === 'auth' && error) logout()
-    }, [user, error])
+        setUserSession(localStorage.getItem('u_s'))
+      
+        checkIfAuthenticated()
+
+    }, [ error, data])
 
     return {
-        user,
+        user: data,
         register,
         login,
         forgotPassword,
         resetPassword,
         resendEmailVerification,
-        logout
+        logout,
+        isAuthenticated
     }
 
 }

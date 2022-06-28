@@ -20,9 +20,9 @@ const StyleProfile = styled.div`
 export default function Profile({ user }) {
 
     const { logout } = useAuth({ middleware: 'guest' })
-    
+
     const user_id = user && user.id;    
- 
+    
     const { data } = useGetBalanceByUserIdQuery(user_id)
  
     
@@ -145,15 +145,16 @@ const DepositComponent = ({ userId }) => {
         }
       }
 
-    const depositAmountToDb = () => {
+      const depositAmountToDb = () => {
+        
        const res = axios.post(`api/users/${userId}/balance`, {
+        'user_id': userId,
         'amount': depositAmount
        } ,{
             headers: {
                 'x-sportsapp-key': configData.SPORTS_APP_KEY
             }        
         })
-    console.log(res)
     }
     
     return (
