@@ -12,6 +12,7 @@ import {
 } from "../components/Html";
 import axios from "../lib/axios"
 import { useGetAuthUserQuery } from "../hooks/customAuth"
+import { useRouter } from 'next/router';
 
 const StyleProfile = styled.div`
     background-color: #ebeded;
@@ -19,6 +20,8 @@ const StyleProfile = styled.div`
 `
 
 export default function Profile() {
+    const router = useRouter()
+    const { pathname } = router
 
     const { logout } = useAuth({ middleware: 'guest' })
     
@@ -27,6 +30,9 @@ export default function Profile() {
         logout()
     }
 
+    useEffect(() => {
+
+    },[pathname])
     return (
         <StyleProfile>
             <Container >

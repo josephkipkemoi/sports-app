@@ -277,7 +277,7 @@ const BottomNavBar = ({ user, login }) => {
                     </a>                
                                
                 </Link>
-                <Link href="/history?tab=all" prefetch={false}>
+                <Link href="/history?his_tab=sbets&tab=all" prefetch={false}>
                     <a
                         itemProp="url"
                         className="btn btn-primary btn-sm"

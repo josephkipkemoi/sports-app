@@ -33,14 +33,13 @@ import {
 import { usePostCustomFixtureQuery } from '../hooks/customFixture';
 import useCustomBetslip from '../hooks/customBetslip';
 import { useGetBetslipQuery } from '../hooks/betslip';
-import useGetBalanceByUserIdQuery from '../hooks/balance';
+import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import axios from '../lib/axios';
 import { useRouter } from 'next/router';
-import { useDispatch } from 'react-redux';
-import useAuth from '../hooks/auth';
 import useClickOutside from '../hooks/useClickOutside';
 import { Spinner } from 'react-bootstrap';
 import useSocialShare from '../hooks/socialShare';
+import useAuth from '../hooks/auth';
   
 const ThemedBody = styled('div')`
  background-color: #585858;
@@ -656,16 +655,16 @@ const StyleShareContainer = styled.div`
 `
 export const Betslip = ({ clicked }) => {
   const [slip, setSlip] = useState([])
-  const [loadingBetslip, setLoadingBetslip] = useState(false)
   const [oddsTotal, setOddsTotal] = useState(0)
   const [balance, setBalance] = useState(0)
   const [isModalOpen, setModalOpen] = useState(false);
   const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false);
   const [clickedd, setClicked] = useState(false)
-  const { user, isAuthenticated } = useAuth({ middleware: 'guest' })
-  const linkBarRef = React.useRef();
-  const congratulationsLinkBarRef = React.useRef();
+  const { isAuthenticated } = useAuth({ middleware: 'guest' })
+  const [userId, setUserId] = useState(null)
   const [loading, setLoading] = useState(null)
+  const congratulationsLinkBarRef = useRef();
+  const linkBarRef = useRef();
   const router = useRouter()
   const { betSession } = router.query
 
@@ -692,18 +691,6 @@ export const Betslip = ({ clicked }) => {
         .then(d => setOddsTotal(Number(d.data.odds_total).toFixed(2)))
         .catch(e => console.error(e.message))
   }
-  
-  const getBalance = async () => {
-      if(!!user) {
-        const res = await axios.get(`api/users/balance?user_id=${user?.id}`, {
-          headers: {
-            'x-sportsapp-key': configData.SPORTS_APP_KEY
-          }
-        })
-    
-        setBalance(res?.data?.amount)
-      }  
-  }
 
 const BalanceModal = () => {
     return (
@@ -718,7 +705,7 @@ const BalanceModal = () => {
             <div className='alert alert-secondary'>
               <p>|--- GO TO LIPA NA MPESA</p>     
               <p>|--- ENTER PAYBILL BUSINESS NO.: <b>123123</b></p>
-              <p>|--- ENTER ACCOUNT NO.: <b>0{user?.phone_number}</b></p>
+              <p>|--- ENTER ACCOUNT NO.: <b>07XX-XXX-XXX</b></p>
               <p>|--- ENTER AMOUNT & SEND</p>
               <p>|--- ONCE YOU RECEIVE MPESA NOTIFICATION, GO AHEAD AND PLACE YOUR BET</p>
             </div>            
@@ -823,7 +810,19 @@ const CartElements = (link, i) => {
 
 const BetCartFormElements = () => {
     const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
- 
+    const { data, error, isLoading } = useGetBalanceByUserIdQuery(userId)
+
+    if(error) {
+      return <span>Error...</span>
+    }
+    if(isLoading) {
+      return ''
+    }
+    
+    const { amount } = data;
+  
+    setBalance(amount)
+
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
 
     const decrementBetAmount = () => {
@@ -861,8 +860,8 @@ const BetCartFormElements = () => {
     }
 
     const postBalanceAfterPlacing = (balance_after_placing) => {
-      axios.post(`api/users/${user?.id}/balance`, {
-        'user_id': user?.id,
+      axios.post(`api/users/${userId}/balance`, {
+        'user_id': userId,
         'amount': balance_after_placing
       } ,
       {
@@ -889,7 +888,7 @@ const BetCartFormElements = () => {
 
       const sessionId = Number(sessionStorage.getItem('session_id'));
   
-      postBetslipCartToDb(sessionId, user.id, betAmount, Number(oddsTotal), possibleWin)
+      postBetslipCartToDb(sessionId, userId, betAmount, Number(oddsTotal), possibleWin)
       postBalanceAfterPlacing(balanceAfterPlacing)
       setNewSessionStorage()
   
@@ -902,11 +901,10 @@ const BetCartFormElements = () => {
               <Small className='fw-bold'>{oddsTotal}</Small>
          </div>
         }
-        {!!user && slip?.data?.length !== 0 ? 
+        {!!isAuthenticated && slip?.data?.length !== 0 ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
             <Small>Balance:</Small>
             <Small className='fw-bold'>
-            <span class="glyphicon glyphicon-refresh"></span>
               <FontAwesomeIcon 
               icon={faRefresh} 
               style={{ 
@@ -957,13 +955,13 @@ const BetCartFormElements = () => {
           </button>
             <button 
             ref={linkBarRef}      
-            disabled={!user || loading}
+            disabled={!isAuthenticated || loading}
             className=' text-dark w-100'
             onClick={postBetslipCart}
             style={{ 
               border: 'none', 
               color: 'rgba(0,0,0,0.6)',
-              cursor: `${!user ? 'not-allowed' : 'cursor'}`,
+              cursor: `${!isAuthenticated ? 'not-allowed' : 'cursor'}`,
               padding: '0.25rem 0.5rem',
               borderRadius: 4,
               fontSize: '0.875rem',
@@ -1115,6 +1113,8 @@ const ShareContainer = () => {
 
 useEffect(() => {
   const sessionId = sessionStorage.getItem('session_id')
+  const userId = localStorage.getItem('u_i');
+  setUserId(userId)
   fetchSocialLinks(sessionId)
   setSession(sessionId)
 }, [])
@@ -1266,9 +1266,8 @@ const MobileCartItems = () => {
     const currentSession = sessionStorage.getItem('session_id')
     fetchBetslips(currentSession)
     fetchBetslipOddsTotal(currentSession)
-    getBalance()
     fetchSessionSlip()
-  }, [clicked, clickedd, user])
+  }, [clicked, clickedd])
 
   return (
     <>

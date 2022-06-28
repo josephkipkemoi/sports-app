@@ -5,6 +5,7 @@ import { BalanceApi } from "../hooks/balance";
 import { BetslipApi } from "../hooks/betslip";
 import { UserApi } from "../hooks/customAuth";
 import { FixtureApi, CustomFixtureApi } from "../hooks/fixture";
+import { HistoryApi } from "../hooks/history";
  
 export const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
         [CustomFixtureApi.reducerPath]: CustomFixtureApi.reducer,
         [BetslipApi.reducerPath]: BetslipApi.reducer,
         [UserApi.reducerPath]: UserApi.reducer,
+        [HistoryApi.reducerPath]: HistoryApi.reducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         immutableCheck: false,
@@ -23,6 +25,7 @@ export const store = configureStore({
         BalanceApi.middleware,
         BetslipApi.middleware,
         UserApi.middleware,
+        HistoryApi.middleware,
     )
 })
 

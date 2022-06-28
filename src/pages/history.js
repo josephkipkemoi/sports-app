@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import styled from 'styled-components';
 import { Span } from '../components/Html';
@@ -12,6 +13,9 @@ import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import { useRouter } from 'next/router';
 import { useGetAllBetHistoryQuery } from '../hooks/betslip';
 import { useGetAuthUserQuery } from '../hooks/customAuth';
+import { useGetAllUserHistoryBetslipQuery, useGetSettledHistoryBetslipQuery, useGetUnsettledHistoryBetslipQuery } from '../hooks/history';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
 const StyledHistory = styled.div`
     background-color: #ebeded;
@@ -26,43 +30,56 @@ export default function History(){
 
     return (
         <>
-            <HistoryProfile/>
+            <SportBetsHistoryProfile/>
         </>
     )
 }
-function HistoryProfile() {
-     
-    const [history, setHistory] = useState([])
-    const [unsettledHistory, setUnsettledHistory] = useState([])
-    const [settledHistory, setSettledHistory] = useState([])
-
-    const { user } = useAuth();
-    const router = useRouter()
-    const { tab } = router.query
-  
-    const fetchBetHistory = async () => {
-        if(!!user) {
-            const response = await axios.get(`api/users/${user.id}/betslips`)
- 
-            setHistory(response?.data?.data)
-        }
-    }
-
-    const fetchActiveHistory = async () => {
+const SportBetsHistoryProfile = () => {
     
-        if(!!user) {
-            const response = await axios
-                                    .get(`api/users/betslips/status?user_id=${user.id}&bet_status=Active`)
-            setUnsettledHistory(response?.data?.data)
-        }
+    const [userId, setUserId] = useState(null)
+    const router = useRouter()
+    const { tab , his_tab} = router.query
+
+    useEffect(() => {
+        const userId = localStorage.getItem('u_i')
+        setUserId(userId)
+    },[ tab])
+
+    return (
+        <StyledHistory>
+            <Row>
+                <Col lg="3" md="3" sm="4">
+                    <UserProfile />
+                    <UpdateHistory user_id={userId}/>
+                </Col>
+                <Col lg="9" md="9" sm="8">
+                    <HistoryFilter/> 
+                    <hr/>    
+                    {tab === 'all' && <AllTabHistory user_id={userId}/>}
+                    {tab === 'settled' && <SettledHistory user_id={userId}/>}
+                    {tab === 'unsettled' && <UnsettledHistory user_id={userId}/>}
+                    {tab === 'search' && <SearchFilterResults user_id={userId}/>}
+                    {his_tab === 'jbets' && <JackpotHistory/>} 
+                </Col>
+            </Row>           
+        </StyledHistory>
+    )
+}
+
+const JackpotHistory = () => <NoBetslipHistory/>
+
+const AllTabHistory = ({ user_id }) => {
+
+    const { data, error, isLoading } = useGetAllUserHistoryBetslipQuery(user_id)
+
+    if(error) {
+        return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
     }
 
-    const fetchSettledHistory = async () => {
-        if(!!user) {
-            const response = await axios
-                                    .get(`api/users/betslips/status?user_id=${user.id}&bet_status=Lost`)
-            setSettledHistory(response?.data?.data)
-        }
+    if(isLoading) {
+        return  <div className='d-flex justify-content-center'>
+        <Spinner className='mt-5' animation="grow" size="lg"/>
+    </div>
     }
 
     const BetHistoryElements = (name, i) => {
@@ -89,7 +106,7 @@ function HistoryProfile() {
                     className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
                     >   
                         {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>}
-                        <Span className="text-warning">{name.betslip_status}</Span>
+                        <Span className={`${name.betslip_status === 'Active' ? 'text-warning' : 'text-white'}`}>{name.betslip_status}</Span>
                     </div>
                     <div className='d-sm-flex justify-content-between mt-2 p-1'>
                         <div>
@@ -107,36 +124,77 @@ function HistoryProfile() {
             </React.Fragment>
         )
     }
-
-    useEffect(() => {
-        fetchBetHistory()
-        fetchActiveHistory()
-        fetchSettledHistory()
-    },[ tab])
-
+ 
     return (
-        <StyledHistory>
-            <Row>
-                <Col lg="3" md="3" sm="4">
-                    <UserProfile />
-                    <UpdateHistory/>
-                </Col>
-                <Col lg="9" md="9" sm="8">
-                    <HistoryFilter/> 
-                    <hr/>    
-                    {(tab === 'all' && history.length === 0) && <NoBetslipHistory/>}  
-                    {(tab === 'all' && !!history.length) && history.map(BetHistoryElements)}  
-                    {(tab === 'settled' && settledHistory?.data?.length === 0) && <NoBetslipHistory/>}     
-                    {(tab === 'settled' && !!settledHistory?.data?.length) && <SettledHistory data={settledHistory?.data}/>}
-                    {(tab === 'unsettled' && unsettledHistory?.data?.length === 0) && <NoBetslipHistory/>}     
-                    {(tab === 'unsettled' && !!unsettledHistory?.data?.length) && <UnsettledHistory data={unsettledHistory?.data}/>}
-                    {tab === 'search' && <SearchFilterResults user_id={user?.id}/>}
-                </Col>
-            </Row>           
-        </StyledHistory>
+        <>
+        { data?.data.length > 0 ?
+         data.data.map(BetHistoryElements) : 
+          <NoBetslipHistory/>}  
+        </>
     )
 }
 
+const SettledHistory = ({ user_id }) => {
+ 
+    const { data, error, isLoading } = useGetSettledHistoryBetslipQuery(user_id)
+    if(error) {
+        return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
+    }
+    if(isLoading) {
+        return <div className='d-flex justify-content-center'>
+        <Spinner className='mt-5' animation="grow" size="lg"/>
+    </div>
+    }
+
+    const SettledItems = (name , i) => {
+                return (
+                    <React.Fragment key={i}>
+                        <div className="card p-3 m-2 cursor-pointer">
+                            <div className='d-flex'>
+                                <Span className='text-secondary'>
+                                    {new Date(name.created_at).getDate()}/
+                                    {new Date(name.created_at).getMonth()}/
+                                    {new Date(name.created_at).getFullYear()}
+                                </Span>
+                                <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                                    {new Date(name.created_at).getHours()}:
+                                    {new Date(name.created_at).getMinutes()}
+                                </Span>
+                            </div>
+                            <div>
+                                <small>Bet ID:</small>
+                                <small>{name.session_id}</small>
+                            </div>
+                            <div 
+                            className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                            >   
+                                <span>Bet Status</span>
+                                <Span className="text-white fw-bold">{name.betslip_status}</Span>
+                            </div>
+                            <div className='d-sm-flex justify-content-between mt-2 p-1'>
+                                <div>
+                                    <Span>Stake Amount: </Span>
+                                    <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                </div>
+                                <div>
+                                    <Span>Final Payout: </Span>
+                                    <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                </div>  
+                            </div>
+                                       
+                        </div>
+                    </React.Fragment>
+                )
+            }
+    
+    return (
+        <>
+        {data.data.data.length > 0 ? 
+        data.data.data.map(SettledItems) : 
+        <NoBetslipHistory/>}
+        </>
+    )
+}
 const SearchFilterResults = ({ user_id }) => {
     const router = useRouter()
     const { from, to } = router.query;
@@ -198,57 +256,19 @@ const SearchFilterResults = ({ user_id }) => {
     )
 }
 
-const SettledHistory = ({ data }) => {
+const UnsettledHistory = ({ user_id }) => {
+    const { data, error, isLoading } = useGetUnsettledHistoryBetslipQuery(user_id)
 
-    const SettledItems = (name , i) => {
-        return (
-            <React.Fragment key={i}>
-                <div className="card p-3 m-2 cursor-pointer">
-                    <div className='d-flex'>
-                        <Span className='text-secondary'>
-                            {new Date(name.created_at).getDate()}/
-                            {new Date(name.created_at).getMonth()}/
-                            {new Date(name.created_at).getFullYear()}
-                        </Span>
-                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
-                            {new Date(name.created_at).getHours()}:
-                            {new Date(name.created_at).getMinutes()}
-                        </Span>
-                    </div>
-                    <div>
-                        <small>Bet ID:</small>
-                        <small>{name.session_id}</small>
-                    </div>
-                    <div 
-                    className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
-                    >   
-                    <span>Bet Status</span>
-                        {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
-                        <Span className="text-warning">{name.betslip_status}</Span>
-                    </div>
-                    <div className='d-sm-flex justify-content-between mt-2 p-1'>
-                        <div>
-                            <Span>Stake Amount: </Span>
-                            <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                        </div>
-                        <div>
-                            <Span>Final Payout: </Span>
-                            <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                        </div>  
-                    </div>
-                               
-                </div>
-            </React.Fragment>
-        )
+    if(error) {
+        return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
     }
-    return (
-        <>
-        {data.map(SettledItems)}
-        </>
-    )
-}
 
-const UnsettledHistory = ({ data }) => {
+    if(isLoading) {
+        return <div className='d-flex justify-content-center'>
+                    <Spinner className='mt-5' animation="grow" size="lg"/>
+                </div>
+    }
+
     const UnsettledItems = (name, i) => {
         return (
             <React.Fragment key={i}>
@@ -292,7 +312,9 @@ const UnsettledHistory = ({ data }) => {
     }
     return (
         <>
-          {data.map(UnsettledItems)}
+            {data.data.data.length > 0 ? 
+            data.data.data.map(UnsettledItems) :
+            <NoBetslipHistory/>}
         </>
     )
 }
@@ -316,10 +338,10 @@ const userProfileLinks = [
     },
     {
         name: 'Bet History',
-        path: '/history?tab=all'
+        path: '/history?his_tab=sbets&tab=all'
     }
 ]
-const UserProfile = () => {
+export const UserProfile = () => {
     const [userId, setUserId] = useState(null);
       
     const UserProfileLinkElements = (link, i) => {
@@ -350,7 +372,16 @@ const UserProfile = () => {
     
             const { amount } = data
             return (
-                <Span className='d-block fw-bold'>KES {amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                <Span className='d-block fw-bold'>
+                    <FontAwesomeIcon 
+                    icon={faRefresh} 
+                    style={{ 
+                        cursor: 'pointer',
+                        paddingRight: 4, 
+                    }}
+                    />
+                    KES {amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                </Span>
             )
         }
         }
@@ -437,8 +468,8 @@ const HistoryFilter = () => {
     });
     const { from_date, to_date } = dates;
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const { tab } = router.query
-    
+    const { tab, his_tab } = router.query
+
     const openModal = () => {
         setIsModalOpen(prev => !prev)
     }
@@ -452,14 +483,36 @@ const HistoryFilter = () => {
         <div className='history-header mb-3 card m-2 p-2'>
             <div>
                 <StyleHeaderNav className='d-flex p-2'>
-                    <h5 className="fw-bold active-h5 p-3">Sports Bets</h5>
-                    <h5 className='jackpot p-3'>Jackpot</h5>
+                    <Link href="history?his_tab=sbets&tab=all">
+                        <a
+                            itemProp='url'
+                            className='text-decoration-none text-dark'
+                        >
+                            <h5 
+                            className={`${his_tab === 'sbets' ? 'fw-bold active-h5' : ''}  p-3`}
+                            >
+                                Sports Bets
+                            </h5>
+                        </a>
+                    </Link>
+                    <Link href="history?his_tab=jbets&tab=j_all">
+                        <a
+                           itemProp='url'
+                           className='text-decoration-none text-dark'  
+                        >
+                            <h5 
+                            className={`${his_tab === 'jbets' ? 'fw-bold active-h5' : ''}  p-3`}
+                            >
+                                Jackpot
+                            </h5>
+                        </a>
+                    </Link>
                 </StyleHeaderNav>          
             </div>
             <Row className='d-flex p-2 '>
             <Col sm="12" md="9" lg="9">
                 <StyleFilterBtn className="d-flex ">
-                    <Link href="history?tab=all">
+                    <Link href="history?his_tab=sbets&tab=all">
                         <a itemProp="url">
  
                             <button className={`btn btn-outline-secondary ${tab === 'all' && 'active'}`}>
@@ -467,14 +520,14 @@ const HistoryFilter = () => {
                             </button>
                         </a>
                     </Link>
-                    <Link href="history?tab=settled">
+                    <Link href="history?his_tab=sbets&tab=settled">
                         <a itemProp='url'>
                             <button className={`btn btn-outline-secondary ${tab === 'settled' && 'active'}`}>
                                 Settled
                             </button>
                         </a>
                     </Link>
-                    <Link href="history?tab=unsettled">
+                    <Link href="history?his_tab=sbets&tab=unsettled">
                         <a itemProp='url'>
                             <button className={`btn btn-outline-secondary ${tab === 'unsettled' && 'active'}`}>
                                 Unsettled
@@ -538,20 +591,23 @@ const HistoryFilter = () => {
 }
 
 const NoBetslipHistory = () => {
+    const router = useRouter()
+    const { his_tab } = router.query
     return (
         <>
         <div className="text-center mt-5">
-            <Span>You do not have any sportsbook bets</Span>
+            <Span>
+                You do not have any {his_tab === 'sbets' ? 'Sportsbook' : 'Jackpot'} bets
+            </Span>
         </div>
         </>
     )
 }
 
-const UpdateHistory = () => {
-    const { user } = useAuth({ middleware: 'guest' })
-    const user_id = user && user.id
+const UpdateHistory = ({ user_id }) => {
+
     const updateLost = async () => {
-      await axios.patch(`api/users/betslips/update?user_id=${user_id}&session_id=1655669961037`)
+      await axios.patch(`api/users/betslips/update?user_id=${user_id}&session_id=1656438566731`)
      
     }
     return (
