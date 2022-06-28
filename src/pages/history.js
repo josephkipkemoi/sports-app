@@ -6,11 +6,12 @@ import styled from 'styled-components';
 import { Span } from '../components/Html';
 import useAuth from '../hooks/auth';
 import axios from '../lib/axios';
-import { Card } from 'react-bootstrap';
+import Card from 'react-bootstrap/Card';
 import Link from 'next/link';
 import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import { useRouter } from 'next/router';
 import { useGetAllBetHistoryQuery } from '../hooks/betslip';
+import { useGetAuthUserQuery } from '../hooks/customAuth';
 
 const StyledHistory = styled.div`
     background-color: #ebeded;
@@ -29,7 +30,8 @@ export default function History(){
         </>
     )
 }
-function HistoryProfile() { 
+function HistoryProfile() {
+     
     const [history, setHistory] = useState([])
     const [unsettledHistory, setUnsettledHistory] = useState([])
     const [settledHistory, setSettledHistory] = useState([])
@@ -37,9 +39,7 @@ function HistoryProfile() {
     const { user } = useAuth();
     const router = useRouter()
     const { tab } = router.query
- 
-    const { data } = useGetBalanceByUserIdQuery(user && user.id)
- 
+  
     const fetchBetHistory = async () => {
         if(!!user) {
             const response = await axios.get(`api/users/${user.id}/betslips`)
@@ -66,28 +66,7 @@ function HistoryProfile() {
     }
 
     const BetHistoryElements = (name, i) => {
-        const FixtureElements = (link, ii) => {
-            return (
-                <React.Fragment key={ii} >
-                    <div>
-                        <Span>Teams: </Span>
-                        <Span>{link.betslip_teams}</Span>
-                    </div>
-                    <div>
-                        <Span>Market: </Span>
-                        <Span>{link.betslip_market}</Span>
-                    </div>
-                    <div>
-                        <Span>Picked: </Span>
-                        <Span>{link.betslip_picked}</Span>
-                    </div>
-                    <div>
-                        <Span>Odds: </Span>
-                        <Span>{link.betslip_odds}</Span>
-                    </div>
-                </React.Fragment>
-            )
-        }
+  
         return (
             <React.Fragment key={i} >
                 <div className="card p-3 m-2 cursor-pointer">
@@ -125,10 +104,6 @@ function HistoryProfile() {
                                
                 </div>
                            
-                {/* <div>
-                    {name.fixtures.map(FixtureElements)}
-                </div> */}
-             
             </React.Fragment>
         )
     }
@@ -137,13 +112,13 @@ function HistoryProfile() {
         fetchBetHistory()
         fetchActiveHistory()
         fetchSettledHistory()
-    },[user, tab])
+    },[ tab])
 
     return (
         <StyledHistory>
             <Row>
                 <Col lg="3" md="3" sm="4">
-                    <UserProfile user={user} balance={data?.amount}/>
+                    <UserProfile />
                     <UpdateHistory/>
                 </Col>
                 <Col lg="9" md="9" sm="8">
@@ -344,8 +319,9 @@ const userProfileLinks = [
         path: '/history?tab=all'
     }
 ]
-const UserProfile = ({ user, balance }) => {
-
+const UserProfile = () => {
+    const [userId, setUserId] = useState(null);
+      
     const UserProfileLinkElements = (link, i) => {
         return (
             <Link key={i} href={link.path}>
@@ -359,6 +335,48 @@ const UserProfile = ({ user, balance }) => {
             </Link>
         )
     }
+
+    const BalanceElement = () => {
+        if(userId) {
+            const {data, error, isLoading} = useGetBalanceByUserIdQuery(userId)
+
+            if(error) {
+                return <span className="d-block fw-bold text-danger mt-1">Error</span>
+            }
+    
+            if(isLoading) {
+                return ''
+            }
+    
+            const { amount } = data
+            return (
+                <Span className='d-block fw-bold'>KES {amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+            )
+        }
+        }
+
+    const UserProfileElement = () => {
+        const { data, error, isLoading } = useGetAuthUserQuery(userId)
+
+        if(error) {
+            return <span>Error</span>
+        }
+
+        if(isLoading) {
+            return ''
+        }
+
+        const { user } = data;
+
+        return (
+            <Span style={{ marginLeft: 10 }}>0{user?.phone_number}</Span>
+        )
+    }
+       
+    useEffect(() => {
+        const userId = localStorage.getItem('u_i');
+        setUserId(userId)
+    })
     return (
         <StyleUserProfile className='card m-2 p-2'>
             <Card>
@@ -367,11 +385,11 @@ const UserProfile = ({ user, balance }) => {
                         <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
                         <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                     </svg>
-                    <Span style={{ marginLeft: 10 }}>0{user?.phone_number}</Span>
+                    <UserProfileElement/>
                 </Card.Header>
                 <Card.Body>
                     <Span className='d-block'>Balance</Span>
-                    <Span className='d-block fw-bold'>KES {balance?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                    <BalanceElement/>
                     <hr/>
 
                     {userProfileLinks.map(UserProfileLinkElements)}

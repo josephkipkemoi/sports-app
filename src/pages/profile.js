@@ -112,7 +112,7 @@ const AuthUserProfile = () => {
         if(userId) {
             const { data, error, isLoading } = useGetBalanceByUserIdQuery(userId)
             if(error) {
-                return <span>Error</span>
+                return <span className="d-block fw-bold text-danger mt-1">Error</span>
             }
         
             if(isLoading) {
