@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from '@reduxjs/toolkit/dist/query';
 import { BalanceApi } from "../hooks/balance";
 import { BetslipApi } from "../hooks/betslip";
+import { UserApi } from "../hooks/customAuth";
 import { FixtureApi, CustomFixtureApi } from "../hooks/fixture";
  
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
         [FixtureApi.reducerPath]: FixtureApi.reducer,
         [CustomFixtureApi.reducerPath]: CustomFixtureApi.reducer,
         [BetslipApi.reducerPath]: BetslipApi.reducer,
+        [UserApi.reducerPath]: UserApi.reducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         immutableCheck: false,
@@ -20,6 +22,7 @@ export const store = configureStore({
         CustomFixtureApi.middleware, 
         BalanceApi.middleware,
         BetslipApi.middleware,
+        UserApi.middleware,
     )
 })
 

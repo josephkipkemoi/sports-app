@@ -1,6 +1,6 @@
 import Link from "next/link"
-import React, { useState } from "react"
-import { Button, Container } from "react-bootstrap"
+import React, { useEffect, useState } from "react"
+import { Button, Container, Spinner } from "react-bootstrap"
 import styled from "styled-components"
 import useAuth from "../hooks/auth"
 import { useGetBalanceByUserIdQuery } from "../hooks/balance"
@@ -11,20 +11,16 @@ import {
     Small 
 } from "../components/Html";
 import axios from "../lib/axios"
+import { useGetAuthUserQuery } from "../hooks/customAuth"
 
 const StyleProfile = styled.div`
     background-color: #ebeded;
     padding-bottom: 24px;
 `
 
-export default function Profile({ user }) {
+export default function Profile() {
 
     const { logout } = useAuth({ middleware: 'guest' })
-
-    const user_id = user && user.id;    
-    
-    const { data } = useGetBalanceByUserIdQuery(user_id)
- 
     
     const logoutUser = (e) => {
         e.preventDefault()
@@ -34,27 +30,9 @@ export default function Profile({ user }) {
     return (
         <StyleProfile>
             <Container >
-                <div className="pt-4 text-center">
-                    <button className="btn btn-secondary rounded-circle p-3 ">
-                        <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="32" 
-                        height="32" 
-                        fill="currentColor" 
-                        className="bi bi-person d-block " 
-                        viewBox="0 0 16 16"
-                        >
-                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                        </svg>
-                    </button>      
-                    <Span className="d-block fw-bold mt-3">
-                        (254) {user?.phone_number}    
-                    </Span>
-                </div>
-               
-                
-                <BalanceComponent data={data}/>
-                <DepositComponent userId={user_id}/>
+                <AuthUserProfile />
+                <BalanceComponent />
+                <DepositComponent />
                 <WithdrawComponent/>
 
                 <div className="p-4">
@@ -74,12 +52,80 @@ export default function Profile({ user }) {
                         Logout
                     </a>
                 </Link>
+
             </Container>            
         </StyleProfile>
     )
 }
 
- const BalanceComponent = ({ data }) => {
+const AuthUserProfile = () => {
+    const [userId, setUserId] = useState(null);
+
+    const AuthProfileElement = () => {
+
+        const {data, error, isLoading} = useGetAuthUserQuery(userId);
+
+        if(error){
+            return <span className="d-block fw-bold text-danger mt-1">Error</span>
+        }
+    
+        if(isLoading) {
+            return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
+        }
+        const { user } = data 
+        return (
+            <>
+             <Span className="d-block fw-bold mt-3">
+              (254) {user?.phone_number}    
+            </Span>
+            </>
+        )
+    }   
+
+    useEffect(() => {
+        const userId = localStorage.getItem('u_i')
+        setUserId(userId)
+    }, [])
+    return (
+        <div className="pt-4 text-center">
+            <button className="btn btn-secondary rounded-circle p-3 ">
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="32" 
+                    height="32" 
+                    fill="currentColor" 
+                    className="bi bi-person d-block " 
+                    viewBox="0 0 16 16"
+                >
+                  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+            </button>      
+            <AuthProfileElement/>
+        </div>
+    )
+}
+ const BalanceComponent = () => {
+    const [userId, setUserId] = useState(null);
+
+    const BalanceElement = () => {
+        const { data, error, isLoading } = useGetBalanceByUserIdQuery(userId)
+    
+        if(error) {
+            return <span>Error</span>
+        }
+    
+        if(isLoading) {
+            return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
+        }
+        return (
+            <Span className="d-block fw-bold" style={{ width: 124 }}>Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+        )
+    }
+    
+    useEffect(() => {
+        const userId = localStorage.getItem('u_i')
+        setUserId(userId)
+    }, [])
     return (
         <div className="d-sm-flex justify-content-between shadow-sm p-4 mb-4">
             <div >
@@ -91,7 +137,7 @@ export default function Profile({ user }) {
                     </div>
                     <div className="col d-flex flex-column">
                         <Span className="d-block">Balance</Span>
-                        <Span className="d-block fw-bold" style={{ width: 124 }}>Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                        <BalanceElement />
                     </div>
                 </div>
             </div>
@@ -113,7 +159,7 @@ export default function Profile({ user }) {
     )
 }
 
-const DepositComponent = ({ userId }) => {
+const DepositComponent = () => {
 
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
 
@@ -147,8 +193,8 @@ const DepositComponent = ({ userId }) => {
 
       const depositAmountToDb = () => {
         
-       const res = axios.post(`api/users/${userId}/balance`, {
-        'user_id': userId,
+       const res = axios.post(`api/users/${1}/balance`, {
+        'user_id': 1,
         'amount': depositAmount
        } ,{
             headers: {
