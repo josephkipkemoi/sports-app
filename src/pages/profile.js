@@ -63,23 +63,24 @@ const AuthUserProfile = () => {
 
     const AuthProfileElement = () => {
 
-        const {data, error, isLoading} = useGetAuthUserQuery(userId);
+        if(userId) {
+            const {data, error, isLoading} = useGetAuthUserQuery(userId);
 
-        if(error){
-            return <span className="d-block fw-bold text-danger mt-1">Error</span>
+            if(error){
+                return <span className="d-block fw-bold text-danger mt-1">Error</span>
+            }
+        
+            if(isLoading) {
+                return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
+            }
+            const { user } = data 
+            return (
+                 <Span className="d-block fw-bold mt-3">
+                  (254) {user?.phone_number}    
+                </Span>
+            )
         }
-    
-        if(isLoading) {
-            return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
-        }
-        const { user } = data 
-        return (
-            <>
-             <Span className="d-block fw-bold mt-3">
-              (254) {user?.phone_number}    
-            </Span>
-            </>
-        )
+        
     }   
 
     useEffect(() => {
@@ -108,18 +109,20 @@ const AuthUserProfile = () => {
     const [userId, setUserId] = useState(null);
 
     const BalanceElement = () => {
-        const { data, error, isLoading } = useGetBalanceByUserIdQuery(userId)
-    
-        if(error) {
-            return <span>Error</span>
+        if(userId) {
+            const { data, error, isLoading } = useGetBalanceByUserIdQuery(userId)
+            if(error) {
+                return <span>Error</span>
+            }
+        
+            if(isLoading) {
+                return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
+            }
+            return (
+                <Span className="d-block fw-bold" style={{ width: 124 }}>Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+            )
         }
     
-        if(isLoading) {
-            return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
-        }
-        return (
-            <Span className="d-block fw-bold" style={{ width: 124 }}>Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-        )
     }
     
     useEffect(() => {
