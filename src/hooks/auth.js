@@ -35,8 +35,13 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         axios
             .post('api/register', props)
             .then((d) => {
+                console.log(d)
                 localStorage.removeItem('u_s')
+                localStorage.removeItem('u_i')
+                localStorage.setItem('u_i',d.data.user_id)
+
                localStorage.setItem('u_s',d.data.session_payload)
+               window.location.pathname = '/'
                 mutate()
             })
             .catch(e => {
@@ -63,6 +68,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                 localStorage.removeItem('u_i')
                 localStorage.setItem('u_s',d.data.session_cookie)
                 localStorage.setItem('u_i', d.data.session_uid)
+                window.location.pathname = '/'
                 setIsLoading(false)
                 return true
                 }
@@ -125,7 +131,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                         mutate()
                         })
         }
-
+        localStorage.removeItem('u_i')
         localStorage.removeItem('u_s')
         window.location.pathname = '/'
     }
