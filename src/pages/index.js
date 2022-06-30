@@ -1097,7 +1097,7 @@ const ShareContainer = () => {
   }
 
   const handleCodeClick = () => {
-    copyToClipboard(fullUrl)
+    copyToClipboard(session)
     .then(() => {
       setIsCodeCopied(true)
       setCopiedSmall('')

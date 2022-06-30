@@ -13,7 +13,12 @@ import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import { useRouter } from 'next/router';
 import { useGetAllBetHistoryQuery } from '../hooks/betslip';
 import { useGetAuthUserQuery } from '../hooks/customAuth';
-import { useGetAllUserHistoryBetslipQuery, useGetSettledHistoryBetslipQuery, useGetUnsettledHistoryBetslipQuery } from '../hooks/history';
+import {    useGetAllUserHistoryBetslipQuery, 
+            useGetPaginatedHistoryQuery, 
+            useGetSettledHistoryBetslipQuery, 
+            useGetUnsettledHistoryBetslipQuery, 
+            useRemoveSingleHistoryBetslipQuery 
+        } from '../hooks/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
@@ -68,10 +73,41 @@ const SportBetsHistoryProfile = () => {
 
 const JackpotHistory = () => <NoBetslipHistory/>
 
+
+const Pagination = (data) => {
+    const PaginationItems = (name, i) => {
+        return (
+           <React.Fragment key={i}>
+               {name.label === 'pagination.previous' 
+                && <li className={`page-item ${name.active && 'active'} ${(name.label === 'pagination.previous' && name.url === null) && 'disabled'}`}>
+                <a className="page-link" href="#" tabIndex="-1">Previous</a>
+                </li>}
+                {(name.label  !== 'pagination.next' && name.label !== 'pagination.previous') && 
+                <li className={`page-item ${name.active && 'active'}`}><a className="page-link" href="#">{name.label}</a></li>
+                }
+                {name.label === 'pagination.next' 
+                && <li className={`page-item ${name.active && 'active'} ${(name.label === 'pagination.next' && name.url === null) && 'disabled'}`}>
+                <a className="page-link" href="#" tabIndex="-1">Next</a>
+                </li>}
+              
+           </React.Fragment>
+        )
+    }
+    return (
+          <>
+           <nav aria-label="History page navigation" >
+            <ul className="pagination d-flex justify-content-center" >
+                {data.data.links.map(PaginationItems)}
+                </ul>
+           </nav>            
+          </>
+    )
+}
+
 const AllTabHistory = ({ user_id }) => {
-
+    
     const { data, error, isLoading } = useGetAllUserHistoryBetslipQuery(user_id)
-
+    
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
     }
@@ -83,11 +119,14 @@ const AllTabHistory = ({ user_id }) => {
     }
 
     const BetHistoryElements = (name, i) => {
-  
+        const removeBetslip = (session_id) => {
+            axios.delete(`api/users/betslips/delete?user_id=${user_id}&session_id=${session_id}`)
+        }
         return (
             <React.Fragment key={i} >
                 <div className="card p-3 m-2 cursor-pointer">
-                    <div className='d-flex'>
+                    <div className='d-flex justify-content-between'>
+                        <div>
                         <Span className='text-secondary'>
                             {new Date(name.created_at).getDate()}/
                             {new Date(name.created_at).getMonth()}/
@@ -97,6 +136,10 @@ const AllTabHistory = ({ user_id }) => {
                             {new Date(name.created_at).getHours()}:
                             {new Date(name.created_at).getMinutes()}
                         </Span>
+                        </div>
+                        <div className='btn btn-danger'>
+                            <i className="bi bi-trash" onClick={() => removeBetslip(name.session_id)}></i>
+                        </div>                       
                     </div>
                     <div>
                         <small>Bet ID:</small>
@@ -105,8 +148,8 @@ const AllTabHistory = ({ user_id }) => {
                     <div 
                     className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
                     >   
-                        {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>}
-                        <Span className={`${name.betslip_status === 'Active' ? 'text-warning' : 'text-white'}`}>{name.betslip_status}</Span>
+                        <span>Bet Status</span> 
+                        <Span className='text-warning'>{name.betslip_status}</Span>
                     </div>
                     <div className='d-sm-flex justify-content-between mt-2 p-1'>
                         <div>
@@ -120,16 +163,17 @@ const AllTabHistory = ({ user_id }) => {
                     </div>
                                
                 </div>
-                           
             </React.Fragment>
         )
     }
  
     return (
         <>
-        { data?.data.length > 0 ?
-         data.data.map(BetHistoryElements) : 
+         {data?.data.data.length > 0 ?
+         data.data.data.map(BetHistoryElements) : 
           <NoBetslipHistory/>}  
+
+          {data?.data.data.length >= 5 && <Pagination data={data.data}/>} 
         </>
     )
 }
@@ -150,7 +194,8 @@ const SettledHistory = ({ user_id }) => {
                 return (
                     <React.Fragment key={i}>
                         <div className="card p-3 m-2 cursor-pointer">
-                            <div className='d-flex'>
+                            <div className='d-flex justify-content-between'>
+                                <div>
                                 <Span className='text-secondary'>
                                     {new Date(name.created_at).getDate()}/
                                     {new Date(name.created_at).getMonth()}/
@@ -160,10 +205,14 @@ const SettledHistory = ({ user_id }) => {
                                     {new Date(name.created_at).getHours()}:
                                     {new Date(name.created_at).getMinutes()}
                                 </Span>
+                                </div>                                                            
+                                <div className='btn btn-danger'>
+                                    <i className="bi bi-trash" onClick={() => removeBetslip(name.session_id)}></i>
+                                </div>   
                             </div>
                             <div>
                                 <small>Bet ID:</small>
-                                <small>{name.session_id}</small>
+                                <small>{name.session_id}</small> 
                             </div>
                             <div 
                             className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
@@ -192,6 +241,8 @@ const SettledHistory = ({ user_id }) => {
         {data.data.data.length > 0 ? 
         data.data.data.map(SettledItems) : 
         <NoBetslipHistory/>}
+
+        {data?.data.data.length >= 5 && <Pagination data={data.data}/>} 
         </>
     )
 }
@@ -273,16 +324,21 @@ const UnsettledHistory = ({ user_id }) => {
         return (
             <React.Fragment key={i}>
                 <div className="card p-3 m-2 cursor-pointer">
-                    <div className='d-flex'>
-                        <Span className='text-secondary'>
-                            {new Date(name.created_at).getDate()}/
-                            {new Date(name.created_at).getMonth()}/
-                            {new Date(name.created_at).getFullYear()}
-                        </Span>
-                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
-                            {new Date(name.created_at).getHours()}:
-                            {new Date(name.created_at).getMinutes()}
-                        </Span>
+                    <div className='d-flex d-flex justify-content-between'>
+                        <div>
+                            <Span className='text-secondary'>
+                                {new Date(name.created_at).getDate()}/
+                                {new Date(name.created_at).getMonth()}/
+                                {new Date(name.created_at).getFullYear()}
+                            </Span>
+                            <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                                {new Date(name.created_at).getHours()}:
+                                {new Date(name.created_at).getMinutes()}
+                            </Span>
+                        </div>
+                        <div className='btn btn-danger'>
+                            <i className="bi bi-trash" onClick={() => removeBetslip(name.session_id)}></i>
+                        </div>  
                     </div>
                     <div>
                         <small>Bet ID:</small>
@@ -315,6 +371,8 @@ const UnsettledHistory = ({ user_id }) => {
             {data.data.data.length > 0 ? 
             data.data.data.map(UnsettledItems) :
             <NoBetslipHistory/>}
+            
+          {data?.data.data.length >= 5 && <Pagination data={data.data}/>} 
         </>
     )
 }
@@ -607,7 +665,7 @@ const NoBetslipHistory = () => {
 const UpdateHistory = ({ user_id }) => {
 
     const updateLost = async () => {
-      await axios.patch(`api/users/betslips/update?user_id=${user_id}&session_id=1656438566731`)
+      await axios.patch(`api/users/betslips/update?user_id=${user_id}&session_id=1656600860764`)
      
     }
     return (

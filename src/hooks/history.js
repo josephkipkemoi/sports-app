@@ -14,6 +14,9 @@ export const HistoryApi = createApi({
         }),
         getUnsettledHistoryBetslip: builder.query({
             query: (user_id) => `betslips/status?user_id=${user_id}&bet_status=Active`
+        }),
+        removeSingleHistoryBetslip: builder.query({
+            query: (user_id, session_id) => `betslips/delete?user_id=${user_id}&session_id=${session_id}`
         })
     })
 })
@@ -22,4 +25,5 @@ export const {
     useGetAllUserHistoryBetslipQuery,
     useGetSettledHistoryBetslipQuery,
     useGetUnsettledHistoryBetslipQuery,
+    useRemoveSingleHistoryBetslipQuery,
 } = HistoryApi
