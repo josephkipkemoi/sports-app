@@ -9,13 +9,13 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const { data, error, mutate } = useSWR(`api/user`, async () => {
-        if(!!userSession) {
-            const response = await axios.get(`api/user?us_s=${userSession}`)
-            if(response.data.status === 200) {
-                setIsAuthenticated(true)
-            }
-            return response.data.user[0]
-        }
+        // if(!!userSession) {
+        //     const response = await axios.get(`api/user?us_s=${userSession}`)
+        //     if(response.data.status === 200) {
+        //         setIsAuthenticated(true)
+        //     }
+        //     return response.data.user[0]
+        // }
       
         // .then(res => res.data)
         // .catch(e => {
@@ -133,6 +133,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         }
         localStorage.removeItem('u_i')
         localStorage.removeItem('u_s')
+        localStorage.removeItem('share_code')
         window.location.pathname = '/'
     }
     
