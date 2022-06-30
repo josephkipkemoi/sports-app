@@ -17,6 +17,9 @@ export const HistoryApi = createApi({
         }),
         removeSingleHistoryBetslip: builder.query({
             query: (user_id, session_id) => `betslips/delete?user_id=${user_id}&session_id=${session_id}`
+        }),
+        getBetSessionFixtures: builder.query({
+            query: (session_id) => `sessions/${session_id}/history`
         })
     })
 })
@@ -26,4 +29,5 @@ export const {
     useGetSettledHistoryBetslipQuery,
     useGetUnsettledHistoryBetslipQuery,
     useRemoveSingleHistoryBetslipQuery,
+    useGetBetSessionFixturesQuery,
 } = HistoryApi

@@ -119,12 +119,15 @@ const AllTabHistory = ({ user_id }) => {
     }
 
     const BetHistoryElements = (name, i) => {
-        const removeBetslip = (session_id) => {
-            axios.delete(`api/users/betslips/delete?user_id=${user_id}&session_id=${session_id}`)
-        }
+    
         return (
             <React.Fragment key={i} >
-                <div className="card p-3 m-2 cursor-pointer">
+                <Link href={`history/${name.session_id}`}>
+                    <a
+                        itemProp='url'
+                        className='text-decoration-none text-dark'
+                    >
+                    <div className="card p-3 m-2 cursor-pointer" >
                     <div className='d-flex justify-content-between'>
                         <div>
                         <Span className='text-secondary'>
@@ -137,9 +140,7 @@ const AllTabHistory = ({ user_id }) => {
                             {new Date(name.created_at).getMinutes()}
                         </Span>
                         </div>
-                        <div className='btn btn-danger'>
-                            <i className="bi bi-trash" onClick={() => removeBetslip(name.session_id)}></i>
-                        </div>                       
+                                          
                     </div>
                     <div>
                         <small>Bet ID:</small>
@@ -160,9 +161,11 @@ const AllTabHistory = ({ user_id }) => {
                             <Span>Final Payout: </Span>
                             <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                         </div>  
+                    </div>                               
                     </div>
-                               
-                </div>
+                    </a>
+                </Link>
+          
             </React.Fragment>
         )
     }
