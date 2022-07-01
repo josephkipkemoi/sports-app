@@ -41,6 +41,7 @@ import { Spinner } from 'react-bootstrap';
 import useSocialShare from '../hooks/socialShare';
 import useAuth from '../hooks/auth';
 import Support from '../components/Support';
+import Loader from '../components/Loader';
 const ThemedBody = styled('div')`
  background-color: #585858;
 
@@ -194,7 +195,7 @@ function App() {
 
     if(isLoading)
     {
-      return <span>loading...</span>
+      return <Spinner animation='grow'/>
     }
  
     let newMarket = []

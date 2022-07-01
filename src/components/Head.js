@@ -6,7 +6,7 @@ export default ({
 }) => {
     return (
         <Head>
-            <title>Sports App</title>
+            <title>Bet360 | KE</title>
             <meta name="csrf-token" content="{{ csrf_token() }}"/>
         </Head>
     )
