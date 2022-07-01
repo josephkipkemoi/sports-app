@@ -17,7 +17,7 @@ import Head from "../components/Head";
 import NavWrapper from '../components/NavWrapper';
 import Script from "next/script";
 import useAuth from "../hooks/auth";
-
+import Loader from "../components/Loader";
 if(typeof document !== 'undefined') {
     if(!window.sayHello) {
         console.log('Contact Developer: jkemboe@gmail.com')
@@ -64,16 +64,12 @@ export default function MyApp({ Component, pageProps }) {
     
     const [queryClient] = useState(() => new QueryClient())
 
-    const { user,login } = useAuth({ middleware: 'guest' });
+    const { login } = useAuth({ middleware: 'guest' });
+
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        let token = document.head.querySelector('meta[name="csrf-token"]');
-    
-        if(token){ 
-            // window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content
-        } else {
-            console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
-        }
+        setLoading(true)
     }, [])
     
     
@@ -102,11 +98,15 @@ export default function MyApp({ Component, pageProps }) {
             <GlobalStyles/>
             <QueryClientProvider client={queryClient}>
                 <Hydrate state={pageProps.dehydratedState}>
-                    <NavWrapper user={user} login={login}>
-                        <Provider store={store}>
-                            <Component user={user} {...pageProps}/>
+                    {loading ? <NavWrapper  login={login}>
+                      <Provider store={store}>
+                            <Component  {...pageProps}/>
                         </Provider>
-                    </NavWrapper>
+                    </NavWrapper>    : 
+                      
+                <Loader/> 
+                    }
+                  
                 </Hydrate>
             </QueryClientProvider>       
             </ThemeProvider>
