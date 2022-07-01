@@ -139,7 +139,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     
     function checkIfAuthenticated() {
 
-        if(!!localStorage.getItem('u_s')) {
+        if(!!localStorage.getItem('u_i')) {
             setIsAuthenticated(true)
         }
     }

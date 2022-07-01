@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import styledComponents from "styled-components";
 import Modal from "react-bootstrap/Modal";
@@ -8,7 +8,8 @@ import Spinner from "react-bootstrap/Spinner";
 import useClickOutside from "../hooks/useClickOutside";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 import useAuth from "../hooks/auth";
- 
+import { Col, Row } from "react-bootstrap";
+ import { useGetAuthUserQuery } from "../hooks/customAuth";
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
     display: inline-flex;
@@ -77,7 +78,7 @@ const topNavLinks = [
     }
 ]
 
-export default function NavBar({ user, logout, login }) {
+export default function NavBar({ logout, login }) {
 
     const TopNavLinkElements = (link, i) => (        
         <div itemProp="name" key={i} className="nav-item">        
@@ -114,13 +115,12 @@ export default function NavBar({ user, logout, login }) {
                 </div>
         </nav>
         </StyledTopRightNav>
-        <BottomNavBar user={user} logout={logout} login={login}/>
+        <BottomNavBar logout={logout} login={login}/>
         </>
     )
 }
 
-
-const bottomNavLinks = [
+const midnavLinks = [
     {
         name: 'Sports',
         path: '/sports',
@@ -131,36 +131,21 @@ const bottomNavLinks = [
         path: '/live',
         class: 'live-games'
     },
+]
+
+const unauthLinks = [
     {
-        name: '',
-        path: '#',
-        class: 'hide',
-        links: [
-            {
-                name: 'search',
-                path: '/search',
-            },
-            {
-                name: 'Join',
-                path: '/register',
-                class: 'join',
-            },
-            {
-                name:'Log In',
-                path: '/login',
-            }
-        ]
+        name: 'search',
+        path: '/search',
     },
     {
-        name: '',
-        path: '#',
-        class: 'hide',
-        authLinks: [
-            {
-                name: 'Log out',
-                path: '/logout'
-            }
-        ]
+        name: 'Join',
+        path: '/register',
+        class: 'join',
+    },
+    {
+        name:'Log In',
+        path: '/login',
     }
 ]
 
@@ -170,6 +155,8 @@ const StyleBottomNavBar = styledComponents.div`
        padding: 6px;
        border-radius: 6px;
        margin-top: -4px;
+       margin-right: 12px;
+       margin-left: 12px;
        color: black;
    }
    .hide {
@@ -181,11 +168,7 @@ const StyleBottomNavBar = styledComponents.div`
    nav a {
        color: #fff;
    }
-   .align-right {
-        position: absolute;
-        display: flex;
-        right: 15px;
-   }
+
     nav {
         background-color: #126e51;
     }
@@ -211,6 +194,9 @@ const StyleBottomNavBar = styledComponents.div`
         .align-right {
             top: 56px;
         }
+        .mobile {
+            display: none; 
+        }
     }
 `
 const StyleAuthenticated = styledComponents.div`
@@ -225,11 +211,13 @@ const StyleAuthenticated = styledComponents.div`
 .log-out {
     margin-right: -5px;
 }
+ 
 `
  
-const BottomNavBar = ({ user, login }) => {
+const BottomNavBar = ({ login }) => {
     const [isModalOpen, setModalOpen] = useState(false);
-    const { isAuthenticated } = useAuth({ middleware: 'guest' })
+    const [isDepositModalOpen, setDepositModalOpen] = useState(false)
+    const { isAuthenticated } = useAuth()
     const [userDetails, setUserDetails] = useState({
         email: '',
         password: '',
@@ -256,14 +244,22 @@ const BottomNavBar = ({ user, login }) => {
         setModalOpen(true)
     }
 
+    const openDepositModal = () => {
+        setDepositModalOpen(true)
+    }
+
     const ErrorElement = () => errors.map(error => <div id="modal-ref" className="d-block text-danger text-center fw-bold" key={error}>{error}</div>)
 
     const AuthenticatedItems = () => (
         <>
-            <StyleAuthenticated>
-                <button className="btn btn-warning btn-sm">
-                <i className="bi bi-bell"></i>
-                </button>
+            <StyleAuthenticated className="d-flex">
+                <Link href="/notifications">
+                    <a className="btn btn-warning btn-sm text-dark">
+                        <i className="bi bi-bell"></i>
+                        <small>5</small> 
+                    </a>
+                </Link>
+             
                 <Link href="/profile" prefetch={false}>
                     <a 
                         itemProp="url"
@@ -280,50 +276,107 @@ const BottomNavBar = ({ user, login }) => {
                 <Link href="/history?his_tab=sbets&tab=all" prefetch={false}>
                     <a
                         itemProp="url"
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-secondary btn-sm"
                         style={{ marginLeft: 5 }}
                     >
-                        <i className="bi bi-card-list" style={{ marginRight: 3 }}></i>
+                        <i className="bi bi-card-list w-100" style={{ marginRight: 3 }}></i>
                         My Bets
                     </a>
                 </Link>
-                <button className="btn btn-warning btn-sm" style={{ marginLeft: 5 }}>Deposit</button>
+                <button className="btn btn-secondary btn-sm" style={{ marginLeft: 5 }} onClick={openDepositModal}>
+                    Deposit
+                </button>
             </StyleAuthenticated>            
         </>
     )
 
-    const BottomNavLinkItem = (link, i) => (
-        <div key={i} >
-            <Link href={link.path} key={i} prefetch={false}>
-                <a
-                 itemProp="url"
-                 className={"nav-link " + link.class}
-                 onClick={link.name === 'Log In' ? openModal : ''}
-                >
-                    {link.name === "search" ? <i className="bi bi-search"></i> : link.name}
-          
-                </a>
-            </Link>
-             {(link.links) && (
-                <div className="align-right">{!!isAuthenticated === false ? link.links.map(BottomNavLinkItem) :  <AuthenticatedItems/>}</div> 
-            )}
-  
-        </div>
-    )
+    const MidNavLinkItems = (link, i) => {
+        return (
+            <React.Fragment key={i}>
+                <Link href={link.path}>
+                    <a
+                        itemProp="url"
+                        className="text-decoration-none mobile m-1  "
+                    >
+                        {link.name}
+                    </a>
+                </Link>
+            </React.Fragment>
+        )
+    }
 
+    const UnAuthenticatedItems = (link, i) => {
+        return (
+            <React.Fragment key={i}>
+                  <Link href={link.path} key={i} prefetch={false}>
+                    <a
+                    itemProp="url"
+                    className={`${link.class} text-decoration-none`}
+                    onClick={link.name === 'Log In' ? openModal : ''}
+                    >
+                        {link.name === "search" ? <i className="bi bi-search"></i> : link.name}
+                    </a>
+                </Link>
+            </React.Fragment>
+        )
+    }
+
+    const DepositModal = () => {
+        return (
+            <Modal show={isDepositModalOpen}>
+                <button 
+                className="fw-bold" 
+                style={{ paddingTop: 15, paddingRight: 20, position: 'absolute', right: 0, border: 'none', background: 'none' }}
+                onClick={() => setDepositModalOpen(false)}
+                >
+                    X
+                </button>
+                <Modal.Header>
+                    <h2 className="mx-auto">Deposit</h2>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className='alert alert-secondary'>
+                        <p>|--- GO TO LIPA NA MPESA</p>     
+                        <p>|--- ENTER PAYBILL BUSINESS NO.: <b>123123</b></p>
+                        <p>|--- ENTER ACCOUNT NO.: <b>07XX-XXX-XXX</b></p>
+                        <p>|--- ENTER AMOUNT & SEND</p>
+                        <p>|--- ONCE YOU RECEIVE MPESA NOTIFICATION, GO AHEAD AND PLACE YOUR BET</p>
+                    </div>  
+                    <button className="btn btn-primary btn-lg w-100" onClick={() => setDepositModalOpen(false)}>
+                        CONFIRMED
+                    </button>
+                        <Link href="/profile">
+                            <a
+                                itemProp="url"
+                                className="text-decoration-none text-dark btn btn-warning btn-lg w-100 mt-2"
+                                onClick={() => setDepositModalOpen(false)}
+                            >
+                                DIRECT DEPOSIT                            
+                            </a>
+                        </Link>
+
+                </Modal.Body>
+            </Modal>
+        )
+    }
     const linkBarRef = React.useRef()
 
     useClickOutside(linkBarRef, closeMenu)    
-           
+
     return (
         <StyleBottomNavBar>  
-        <nav className="p-4" ref={linkBarRef}>
-            <div className="custom-mx-auto d-flex justify-content-center w-50 mx-auto">
-                {bottomNavLinks.map(BottomNavLinkItem)}
-            </div>           
+        <nav className="p-3" ref={linkBarRef}>
+            <Row>
+                <Col lg="6" md="6" sm="6" className="d-flex justify-content-end">
+                    {midnavLinks.map(MidNavLinkItems)}
+                </Col>
+                <Col lg="6" md="6" sm="6" className="d-flex justify-content-end">     
+                    {isAuthenticated ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   
+                </Col>
+            </Row>
         </nav>
     
-             <Modal show={!!user ? false : isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
+             <Modal show={isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
                  <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
                         <Form modalId="modal-ref">
                             <Form.Group modalId="modal-ref" className="mb-3">
@@ -381,6 +434,8 @@ const BottomNavBar = ({ user, login }) => {
                         </Form>                       
                     </Modal.Body>                            
                 </Modal>
+
+                <DepositModal/>
         </StyleBottomNavBar>
     )
 }
