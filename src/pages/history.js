@@ -196,7 +196,12 @@ const SettledHistory = ({ user_id }) => {
     const SettledItems = (name , i) => {
                 return (
                     <React.Fragment key={i}>
-                        <div className="card p-3 m-2 cursor-pointer">
+                        <Link href={`history/${name.session_id}`}>
+                            <a
+                                itemProp='url'
+                                className='text-decoration-none text-dark'
+                            >
+                            <div className="card p-3 m-2">
                             <div className='d-flex justify-content-between'>
                                 <div>
                                 <Span className='text-secondary'>
@@ -209,9 +214,7 @@ const SettledHistory = ({ user_id }) => {
                                     {new Date(name.created_at).getMinutes()}
                                 </Span>
                                 </div>                                                            
-                                <div className='btn btn-danger'>
-                                    <i className="bi bi-trash" onClick={() => removeBetslip(name.session_id)}></i>
-                                </div>   
+                           
                             </div>
                             <div>
                                 <small>Bet ID:</small>
@@ -235,6 +238,8 @@ const SettledHistory = ({ user_id }) => {
                             </div>
                                        
                         </div>
+                            </a>
+                        </Link>
                     </React.Fragment>
                 )
             }
@@ -326,46 +331,52 @@ const UnsettledHistory = ({ user_id }) => {
     const UnsettledItems = (name, i) => {
         return (
             <React.Fragment key={i}>
-                <div className="card p-3 m-2 cursor-pointer">
-                    <div className='d-flex d-flex justify-content-between'>
-                        <div>
-                            <Span className='text-secondary'>
-                                {new Date(name.created_at).getDate()}/
-                                {new Date(name.created_at).getMonth()}/
-                                {new Date(name.created_at).getFullYear()}
-                            </Span>
-                            <Span className='text-secondary' style={{ marginLeft: 5 }}>
-                                {new Date(name.created_at).getHours()}:
-                                {new Date(name.created_at).getMinutes()}
-                            </Span>
+                <Link href={`history/${name.session_id}`}>
+                    <a
+                        itemProp='url'
+                        className='text-decoration-none text-dark'
+                    >
+                        <div className="card p-3 m-2 cursor-pointer">
+                            <div className='d-flex d-flex justify-content-between'>
+                                <div>
+                                    <Span className='text-secondary'>
+                                        {new Date(name.created_at).getDate()}/
+                                        {new Date(name.created_at).getMonth()}/
+                                        {new Date(name.created_at).getFullYear()}
+                                    </Span>
+                                    <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                                        {new Date(name.created_at).getHours()}:
+                                        {new Date(name.created_at).getMinutes()}
+                                    </Span>
+                                </div>
+                        
+                            </div>
+                            <div>
+                                <small>Bet ID:</small>
+                                <small>{name.session_id}</small>
+                            </div>
+                            <div 
+                            className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                            >   
+                            <span>Bet Status</span>
+                                {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
+                                <Span className="text-warning">{name.betslip_status}</Span>
+                            </div>
+                            <div className='d-sm-flex justify-content-between mt-2 p-1'>
+                                <div>
+                                    <Span>Stake Amount: </Span>
+                                    <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                </div>
+                                <div>
+                                    <Span>Final Payout: </Span>
+                                    <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                </div>  
+                            </div>
+                                    
                         </div>
-                        <div className='btn btn-danger'>
-                            <i className="bi bi-trash" onClick={() => removeBetslip(name.session_id)}></i>
-                        </div>  
-                    </div>
-                    <div>
-                        <small>Bet ID:</small>
-                        <small>{name.session_id}</small>
-                    </div>
-                    <div 
-                    className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
-                    >   
-                    <span>Bet Status</span>
-                        {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
-                        <Span className="text-warning">{name.betslip_status}</Span>
-                    </div>
-                    <div className='d-sm-flex justify-content-between mt-2 p-1'>
-                        <div>
-                            <Span>Stake Amount: </Span>
-                            <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                        </div>
-                        <div>
-                            <Span>Final Payout: </Span>
-                            <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                        </div>  
-                    </div>
-                               
-                </div>
+                    </a>
+                </Link>
+               
             </React.Fragment>
         )
     }
