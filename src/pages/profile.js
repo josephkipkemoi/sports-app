@@ -171,6 +171,7 @@ const AuthUserProfile = () => {
 }
 
 const DepositComponent = () => {
+    const [userId, setUserId] = useState(null);
 
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
 
@@ -203,17 +204,21 @@ const DepositComponent = () => {
       }
 
       const depositAmountToDb = () => {
-        
-       const res = axios.post(`api/users/${1}/balance`, {
-        'user_id': 1,
-        'amount': depositAmount
-       } ,{
-            headers: {
-                'x-sportsapp-key': configData.SPORTS_APP_KEY
-            }        
-        })
+        if(userId) {
+            axios.post(`api/users/${userId}/balance`, {
+                'user_id': userId,
+                'amount': depositAmount
+               } ,{
+                    headers: {
+                        'x-sportsapp-key': configData.SPORTS_APP_KEY
+                    }        
+            })
+        }
     }
-    
+    useEffect(() => {
+        const userId = localStorage.getItem('u_i')
+        setUserId(userId)
+    }, [])
     return (
         <div className="shadow-sm p-4 mb-4">
             <h5>Deposit</h5>
