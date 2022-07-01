@@ -5,19 +5,22 @@ import NavBar from './NavBar';
 import Footer from './Footer';
 
 const PageStyles = styled('div')`
-   background: #000;
+background: #444;
+height: 100vh;
 `
 
 const ContentStyled = styled('div')`
-background: #000;
+background: #444;
+height: auto;
 font-style: normal;
 font-weight: 200;
+border-bottom: 1px solid gray;
 `
 
-export default function NavWrapper({ children, user, logout, login }) {
+export default function NavWrapper({ children, user, logout, login, isAuthenticated }) {
     return (
         <PageStyles>
-            <NavBar user={user} logout={logout} login={login}/>   
+            <NavBar user={user} logout={logout} login={login} isAuthenticated={isAuthenticated}/>   
             <ContentStyled>{children}</ContentStyled>
             <Footer/>
         </PageStyles>

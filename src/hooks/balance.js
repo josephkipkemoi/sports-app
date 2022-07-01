@@ -13,7 +13,7 @@ export const BalanceApi = createApi({
     }), 
     endpoints: (builder) => ({
         getBalanceByUserId: builder.query({
-            query: (user_id) => `users/${user_id}/balance`
+            query: (user_id) => `api/users/balance?user_id=${user_id}`
         }),
         getUserBalanceTransactions: builder.query({
             query: (user_id) => `users/${user_id}/balance/deposits`

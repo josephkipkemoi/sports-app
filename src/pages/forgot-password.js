@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import styled from "styled-components";
+import Support from '../components/Support';
 
 const StyledPassword = styled.div`
     background: #EBEDED;   
@@ -37,6 +38,7 @@ export default function forgotPassword() {
                 </Form>
              </div>           
          </Container>   
+         <Support/>
         </StyledPassword>
     )
 }

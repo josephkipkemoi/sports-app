@@ -1,6 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import Card from 'react-bootstrap/Card';
+import Support from '../components/Support';
+
 const StyleLivePage = styled.div`
     height: 100vh;
     background-color: #fff;
@@ -17,7 +19,7 @@ export default function Live() {
                 </Card.Body>
             </Card>
            
-
+        <Support/>
         </StyleLivePage>
     )
 }
