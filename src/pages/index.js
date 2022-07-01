@@ -1400,14 +1400,13 @@ const BetslipSessionModal = () => {
     <>
      <StyleBetslip className='mx-auto'>
       <StyleBetCart className='betcart-mb'>
-      <BetslipCartHeader/>
-      <ShareContainer/> 
      
-      {/* {slip.length === 0 && <EmptyCart/> } */}
-      {slip.data === undefined && <StyleSpinner><Spinner animation="grow" size="lg"/></StyleSpinner>}
-      {slip?.data?.length === 0 && <EmptyCart/>}
-      {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
-      <BetCartFormElements/>
+      <ShareContainer/> 
+
+      {slip?.data?.length > 0 ? 
+      <> <BetslipCartHeader/>{ slip.data?.map(CartElements)} <BetCartFormElements/></> : 
+      <EmptyCart/>}
+    
       <BetslipSessionModal/>
 
       </StyleBetCart>
