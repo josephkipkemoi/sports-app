@@ -9,6 +9,9 @@ const StlyeSupport = styled.div`
     padding: 10px;
     width: 112px;
     cursor: pointer;
+    @media screen and (max-width: 990px) {
+        display: none;
+      }
 `
 
 const StyleSupportForm = styled.div`
