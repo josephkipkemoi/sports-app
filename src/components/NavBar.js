@@ -256,7 +256,7 @@ const BottomNavBar = ({ login }) => {
                 <Link href="/notifications">
                     <a className="btn btn-warning btn-sm text-dark">
                         <i className="bi bi-bell"></i>
-                        <small>5</small> 
+                        <small></small> 
                     </a>
                 </Link>
              
