@@ -6,6 +6,8 @@ import styled from 'styled-components'
 import { Span } from '../components/Html'
 import {  useGetUserBalanceTransactionsQuery } from '../hooks/balance'
 import { UserProfile } from './history'
+import Support from '../components/Support';
+
 const StyleTransaction = styled.div`
     height: 100vh;
     background: #fff;
@@ -30,7 +32,7 @@ export default function Deposits() {
                     <DepositsProfile data={transactions?.data?.balances}/>}               
                 </Col>
             </Row>
-        
+            <Support/>
         </StyleTransaction>
     )
 }

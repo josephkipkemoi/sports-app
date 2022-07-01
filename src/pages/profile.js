@@ -13,6 +13,7 @@ import {
 import axios from "../lib/axios"
 import { useGetAuthUserQuery } from "../hooks/customAuth"
 import { useRouter } from 'next/router';
+import Support from '../components/Support';
 
 const StyleProfile = styled.div`
     background-color: #ebeded;
@@ -59,7 +60,8 @@ export default function Profile() {
                     </a>
                 </Link>
 
-            </Container>            
+            </Container>      
+            <Support/>      
         </StyleProfile>
     )
 }

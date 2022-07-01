@@ -1,6 +1,7 @@
 import React from "react";
 import Container  from "react-bootstrap/Container";
 import styled from "styled-components";
+import Support from '../components/Support';
 
 const StyleNotifications = styled.div`
     height: 100vh;
@@ -25,6 +26,7 @@ export default function Notifications() {
                     <EmptyNotifications/>
                 </div>
             </Container>
+            <Support/>
         </StyleNotifications>
     )
 }

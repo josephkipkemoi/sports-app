@@ -21,6 +21,7 @@ import {    useGetAllUserHistoryBetslipQuery,
         } from '../hooks/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import Support from '../components/Support';
 
 const StyledHistory = styled.div`
     background-color: #ebeded;
@@ -66,7 +67,8 @@ const SportBetsHistoryProfile = () => {
                     {tab === 'search' && <SearchFilterResults user_id={userId}/>}
                     {his_tab === 'jbets' && <JackpotHistory/>} 
                 </Col>
-            </Row>           
+            </Row>    
+            <Support/>       
         </StyledHistory>
     )
 }

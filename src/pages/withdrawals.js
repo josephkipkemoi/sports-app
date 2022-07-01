@@ -6,6 +6,8 @@ import Col from 'react-bootstrap/Col'
 import styled from 'styled-components'
 import { Span } from '../components/Html'
 import { UserProfile } from './history'
+import Support from '../components/Support';
+
 const StyleTransaction = styled.div`
     height: 100vh;
     background: #fff;
@@ -30,7 +32,7 @@ export default function Deposits() {
                  
                 </Col>
             </Row>
-        
+            <Support/>
         </StyleTransaction>
     )
 }

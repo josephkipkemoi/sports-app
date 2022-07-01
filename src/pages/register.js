@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Select from 'react-select';
 import  useAuth  from '../hooks/auth';
 import { validateNumber } from '../lib/validation';
+import Support from '../components/Support';
 
 const StyleRegistration = styled.div`
 background-color: #ebeded;
@@ -176,7 +177,8 @@ export default function Register() {
                         Join SportsApp
                     </Button>
                 </Form>               
-            </Container>           
+            </Container>      
+        <Support/>
         </StyleRegistration>
     )
 }

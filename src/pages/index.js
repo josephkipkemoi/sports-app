@@ -40,7 +40,7 @@ import useClickOutside from '../hooks/useClickOutside';
 import { Spinner } from 'react-bootstrap';
 import useSocialShare from '../hooks/socialShare';
 import useAuth from '../hooks/auth';
-  
+import Support from '../components/Support';
 const ThemedBody = styled('div')`
  background-color: #585858;
 
@@ -348,7 +348,9 @@ function App() {
                   </Col>
               </Row>
             </main>
-        </div>     
+        </div>   
+
+        <Support/>  
     </ThemedBody>
   );
 }

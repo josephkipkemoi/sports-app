@@ -7,6 +7,8 @@ import {  useGetUserBalanceTransactionsQuery } from '../hooks/balance';
 import { Span } from '../components/Html';
 import Link from 'next/link';
 import { UserProfile } from './history';
+import Support from '../components/Support';
+
 const StyleTransaction = styled.div`
     height: 100vh;
     background: #fff;
@@ -27,7 +29,8 @@ export default function Transactions() {
                 <Col lg="9" md="9" sm="8">
                     <TransactionsProfile data={transactions?.data?.balances}/>
                 </Col>
-            </Row>          
+            </Row>    
+            <Support/>      
         </StyleTransaction>
     )
 }
