@@ -127,41 +127,14 @@ const scoreLinks = [
     }
 ]
 
-const formStatsLinks = [
-    {
-        name: 'Sport & Betting News',
-        path: '/blog'
-    },
-    {
-        name: 'Soccer Stats',
-        path: '/soccer-stats'
-    },
-    {
-        name: 'Sports Stats',
-        path: '/sports-stats'
-    },
-    {
-        name: 'Horse Form',
-        path: '/horse-form'
-    },
-    {
-        name: 'Horse Search',
-        path: '/horse-search'
-    },
-    {
-        name: 'UK & Irish Racing Archive',
-        path: '/racing-archive'
-    }
-]
-
 const promotionLinks = [
     {
         name: 'Open Account Offer',
-        path: '/open-account-offer'
+        path: '#'
     },
     {
         name: 'Current Offers',
-        path: '/current-offers'
+        path: '#'
     }
 ]
 
@@ -213,18 +186,6 @@ export default function Footer(){
         </div>
     )
 
-    const FormStatsLinkItem = (link, i) => (
-        <div key={i} className="link">
-            <Link key={i} href={link.path} prefetch={false}>
-                <a
-                    itemProp="url"
-                >
-                    {link.name}
-                </a>
-            </Link>
-        </div>
-    )
-
     const PromotionLinkItem = (link, i) => (
         <div key={i} className="link">
             <Link key={i} href={link.path} prefetch={false}>
@@ -254,7 +215,7 @@ export default function Footer(){
     <StyledFooter>
         <div className="p-2 container">
             <Row>
-                <Col lg={3} md={6} sm={6}>
+                <Col lg={4} md={6} sm={6}>
                     <StyledMenuHeader>
                         Help
                     </StyledMenuHeader>
@@ -262,7 +223,7 @@ export default function Footer(){
                         {helpLinks.map(HelpLinkItem)}
                     </LinkFooter>
                 </Col>
-                <Col lg={3} md={6} sm={6}>
+                <Col lg={4} md={6} sm={6}>
                     <StyledMenuHeader>
                         Settings
                     </StyledMenuHeader>
@@ -293,26 +254,19 @@ export default function Footer(){
                         </span>
                     </LinkFooter>                    
                 </Col>
-                <Col lg={3} md={6} sm={6}>
-                    <StyledMenuHeader>
-                        Form & Stats
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        {formStatsLinks.map(FormStatsLinkItem)}
-                    </LinkFooter>
-                    <StyledMenuHeader>
-                        Promotions
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        {promotionLinks.map(PromotionLinkItem)}
-                    </LinkFooter>
-                </Col>
-                <Col lg={3} md={6} sm={6}>
+                <Col lg={4} md={6} sm={6}>
                     <StyledMenuHeader>
                         Social
                     </StyledMenuHeader>
                     <LinkFooter>
                         {socialLinks.map(SocialLinkItem)}
+                    </LinkFooter>
+                    
+                    <StyledMenuHeader>
+                        Promotions
+                    </StyledMenuHeader>
+                    <LinkFooter>
+                        {promotionLinks.map(PromotionLinkItem)}
                     </LinkFooter>
                 </Col>
             </Row>

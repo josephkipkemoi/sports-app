@@ -43,20 +43,12 @@ const topNavLinks = [
         path: '/sports'
     },
     {
-        name: 'In-Play',
-        path: '/live'
-    },
-    {
-        name: 'Live Casino',
-        path: '/live-casino'
-    },
-    {
-        name: 'Casino',
-        path: '/casino'
+        name: 'Jackpot',
+        path: '/jackpot'
     },
     {
         name: 'Livescore',
-        path: '/livescore'
+        path: '/live'
     },
     {
         name: 'Results',
@@ -72,7 +64,7 @@ const topNavLinks = [
             },
             {
                 name: 'Help',
-                path: '/help'
+                path: '/FAQ'
             }
         ]
     }
@@ -101,7 +93,9 @@ export default function NavBar({ logout, login }) {
         <StyledTopRightNav>
         <nav className="navbar navbar-expand-lg navbar-light">
                 <div className="container-fluid">
-                    <a className="navbar-brand text-light" href="/">SportsApp</a>
+                    <Link href="/">
+                        <a className="navbar-brand text-light" itemProp="url">SportsApp</a>
+                    </Link>
                     <button className="navbar-toggler bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon "></span>
                     </button>
