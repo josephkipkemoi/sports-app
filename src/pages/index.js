@@ -933,16 +933,17 @@ const BetCartFormElements = () => {
     }
 
 
-    const postBalanceAfterPlacing = (balance_after_placing) => {
-      axios.post(`api/users/${userId}/balance`, {
+    const postBalanceAfterPlacing = async () => {
+    const res =  await axios.post(`api/users/${userId}/balance/decrement`, {
         'user_id': userId,
-        'amount': balance_after_placing
+        'amount': betAmount
       } ,
       {
         headers: {
           'x-sportsapp-key': configData.SPORTS_APP_KEY
         }
       })
+      console.log(res)
     }
 
     const setNewSessionStorage = () => {
@@ -963,7 +964,7 @@ const BetCartFormElements = () => {
       const sessionId = Number(sessionStorage.getItem('session_id'));
   
       postBetslipCartToDb(sessionId, userId, betAmount, Number(oddsTotal), possibleWin)
-      postBalanceAfterPlacing(balanceAfterPlacing)
+      postBalanceAfterPlacing()
       setNewSessionStorage()
   
     } 
