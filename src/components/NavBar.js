@@ -94,7 +94,7 @@ export default function NavBar({ logout, login }) {
         <nav className="navbar navbar-expand-lg navbar-light">
                 <div className="container-fluid">
                     <Link href="/">
-                        <a className="navbar-brand text-light" itemProp="url">SportsApp</a>
+                        <a className="navbar-brand text-light" itemProp="url">Bet360</a>
                     </Link>
                     <button className="navbar-toggler bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon "></span>

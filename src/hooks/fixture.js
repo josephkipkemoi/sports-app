@@ -35,6 +35,12 @@ export const CustomFixtureApi = createApi({
         }),
         getCustomOdds: builder.query({
             query: () => '/api/odds'
+        }),
+        getV1CustomFixture: builder.query({
+            query: () => 'api/custom_fixture'
+        }),
+        getV1CustomFixtureById: builder.query({
+            query: (fixture_id) => `api/custom_fixture/${fixture_id}`
         })
     })
 })
@@ -42,6 +48,8 @@ export const CustomFixtureApi = createApi({
 export const {
     useGetCustomFixturesQuery,
     useGetCustomOddsQuery,
+    useGetV1CustomFixtureQuery,
+    useGetV1CustomFixtureByIdQuery,
 } = CustomFixtureApi
 
 export const {

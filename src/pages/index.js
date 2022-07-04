@@ -5,7 +5,7 @@ import Row  from 'react-bootstrap/Row';
 import Col  from 'react-bootstrap/Col';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from 'next/link';
-import { useGetCustomFixturesQuery, useGetCustomOddsQuery, useGetFixturesQuery, useGetOddsFixtureQuery } from '../hooks/fixture';
+import { useGetCustomFixturesQuery, useGetCustomOddsQuery, useGetFixturesQuery, useGetOddsFixtureQuery, useGetV1CustomFixtureQuery } from '../hooks/fixture';
 import useCustomFixture from '../hooks/customFixture';
 import useCustomOdds from '../hooks/odds';
 import configData from '../../config.json';
@@ -35,7 +35,7 @@ import useCustomBetslip from '../hooks/customBetslip';
 import { useGetBetslipQuery } from '../hooks/betslip';
 import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import axios from '../lib/axios';
-import { useRouter } from 'next/router';
+import { Router, useRouter } from 'next/router';
 import useClickOutside from '../hooks/useClickOutside';
 import { Spinner } from 'react-bootstrap';
 import useSocialShare from '../hooks/socialShare';
@@ -105,7 +105,6 @@ overflow-x: hidden;
 function App() {
 
   const [clicked, setClicked] = useState(false)
-
  
   useEffect(() => {
 
@@ -117,77 +116,11 @@ function App() {
 
   },[clicked])
 
-
-
-  const Games = () => {
-    
-    const { postFixture } = useCustomFixture();
-
-    const { data, error, isLoading } = useGetFixturesQuery();
-
-    if(isLoading) {
-      return <span>loading...</span>
-    }
-
-    if(error){
-      return <span>Error</span>
-    }
-
-    const { response } = data;
-
-    let fixtureIdData = []
-    let dateData = []
-    let countryData = []
-    let leagueNameData = []
-    let homeTeamData = []
-    let awayTeamData = []
-    let logoData = []
-
-    response.map(data => {
-       const { fixture: { id, date }, league: { country, name, logo }, teams: { away, home } } = data;
-
-       fixtureIdData.push(id)
-       dateData.push(date)
-       countryData.push(country)
-       leagueNameData.push(name)
-       homeTeamData.push(home.name)
-       awayTeamData.push(away.name)
-       logoData.push(logo)
-    })
-    const sendFixtureData = async (e) => {
-      e.preventDefault()
-     
-
-     postFixture({
-        'fixture_id': fixtureIdData,
-        'fixture_date': dateData,
-        'fixture_country': countryData,
-        'fixture_league_name': leagueNameData,
-        'fixture_logo': logoData,
-        'home_team': homeTeamData,
-        'away_team': awayTeamData
-      })
- 
-        
-    }
- 
-  
-    return (
-      <>
-        <button onClick={sendFixtureData}>Click Me</button>
-      </>
-    )
-   }
-
    const GameElement = () => {
     const { postBetslip } = useCustomBetslip()
-    // const { getOdds } = useCustomOdds()
- 
-    const { data, error, isLoading } = useGetCustomOddsQuery()
-    const fixture = useGetCustomFixturesQuery()
- 
-    const [fixtureData, setFixtureData] = useState([])
- 
+    
+    const {error, isLoading, data} = useGetV1CustomFixtureQuery()
+    
     if(error)
     {
       return <span>Errors</span>
@@ -197,34 +130,8 @@ function App() {
     {
       return <Spinner animation='grow'/>
     }
- 
-    let newMarket = []
 
-    if(fixture.status === 'fulfilled')
-    {
-  
-      data.data.filter(([d]) => {
-        
-        if(JSON.parse(fixture?.data?.fixture_id).indexOf(d?.fixture.id) !== -1)
-        {
-          const ids = JSON.parse(fixture?.data?.fixture_id).indexOf(d?.fixture.id) 
-          const home = JSON.parse(fixture?.data?.home_team)[ids] 
-          const away = JSON.parse(fixture?.data?.away_team)[ids] 
-     
-      
-          let oddsMarket = {
-            home_team: home,
-            away_team: away,
-            league: d.league.name,
-            fixture_id: d.fixture.id,
-            market_odds: d.bookmakers
-          }
-        
-          newMarket.push(oddsMarket)
-        } 
-         
-      })
-    }
+    const response = data.fixtures.filter(val => val.unserialized_odds !== false)
 
     const sendBetslip = async (e)  => {
       const homeTeam = e.target.getAttribute('home_team');
@@ -246,44 +153,78 @@ function App() {
  
       setClicked(prev => !prev)
     }
- 
 
+    const displayMoreMarkets = (index) => {
+      const elements = document.getElementsByClassName('more-market')[index]
+       if( elements.style.display === 'none') {
+        elements.style.display = 'block'
+       } else {
+      elements.style.display = 'none'
+       }
+    }
+ 
+    const MoreFixtureMarket = (name, i) => {
+      const OddsMarket = (odds, ii) => {
+ 
+        return (
+          <React.Fragment key={ii}>
+              <button 
+              className='btn-custom d-flex justify-content-between' 
+              style={{ width: '30%' }}
+              odds={odds.odd} 
+              btn_id={i}
+              home_team={odds.home} 
+              market={odds.name} 
+              away_team={odds.away} 
+              picked={odds.value}
+              fixtureid={odds.fixture_id}
+              onClick={sendBetslip}  
+              >
+               <span>{odds.value}</span>
+               <span> {odds.odd}</span>
+              </button>
+          </React.Fragment>
+        )
+      }
+      return (
+        <React.Fragment key={i}>
+          <span className='text-light'>{name.name}</span>
+          <div className='d-flex justify-content-between flex-wrap'>
+           {name.values.map(OddsMarket)}
+          </div>
+        </React.Fragment>
+      )
+    }
     return (
       <>
-        {newMarket.map((data,i) => {
+        {response.map((data,i) => {
           return (
             <React.Fragment key={i + data.league}>
             <Col lg={8} sm={8} className="custom-grid-box-main p-2">  
       
               <Row style={{ marginLeft: 2 }}>
-              <h5 className='header'>{data.league}</h5>
-                <Col lg={1} md={1} sm={1}>
-                  <Link href={`fixture/${data.fixture_id}?home=${data.home_team}&away=${data.away_team}`} >
-                  <a
-                    itemProp='url'
-                    className='text-decoration-none text-light'  
-                    onClick={() =>{
-                      sessionStorage.setItem('home_team', data.home_team)
-                      sessionStorage.setItem('away_team', data.away_team)                      
-                      }}                  
-                  >
-                    <Small>
-                      {data.market_odds[0].bets.length}
+              <h5 className='header'> <img src={data.flag} className="img-fluid" style={{ width : 16 }}/> {data.country} | {data.league_name}</h5>
+              <small>{data.fixture_date}</small>
+                <Col lg={1} md={1} sm={1} className="d-flex flex-column justify-content-between">
+                  
+                    <i className="bi bi-star"></i>
+                    
+                    <Small onClick={() => displayMoreMarkets(i)}>
+                      {data.unserialized_odds.bookmakers[0].bets.length}
                       <i className="bi bi-arrow-right-short"></i>
                     </Small>
-                  </a>
-                  </Link>  
+                    
                 </Col>
                 <Col>
-                  <span className='d-block'>{data.home_team} - </span>
-                  <span className='d-block'>{data.away_team}</span>
+                  <span className='d-block'>{data.home} - </span>
+                  <span className='d-block'>{data.away}</span>
                 </Col>
                 <Col></Col>
               </Row>
                      
             </Col>
             <Col lg={4} sm={4} className="d-flex">
-              {data.market_odds[0].bets.map(odd => {             
+              {data.unserialized_odds.bookmakers[0].bets.map(odd => {             
                 return odd.id === 1 && odd.values.map((val, i) => {
                    return (
                      <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
@@ -292,9 +233,9 @@ function App() {
                         odds={val.odd} 
                         className='btn-custom'
                         btn_id={i}
-                        home_team={data.home_team} 
+                        home_team={data.home} 
                         market={odd.name} 
-                        away_team={data.away_team} 
+                        away_team={data.away} 
                         picked={val.value}
                         fixtureid={data.fixture_id}
                         onClick={sendBetslip}  
@@ -305,7 +246,11 @@ function App() {
                  })
               })}
             </Col>
+            <div className='more-market' style={{ display: 'none' }}>
+              {data.unserialized_odds.bookmakers[0].bets.map(MoreFixtureMarket)}
+            </div>
               <hr/>
+            
           </React.Fragment>
           )
           
@@ -315,6 +260,7 @@ function App() {
   }
 
   const GamesData = () => {
+ 
     return (
     <Row  className="custom-grid">     
        <GameElement />
@@ -329,7 +275,6 @@ function App() {
               description="Africa's Best Online Sports Betting App"
             />
             <main>
-              {/* <Games/> */}
               <Row>
                
                   <Col lg={9} md={12} sm={12}>

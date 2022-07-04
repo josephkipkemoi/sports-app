@@ -5,8 +5,8 @@ import Col  from "react-bootstrap/Col";
 import { Betslip } from "..";
 import styled from "styled-components";
 import Link from "next/link";
-import { useGetFixturesQuery, useGetOddsFixtureQuery } from "../../hooks/fixture";
-import { Small } from "../../components/Html";
+import { useGetV1CustomFixtureByIdQuery } from "../../hooks/fixture";
+
 import  Spinner  from "react-bootstrap/Spinner";
 import useCustomBetslip from "../../hooks/customBetslip";
 
@@ -20,7 +20,7 @@ const Fixture = () => {
     const homeTeam = home
     const awayTeam = away
     const { postBetslip } = useCustomBetslip()
-    const { data , error, isLoading} = useGetOddsFixtureQuery(pid)
+    const { data , error, isLoading} = useGetV1CustomFixtureByIdQuery(pid)
  
     if(error) {
         return <span>Error</span>
@@ -113,7 +113,8 @@ const Fixture = () => {
                     </div>
                     <div className="p-4">
                         <h4 className="text-light fw-bold p-2 text-center">{homeTeam} - {awayTeam}</h4> 
-                        {data.response.map(OddsMarket)}     
+                        {console.log((data.data))}
+                        {/* {data.response.map(OddsMarket)}      */}
                     </div>
                          
                 </Col>
