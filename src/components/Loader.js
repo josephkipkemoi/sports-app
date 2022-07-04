@@ -156,11 +156,11 @@ export default function Loader() {
     return (
         <StyleLoader>
         <h2 className="fw-bold text-danger">BET360</h2>
-        <div class="container">
-            <div class="dash uno"></div>
-            <div class="dash dos"></div>
-            <div class="dash tres"></div>
-            <div class="dash cuatro"></div>
+        <div className="container">
+            <div className="dash uno"></div>
+            <div className="dash dos"></div>
+            <div className="dash tres"></div>
+            <div className="dash cuatro"></div>
         </div>
         </StyleLoader>
     )
