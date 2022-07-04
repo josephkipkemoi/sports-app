@@ -4,6 +4,7 @@ import { setupListeners } from '@reduxjs/toolkit/dist/query';
 import { BalanceApi } from "../hooks/balance";
 import { BetslipApi } from "../hooks/betslip";
 import { UserApi } from "../hooks/customAuth";
+import { FavoritesApi } from "../hooks/favorites";
 import { FixtureApi, CustomFixtureApi } from "../hooks/fixture";
 import { HistoryApi } from "../hooks/history";
  
@@ -15,6 +16,7 @@ export const store = configureStore({
         [BetslipApi.reducerPath]: BetslipApi.reducer,
         [UserApi.reducerPath]: UserApi.reducer,
         [HistoryApi.reducerPath]: HistoryApi.reducer,
+        [FavoritesApi.reducerPath]: FavoritesApi.reducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         immutableCheck: false,
@@ -26,6 +28,7 @@ export const store = configureStore({
         BetslipApi.middleware,
         UserApi.middleware,
         HistoryApi.middleware,
+        FavoritesApi.middleware,
     )
 })
 

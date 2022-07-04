@@ -200,6 +200,17 @@ function App() {
         </React.Fragment>
       )
     }
+
+    const updateFavorite = async (fixture_id) => {
+      const user_id = Number(localStorage.getItem('u_i'))
+
+      const res = await axios.post('api/favorites', {
+        user_id,
+        fixture_id
+      });
+
+      console.log(res)
+    }  
     return (
       <>
         {response.map((data,i) => {
@@ -213,7 +224,7 @@ function App() {
               <small>{data.fixture_date}</small>
                 <Col lg={1} md={1} sm={1} className="d-flex flex-column justify-content-between">
                   
-                    <i className="bi bi-star"></i>
+                    <i className="bi bi-star" onClick={() => updateFavorite(data.fixture_id)}></i>
                     
                     <Small onClick={() => displayMoreMarkets(i)}>
                       {data.unserialized_odds.bookmakers[0].bets.length}
@@ -499,8 +510,8 @@ a {
 
 const topNavLinks = [
   {
-    name: 'Favourites',
-    path: '/favourites',
+    name: 'Favorites',
+    path: '/favorites',
     icon:  faStar
   }, 
   {
@@ -934,7 +945,7 @@ const BetCartFormElements = () => {
 
 
     const postBalanceAfterPlacing = async () => {
-    const res =  await axios.post(`api/users/${userId}/balance/decrement`, {
+      await axios.post(`api/users/${userId}/balance/decrement`, {
         'user_id': userId,
         'amount': betAmount
       } ,
@@ -943,7 +954,6 @@ const BetCartFormElements = () => {
           'x-sportsapp-key': configData.SPORTS_APP_KEY
         }
       })
-      console.log(res)
     }
 
     const setNewSessionStorage = () => {
