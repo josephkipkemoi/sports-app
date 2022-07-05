@@ -288,10 +288,14 @@ function App() {
   }
 
   const GamesData = () => {
- 
+    const router = useRouter()
+    const {tab} = router.query
+
     return (
     <Row  className="custom-grid p-2">     
-       <GameElement />
+       {router.asPath === '/'  && <GameElement />}
+       { tab === 'soccer' && <GameElement />}
+       {tab === 'favorites' && <FavoritesElement/>}
     </Row>
   )}
 
@@ -347,6 +351,18 @@ function App() {
         <Support/>  
     </ThemedBody>
   );
+}
+
+const FavoritesElement = () => {
+  return (
+    <div className='p-4'>
+      <h3 className='text-light'>Favorites</h3>
+      <hr/>
+      <div className='text-center mt-5'>
+        <span className='text-light'>You do not have any favorites</span>
+      </div>
+    </div>
+  )
 }
 
 const SearchResults = ({ data }) => {
@@ -522,71 +538,74 @@ a {
 const topNavLinks = [
   {
     name: 'Favorites',
-    path: '/favorites',
+    path: '?tab=favorites',
     icon:  faStar
   }, 
   {
     name: 'Soccer',
-    path: '/soccer',
+    path: '?tab=soccer',
     icon: faSoccerBall
   },
   {
     name: 'Tennis',
-    path: '/tennis',
+    path: '?tab=tennis',
     icon: faTableTennis
   },
   {
     name: 'American Football',
-    path: '/american-football',
+    path: '?tab=american-football',
     icon: faGlobeAmericas
   },
   {
     name: 'Baseball',
-    path: '/baseball',
+    path: '?tab=baseball',
     icon: faBaseball
   }, 
   {
     name: 'Basketball',
-    path: '/basketball',
+    path: '?tab=basketball',
     icon: faBasketball
   },
   {
     name: 'Beach Volleyball',
-    path: '/beach-volleyball',
+    path: '?tab=beach-volleyball',
     icon: faVolleyballBall
   },
   {
     name: 'Horse Racing',
-    path: '/horse-racing',
+    path: '?tab=horse-racing',
     icon: faHorse
   },
   {
     name: 'Golf',
-    path: '/golf',
+    path: '?tab=golf',
     icon: faGolfBall
   },
   {
     name: 'Table Tennis',
-    path: '/table-tennis',
+    path: '?tab=table-tennis',
     icon: faTableTennisPaddleBall
   },
   {
     name: 'Streaming',
-    path: '/streaming',
+    path: '?tab=streaming',
     icon: faSignal
   },
   {
     name: 'Schedule',
-    path: '/schedule',
+    path: '?tab=schedule',
     icon: faCalendar
   }
 ]
 const TopNavBar = () => {
-
+  
   const TopNavLinkItem = (link, i) => (
     <div sm={1} key={i} className="custom-box d-flex flex-column">
  
-      <FontAwesomeIcon icon={link.icon} className="fa-2x text-secondary d-block"/>
+      <FontAwesomeIcon 
+      icon={link.icon} 
+      className={`fa-2x text-secondary  d-block`}
+      />
      
       <Link href={link.path} prefetch={false} className="icon-text-width">
         <a
