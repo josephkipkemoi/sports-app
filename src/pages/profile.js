@@ -215,8 +215,14 @@ const DepositComponent = () => {
             })
         }
     }
+
+    const fetchMpesa = async () => {
+        const res = await axios.get('api/mpesa/transaction')
+        console.log(res)
+    }
     useEffect(() => {
         const userId = localStorage.getItem('u_i')
+        fetchMpesa()
         setUserId(userId)
     }, [])
     return (
