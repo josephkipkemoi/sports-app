@@ -11,6 +11,7 @@ import useCustomOdds from '../hooks/odds';
 import configData from '../../config.json';
 import  Modal  from 'react-bootstrap/Modal';
 import copyToClipboard from '../hooks/copyToClipboard';
+import CustomFixture from '../components/CustomFixture';
 import  { 
   faStar, 
   faSoccerBall,
@@ -209,7 +210,6 @@ function App() {
         fixture_id
       });
 
-      console.log(res)
     }  
     return (
       <>
@@ -283,6 +283,9 @@ function App() {
           )
           
         })}
+
+        <CustomFixture data={data.custom_fixture} />
+
       </>
     )  
   }

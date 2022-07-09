@@ -13,6 +13,7 @@ import Select from "react-select";
 import { InputNumber } from "../components/Html";
 import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery } from "../hooks/admin";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
+import config from '../../config.json';
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -361,6 +362,51 @@ const FixturesElement = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fi
     )
 }
 const CustomFixture = () => {
+    const [isUpdated, setIsUpdated] = useState(false);
+
+    const [fixtureDetails, setFixtureDetails] = useState({
+        home_team: '',
+        away_team: '',
+        home_odds: '',
+        draw_odds: '',
+        away_odds: '',
+        league_name: '',
+        country: '',
+        fixture_date: '',
+    })
+
+    const { 
+        home_team, 
+        away_team, 
+        home_odds, 
+        draw_odds, 
+        away_odds,
+        league_name,
+        country,
+        fixture_date 
+    } = fixtureDetails
+
+    const submitFixture = async (e) => {
+        e.preventDefault()
+        const res = await axios.post('api/admin/fixture', {
+            fixture_id: config.CUSTOM_FIXTURE_ID,
+            league_name,
+            country,
+            fixture_date,
+            home_team,
+            away_team,
+            home_odds,
+            draw_odds,
+            away_odds,
+        })
+
+        if(res.status === 200) {
+            setIsUpdated(true)
+        }
+    }
+
+    const onchange = (e) => setFixtureDetails(prev => ({...prev, [e.target.name] : e.target.value}))
+
     return (
         <Card className="mt-4 border-0 bg-danger shadow">
             <Card.Header className="bg-primary">
@@ -369,39 +415,97 @@ const CustomFixture = () => {
             <Card.Body className="bg-light ">
             <Form>
                 <Row>
-                        <Col lg="6" md="6" sm="6">
+                        <Col lg="2" md="2" sm="2">
                             <Form.Group className="mb-3" controlId="formBasicHome">
                                 <Form.Label className="text-dark">Home Team</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Home Team" />
+                                <Form.Control 
+                                type="text" 
+                                name="home_team" 
+                                placeholder="Enter Home Team" 
+                                onChange={onchange} 
+                                />
                             </Form.Group>
                         </Col>
-                        <Col lg="6" md="6" sm="6">
+                        <Col lg="2" md="2" sm="2">
                             <Form.Group className="mb-3" controlId="formBasicAway">
                                 <Form.Label className="text-dark">Away Team</Form.Label>
-                                <Form.Control type="text" placeholder="Enter Away Team" />
+                                <Form.Control 
+                                type="text" 
+                                name="away_team" 
+                                placeholder="Enter Away Team" 
+                                onChange={onchange} 
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col lg="2" md="2" sm="2">
+                            <Form.Group className="mb-3" controlId="formBasicAway">
+                                <Form.Label className="text-dark">Country</Form.Label>
+                                <Form.Control 
+                                type="text" 
+                                name="country" 
+                                placeholder="Enter Country" 
+                                onChange={onchange} 
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col lg="2" md="2" sm="2">
+                            <Form.Group className="mb-3" controlId="formBasicAway">
+                                <Form.Label className="text-dark">League</Form.Label>
+                                <Form.Control 
+                                type="text" 
+                                name="league_name" 
+                                placeholder="Enter League Name" 
+                                onChange={onchange} 
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col lg="2" md="2" sm="2">
+                            <Form.Group className="mb-3" controlId="formBasicAway">
+                                <Form.Label className="text-dark">Date</Form.Label>
+                                <Form.Control 
+                                type="date" 
+                                name="fixture_date" 
+                                placeholder="Enter Date" 
+                                onChange={onchange} 
+                                />
                             </Form.Group>
                         </Col>
                         <Col lg="4" md="4" sm="4">
                             <Form.Group className="mb-3" controlId="formBasicHomeOdds">
                                 <Form.Label className="text-dark">Home Odds</Form.Label>
-                                <Form.Control type="number" placeholder="Home Odds" />
+                                <Form.Control 
+                                type="number" 
+                                name="home_odds" 
+                                placeholder="Home Odds" 
+                                onChange={onchange} 
+                                />
                             </Form.Group>                     
                         </Col>
                         <Col lg="4" md="4" sm="4">
                             <Form.Group className="mb-3" controlId="formBasicDrawOdds">
                                 <Form.Label className="text-dark">Draw Odds</Form.Label>
-                                <Form.Control type="number" placeholder="Draw Odds" />
+                                <Form.Control 
+                                type="number" 
+                                name="draw_odds" 
+                                placeholder="Draw Odds" 
+                                onChange={onchange} 
+                                />
                             </Form.Group>
                         </Col>
                         <Col lg="4" md="4" sm="4">   
                             <Form.Group className="mb-3" controlId="formBasicAwayOdds">
                                 <Form.Label className="text-dark">Away Odds</Form.Label>
-                                <Form.Control type="number" placeholder="Away Odds" />
+                                <Form.Control 
+                                type="number" 
+                                name="away_odds" 
+                                placeholder="Away Odds" 
+                                onChange={onchange} 
+                                />
                             </Form.Group>
                         </Col>
                         <div className="text-center">
-                            <Button variant="primary" type="submit">
-                                Add Fixture
+                            <Button variant="primary" type="submit" onClick={submitFixture}>
+                              {isUpdated  ? 'Added' : ' Add Fixture'} 
                             </Button>
                         </div>
                 </Row>
