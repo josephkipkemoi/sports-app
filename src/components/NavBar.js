@@ -331,7 +331,7 @@ const BottomNavBar = ({ login }) => {
                 <Modal.Body>
                     <div className='alert alert-secondary'>
                         <p>|--- GO TO LIPA NA MPESA</p>     
-                        <p>|--- ENTER PAYBILL BUSINESS NO.: <b>123123</b></p>
+                        <p>|--- ENTER PAYBILL BUSINESS NO.: <b>4075207</b></p>
                         <p>|--- ENTER ACCOUNT NO.: <b>07XX-XXX-XXX</b></p>
                         <p>|--- ENTER AMOUNT & SEND</p>
                         <p>|--- ONCE YOU RECEIVE MPESA NOTIFICATION, GO AHEAD AND PLACE YOUR BET</p>

@@ -19,7 +19,7 @@ export const HistoryApi = createApi({
             query: (user_id, session_id) => `betslips/delete?user_id=${user_id}&session_id=${session_id}`
         }),
         getBetSessionFixtures: builder.query({
-            query: (session_id) => `sessions/${session_id}/history`
+            query: ({ userId, pid }) => `${userId}/sessions/${pid}/history`
         })
     })
 })

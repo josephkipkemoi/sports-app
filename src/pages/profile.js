@@ -203,18 +203,18 @@ const DepositComponent = () => {
         }
       }
 
-      const depositAmountToDb = () => {
-        if(userId) {
-            axios.post(`api/users/${userId}/balance`, {
-                'user_id': userId,
-                'amount': depositAmount
-               } ,{
-                    headers: {
-                        'x-sportsapp-key': configData.SPORTS_APP_KEY
-                    }        
-            })
-        }
-    }
+    //   const depositAmountToDb = () => {
+    //     if(userId) {
+    //         axios.post(`api/users/${userId}/balance`, {
+    //             'user_id': userId,
+    //             'amount': depositAmount
+    //            } ,{
+    //                 headers: {
+    //                     'x-sportsapp-key': configData.SPORTS_APP_KEY
+    //                 }        
+    //         })
+    //     }
+    // }
 
     const fetchMpesa = async () => {
         const res = await axios.get('api/mpesa/transaction')
@@ -275,7 +275,7 @@ const DepositComponent = () => {
             <Small className="d-block text-danger">
                 Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Small>
-            <Button variant="warning" onClick={depositAmountToDb}>
+            <Button variant="warning" >
                 Deposit
             </Button>
         </div>

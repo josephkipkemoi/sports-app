@@ -7,7 +7,13 @@ import { useGetBetSessionFixturesQuery } from '../../hooks/history';
 import Spinner from 'react-bootstrap/Spinner';
 import Link from 'next/link';
 import axios from '../../lib/axios';
+import styled from 'styled-components';
 
+const StyleHistory = styled.div`
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+`
 const History = () => {
     const [userId, setUserId] = useState(null)
     const FixturesComponent = () => {
@@ -15,7 +21,8 @@ const History = () => {
 
         const { pid } = router.query
     
-        const {data, isLoading, error } = useGetBetSessionFixturesQuery(pid)
+        const {data, isLoading, error } = useGetBetSessionFixturesQuery({userId, pid})
+
         if(error) {
             return <span>Error...</span>
         }
@@ -67,6 +74,41 @@ const History = () => {
                     router.push('/history?his_tab=sbets&tab=all')
                 }
             }
+        }   
+
+        const TicketContainerElement = (link, i) => {
+            const date = new Date(link.created_at)
+            return (
+                <React.Fragment key={i}>
+                    <span className='fw-bold mb-2 d-block'>Ticket ID: {pid}</span>
+                    <small className='d-block text-secondary'>
+                        Placed at: 
+                        {date.getDate()}/
+                        {date.getMonth()}/
+                        {date.getFullYear()}{ ' '}                     
+                        {date.getHours()}:
+                        {date.getMinutes()}
+                    </small>
+                    <div className='bg-danger text-light p-2 mt-2 mb-2 d-flex justify-content-between rounded shadow-sm'>
+                        {data.fixtures.length > 1 ? <span className='fw-bold'>Multi Bet</span> : <span className='fw-bold'>Single Bet</span>}
+                        <span className='fw-bold'>{link.betslip_status}</span>
+                    </div>
+                    <div className='d-sm-flex justify-content-between mt-4'> 
+                        <div>
+                            <small className='text-secondary'>Total Stake: </small>
+                            <span>KES {link.stake_amount}</span>
+                        </div>  
+                        <div>
+                            <small className='text-secondary'>Total Odds: </small>
+                            <span>{link.total_odds}</span>
+                        </div>                      
+                        <div>
+                            <small className='text-secondary'>Total Return: </small>
+                            <span className='fw-bold text-danger'>KES {link.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </div>                              
+                    </div> 
+                </React.Fragment>
+            )
         }
         return (
             <>
@@ -88,26 +130,7 @@ const History = () => {
                         </div>  
                         </div>
                         <div className='p-3'>
-                            <span className='fw-bold mb-2 d-block'>Ticket ID: {pid}</span>
-                            <small className='d-block text-secondary'>26/06/2022 15:34</small>
-                            <div className='bg-danger text-light p-2 mt-2 mb-2 d-flex justify-content-between rounded shadow-sm'>
-                                {data.fixtures.length > 1 ? <span className='fw-bold'>Multi Bet</span> : <span className='fw-bold'>Single Bet</span>}
-                                <span className='fw-bold'>Active</span>
-                            </div>
-                            <div className='d-sm-flex justify-content-between mt-4'> 
-                                <div>
-                                    <small className='text-secondary'>Total Stake: </small>
-                                    <span>KES 200.00</span>
-                                </div>  
-                                <div>
-                                    <small className='text-secondary'>Total Odds: </small>
-                                    <span>24.12</span>
-                                </div>                      
-                                <div>
-                                <small className='text-secondary'>Total Return: </small>
-                                <span className='fw-bold text-danger'>KES 125.22</span>
-                                </div>                              
-                            </div>
+                            {data.cart.map(TicketContainerElement)}                           
                         </div>
                     </div>
                     <div className='card mt-2 p-4 shadow-sm'>
@@ -125,7 +148,7 @@ const History = () => {
     }, [])
 
     return (
-        <div style={{ backgroundColor: '#fff', height: '100vh' }}>
+        <StyleHistory>
             <Row>
                 <Col lg="3" md="3" sm="4">
                     <UserProfile/>
@@ -137,14 +160,14 @@ const History = () => {
                     <SideAdvert/>
                 </Col>
             </Row>
-        </div>
+        </StyleHistory>
     )
 }
 
 const SideAdvert = () => {
     return (
-        <div className='card shadow-sm mt-2 p-3'>
-        <h1>Side Advert</h1>
+        <div className='card shadow-sm mt-2 p-3 bg-danger text-center border-0'>
+            <h1 className='text-light'>BET360</h1>
         </div>
     )
 }
