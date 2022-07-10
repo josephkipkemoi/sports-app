@@ -159,13 +159,10 @@ function App() {
       setClicked(prev => !prev)
     }
 
-    const sendBetslip2 = async (e)  => {
+    const sendBetslip2 = async (e,odds, market_id, picked)  => {
  
       const homeTeam = localStorage.getItem('home_team');
       const awayTeam =   localStorage.getItem('away_team');
-      const odds = e.target.getAttribute('odds');
-      const market_id = e.target.getAttribute('market'); 
-      const picked = e.target.getAttribute('picked');
       const fixtureId = localStorage.getItem('fixture_id');
       const session_id = sessionStorage.getItem('session_id')
       const games = response.filter(g => g.fixture_id == fixtureId)
@@ -209,7 +206,7 @@ function App() {
               odds={odds.odd} 
               market={i} 
               picked={odds.value}
-              onClick={sendBetslip2}  
+              onClick={(e) => sendBetslip2(e,odds.odd,i,odds.value)}  
               >
                <span>{odds.value}</span>
                <span> {odds.odd}</span>
