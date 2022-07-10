@@ -11,7 +11,7 @@ import useCustomOdds from '../hooks/odds';
 import configData from '../../config.json';
 import  Modal  from 'react-bootstrap/Modal';
 import copyToClipboard from '../hooks/copyToClipboard';
-import CustomFixture from '../components/CustomFixture';
+
 import  { 
   faStar, 
   faSoccerBall,
@@ -36,13 +36,12 @@ import useCustomBetslip from '../hooks/customBetslip';
 import { useGetBetslipQuery } from '../hooks/betslip';
 import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import axios from '../lib/axios';
-import { Router, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import useClickOutside from '../hooks/useClickOutside';
 import { Spinner } from 'react-bootstrap';
 import useSocialShare from '../hooks/socialShare';
 import useAuth from '../hooks/auth';
 import Support from '../components/Support';
-import Loader from '../components/Loader';
 const ThemedBody = styled('div')`
  background-color: #585858;
 
@@ -108,10 +107,7 @@ function App() {
   const [clicked, setClicked] = useState(false)
   const [searchResults, setSearchResults] = useState([])
   const [isSearchLoading, setIsSearchLoading] = useState(false)
-
-  const router = useRouter()
-  const { tab } = router.query
- 
+  
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -123,6 +119,7 @@ function App() {
   },[clicked])
 
    const GameElement = () => {
+
     const { postBetslip } = useCustomBetslip()
     
     const {error, isLoading, data} = useGetV1CustomFixtureQuery()
@@ -139,7 +136,9 @@ function App() {
 
     const response = data.fixtures.filter(val => val.unserialized_odds !== false)
 
+
     const sendBetslip = async (e)  => {
+      e.preventDefault()
       const homeTeam = e.target.getAttribute('home_team');
       const awayTeam =  e.target.getAttribute('away_team');
       const odds = e.target.getAttribute('odds');
@@ -147,7 +146,7 @@ function App() {
       const picked = e.target.getAttribute('picked');
       const fixtureId = e.target.getAttribute('fixtureid');
       const session_id = sessionStorage.getItem('session_id')
-    
+
        postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
@@ -160,31 +159,57 @@ function App() {
       setClicked(prev => !prev)
     }
 
-    const displayMoreMarkets = (index) => {
+    const sendBetslip2 = async (e)  => {
+ 
+      const homeTeam = localStorage.getItem('home_team');
+      const awayTeam =   localStorage.getItem('away_team');
+      const odds = e.target.getAttribute('odds');
+      const market_id = e.target.getAttribute('market'); 
+      const picked = e.target.getAttribute('picked');
+      const fixtureId = localStorage.getItem('fixture_id');
+      const session_id = sessionStorage.getItem('session_id')
+      const games = response.filter(g => g.fixture_id == fixtureId)
+      const market = games[0].unserialized_odds.bookmakers[0].bets[market_id]?.name
+
+       postBetslip({
+        fixture_id: fixtureId+session_id,
+        session_id: session_id,
+        betslip_teams: homeTeam + ' v ' + awayTeam,
+        betslip_market: market,  
+        betslip_picked: picked,
+        betslip_odds: odds 
+      })
+ 
+      setClicked(prev => !prev)
+    }
+
+    const displayMoreMarkets = (index, home, away, fixture_id) => {
+
+      localStorage.setItem('home_team', home)
+      localStorage.setItem('away_team', away)
+      localStorage.setItem('fixture_id', fixture_id)
+  
       const elements = document.getElementsByClassName('more-market')[index]
        if( elements.style.display === 'none') {
         elements.style.display = 'block'
        } else {
       elements.style.display = 'none'
        }
+
     }
  
     const MoreFixtureMarket = (name, i) => {
-      const OddsMarket = (odds, ii) => {
- 
+
+      const OddsMarket = (odds, ii) => {        
         return (
           <React.Fragment key={ii+i+odds.odd}>
               <button 
               className='btn-custom d-flex justify-content-between' 
               style={{ width: '30%' }}
               odds={odds.odd} 
-              btn_id={i}
-              home_team={odds.home} 
-              market={odds.name} 
-              away_team={odds.away} 
+              market={i} 
               picked={odds.value}
-              fixtureid={odds.fixture_id}
-              onClick={sendBetslip}  
+              onClick={sendBetslip2}  
               >
                <span>{odds.value}</span>
                <span> {odds.odd}</span>
@@ -192,6 +217,8 @@ function App() {
           </React.Fragment>
         )
       }
+
+ 
       return ( 
         <React.Fragment key={i+name.name}>
           <span className='text-light'>{name.name}</span>
@@ -237,7 +264,9 @@ function App() {
                   
                     <i className="bi bi-star" onClick={() => updateFavorite(data.fixture_id)}></i>
                     
-                    <Small onClick={() => displayMoreMarkets(i)}>
+                    <Small 
+                    onClick={() => displayMoreMarkets(i, data.home, data.away, data.fixture_id)}
+                    >
                       {data.unserialized_odds.bookmakers[0].bets.length}
                       <i className="bi bi-arrow-right-short"></i>
                     </Small>
@@ -283,8 +312,6 @@ function App() {
           )
           
         })}
-
-        <CustomFixture data={data.custom_fixture} />
 
       </>
     )  
