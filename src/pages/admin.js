@@ -11,9 +11,8 @@ import  Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import Select from "react-select";
 import { InputNumber } from "../components/Html";
-import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery } from "../hooks/admin";
+import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery, useGetAllFixturesIdsQuery } from "../hooks/admin";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
-import config from '../../config.json';
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -363,41 +362,44 @@ const FixturesElement = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fi
 }
 const CustomFixture = () => {
     const [isUpdated, setIsUpdated] = useState(false);
-
     const [fixtureDetails, setFixtureDetails] = useState({
-        home_team: '',
-        away_team: '',
-        home_odds: '',
-        draw_odds: '',
-        away_odds: '',
-        league_name: '',
+        home: '',
+        away: '',
         country: '',
-        fixture_date: '',
+        league_name: '',
+        fixture_id: '',
     })
 
     const { 
-        home_team, 
-        away_team, 
-        home_odds, 
-        draw_odds, 
-        away_odds,
+        home, 
+        away, 
         league_name,
+        fixture_id,
         country,
-        fixture_date 
     } = fixtureDetails
+    const { data, isLoading } = useGetAllFixturesIdsQuery()
+   
+    if(isLoading) {
+        return <Spinner animation="grow"/>
+    }
 
+    const options = data?.data?.map(d => {
+        return {
+            value: d.fixture_id,
+            label: d.fixture_id
+        }
+    })
+
+
+    // console.log(fixtureDetails)
     const submitFixture = async (e) => {
         e.preventDefault()
-        const res = await axios.post('api/admin/fixture', {
-            fixture_id: config.CUSTOM_FIXTURE_ID,
+        const res = await axios.patch('api/admin/fixture', {
+            fixture_id,
             league_name,
+            home,
+            away,
             country,
-            fixture_date,
-            home_team,
-            away_team,
-            home_odds,
-            draw_odds,
-            away_odds,
         })
 
         if(res.status === 200) {
@@ -406,6 +408,8 @@ const CustomFixture = () => {
     }
 
     const onchange = (e) => setFixtureDetails(prev => ({...prev, [e.target.name] : e.target.value}))
+
+    const onselect = (e) => setFixtureDetails(prev => ({...prev, fixture_id: e.value})) 
 
     return (
         <Card className="mt-4 border-0 bg-danger shadow">
@@ -417,10 +421,16 @@ const CustomFixture = () => {
                 <Row>
                         <Col lg="2" md="2" sm="2">
                             <Form.Group className="mb-3" controlId="formBasicHome">
+                                <Form.Label className="text-dark">Fixture ID</Form.Label>
+                                <Select className="text-dark" options={options} onChange={onselect}/>
+                            </Form.Group>
+                        </Col>
+                        <Col lg="2" md="2" sm="2">
+                            <Form.Group className="mb-3" controlId="formBasicHome">
                                 <Form.Label className="text-dark">Home Team</Form.Label>
                                 <Form.Control 
                                 type="text" 
-                                name="home_team" 
+                                name="home" 
                                 placeholder="Enter Home Team" 
                                 onChange={onchange} 
                                 />
@@ -431,7 +441,7 @@ const CustomFixture = () => {
                                 <Form.Label className="text-dark">Away Team</Form.Label>
                                 <Form.Control 
                                 type="text" 
-                                name="away_team" 
+                                name="away" 
                                 placeholder="Enter Away Team" 
                                 onChange={onchange} 
                                 />
@@ -470,39 +480,7 @@ const CustomFixture = () => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col lg="4" md="4" sm="4">
-                            <Form.Group className="mb-3" controlId="formBasicHomeOdds">
-                                <Form.Label className="text-dark">Home Odds</Form.Label>
-                                <Form.Control 
-                                type="number" 
-                                name="home_odds" 
-                                placeholder="Home Odds" 
-                                onChange={onchange} 
-                                />
-                            </Form.Group>                     
-                        </Col>
-                        <Col lg="4" md="4" sm="4">
-                            <Form.Group className="mb-3" controlId="formBasicDrawOdds">
-                                <Form.Label className="text-dark">Draw Odds</Form.Label>
-                                <Form.Control 
-                                type="number" 
-                                name="draw_odds" 
-                                placeholder="Draw Odds" 
-                                onChange={onchange} 
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4" sm="4">   
-                            <Form.Group className="mb-3" controlId="formBasicAwayOdds">
-                                <Form.Label className="text-dark">Away Odds</Form.Label>
-                                <Form.Control 
-                                type="number" 
-                                name="away_odds" 
-                                placeholder="Away Odds" 
-                                onChange={onchange} 
-                                />
-                            </Form.Group>
-                        </Col>
+                      
                         <div className="text-center">
                             <Button variant="primary" type="submit" onClick={submitFixture}>
                               {isUpdated  ? 'Added' : ' Add Fixture'} 
