@@ -1,33 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
-import configData from '../../config.json';
-
-export const FixtureApi = createApi({
-    reducerPath: 'FixtureApi',
-    baseQuery: fetchBaseQuery({ 
-        baseUrl: 'https://api-football-v1.p.rapidapi.com/v3/',
-        prepareHeaders: (headers) => {
-            headers.set('X-RapidAPI-Host', configData.SPORTS_RADAR_HOST)
-            headers.set('X-RapidAPI-Key', configData.SPORTS_RADAR_KEY)
-            return headers
-        } 
-    }), 
-    endpoints: (builder) => ({
-        getFixtures: builder.query({
-            query: () => `fixtures?next=50`
-        }),
-        getOddsFixture: builder.query({
-            query: (id) => `odds?fixture=${id}&bookmaker=8`
-        }),
-        getFixtureById: builder.query({
-            query: (id) => `${id}` 
-        })
-    })
-})
 
 export const CustomFixtureApi = createApi({
     reducerPath: 'CustomeFixtureApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
+        baseUrl:  `${ (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 
+        process.env.NEXT_PUBLIC_BACKEND_URL_DEVELOPMENT : 
+        process.env.NEXT_PUBLIC_BACKEND_URL}`
     }),
     endpoints: (builder) => ({
         getCustomFixtures: builder.query({
@@ -52,7 +30,3 @@ export const {
     useGetV1CustomFixtureByIdQuery,
 } = CustomFixtureApi
 
-export const {
-    useGetFixturesQuery,
-    useGetOddsFixtureQuery,
-} = FixtureApi

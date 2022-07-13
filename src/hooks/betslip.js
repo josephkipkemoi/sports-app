@@ -4,7 +4,9 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react"
 export const BetslipApi = createApi({
     reducerPath: 'BetslipApi',
     baseQuery: fetchBaseQuery({
-        baseUrl:process.env.NEXT_PUBLIC_BACKEND_URL,
+        baseUrl:  `${ (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? 
+        process.env.NEXT_PUBLIC_BACKEND_URL_DEVELOPMENT : 
+        process.env.NEXT_PUBLIC_BACKEND_URL}`,
     }),
     refetchOnFocus: true,
     endpoints: (builder) => ({
