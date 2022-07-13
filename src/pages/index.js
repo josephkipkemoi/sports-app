@@ -100,6 +100,7 @@ overflow-y: scroll;
 overflow-x: hidden;
 
 `
+
 function App() {
 
   const [clicked, setClicked] = useState(false)
@@ -187,9 +188,11 @@ function App() {
       const elements = document.getElementsByClassName('more-market')[index]
        if( elements.style.display === 'none') {
         elements.style.display = 'block'
-       } else {
-      elements.style.display = 'none'
-       }
+
+      } else {
+        elements.style.display = 'none'
+
+      }
 
     }
  
@@ -227,7 +230,7 @@ function App() {
     const updateFavorite = async (fixture_id) => {
       const user_id = Number(localStorage.getItem('u_i'))
 
-      const res = await axios.post('api/favorites', {
+       await axios.post('api/favorites', {
         user_id,
         fixture_id
       });
@@ -254,33 +257,30 @@ function App() {
                 {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </small>
               </div>
-             
-                <Col lg={1} md={1} sm={1} className="d-flex flex-column justify-content-between">
-                  
-                    <i className="bi bi-star" onClick={() => updateFavorite(data.fixture_id)}></i>
-                    
-                    <Small 
-                    onClick={() => displayMoreMarkets(i, data.home, data.away, data.fixture_id)}
-                    >
-                      {data.unserialized_odds.bookmakers[0].bets.length}
-                      <i className="bi bi-arrow-right-short"></i>
-                    </Small>
-                    
+            
+                  <Col lg={1} md={1} sm={1}>
+
+                      <i className="bi bi-star" onClick={() => updateFavorite(data.fixture_id)}></i>
+
+                  </Col>
+            
+               
+                <Col className='d-flex'>
+                  <span>{data.home}</span>
+                  <i className="bi bi-dash-lg"></i>
+                  <span>{data.away}</span>
                 </Col>
-                <Col>
-                  <span className='d-block'>{data.home} - </span>
-                  <span className='d-block'>{data.away}</span>
-                </Col>
-                <Col></Col>
+               
               </Row>
                      
             </Col>
-            <Col lg={4} sm={4} className="d-flex">
+            <Col lg={4} sm={4} className="d-flex align-items-center">
               {data.unserialized_odds.bookmakers[0].bets.map(odd => {             
                 return odd.id === 1 && odd.values.map((val, i) => {
                    return (
                      <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
                         <span className='header text-center'>{val.value}</span>  
+                         
                        <button 
                         odds={val.odd} 
                         className='btn-custom'
@@ -292,16 +292,31 @@ function App() {
                         fixtureid={data.fixture_id}
                         onClick={sendBetslip}  
                         >{val.odd}</button>   
-                                        
+                                   
                      </div>
                    )
                  })
               })}
+
+              <div className='text-center' style={{ position: 'relative' }}>
+
+                <Small 
+                  onClick={() => displayMoreMarkets(i, data.home, data.away, data.fixture_id)}
+                  className="d-flex align-items-center text-warning fw-bold"
+                >
+                    <i className="bi bi-plus" ></i>    
+                    {data.unserialized_odds.bookmakers[0].bets.length}               
+                </Small>
+                <small className='text-warning fw-bold' style={{ position: 'absolute', right: 0 }}> Markets</small> 
+
+              </div>
+               
             </Col>
             <div className='more-market' style={{ display: 'none' }}>
               {data.unserialized_odds.bookmakers[0].bets.map(MoreFixtureMarket)}
             </div>
-              <hr/>
+
+            <hr/>
             
           </React.Fragment>
           )
@@ -342,11 +357,7 @@ function App() {
 
   return (
     <ThemedBody>
-        <div>
-            <Head
-              title="Sports App"
-              description="Africa's Best Online Sports Betting App"
-            />
+        <div>            
             <main>
               <Row>
                   <Col lg={9} md={12} sm={12}>
