@@ -66,7 +66,7 @@ height: 100vh;
 .btn-custom {
   border: none;
   cursor: pointer;
- padding: 24px 12px;
+  padding: 24px 12px;
   width: 100%;
   background: ${props => props.theme.colors.btnColor};
   transition: .3s ease-out;
@@ -100,7 +100,13 @@ overflow-y: scroll;
 overflow-x: hidden;
 
 `
+const StyledFavorites = styled.div`
+ 
+@media screen and (max-width: 576px) {
 
+  
+}
+`
 function App() {
 
   const [clicked, setClicked] = useState(false)
@@ -200,18 +206,19 @@ function App() {
 
       const OddsMarket = (odds, ii) => {        
         return (
-          <React.Fragment key={ii+i+odds.odd}>
-              <button 
-              className='btn-custom d-flex justify-content-between' 
-              style={{ width: '30%' }}
-              odds={odds.odd} 
-              market={i} 
-              picked={odds.value}
-              onClick={(e) => sendBetslip2(e,odds.odd,i,odds.value)}  
-              >
-               <span>{odds.value}</span>
-               <span> {odds.odd}</span>
-              </button>
+          <React.Fragment key={ii+i+odds.odd}>         
+                <div className='d-sm-flex m-1' style={{ width: '30%'}}>
+                  <button 
+                  className='btn-custom d-sm-flex justify-content-between flex-wrap '                  
+                  odds={odds.odd} 
+                  market={i} 
+                  picked={odds.value}
+                  onClick={(e) => sendBetslip2(e,odds.odd,i,odds.value)}  
+                  >
+                  <span className='d-block'>{odds.value}</span>
+                  <span className='fw-bold text-light'>{odds.odd}</span>
+                  </button>
+                </div>   
           </React.Fragment>
         )
       }
@@ -219,10 +226,15 @@ function App() {
  
       return ( 
         <React.Fragment key={i+name.name}>
-          <span className='text-light'>{name.name}</span>
-          <div className='d-flex justify-content-between flex-wrap'>
-           {name.values.map(OddsMarket)}
-          </div>
+            <div 
+              className='text-light bg-success w-100 p-2 fw-bold card'
+              style={{ lineHeight: '30px' }}
+            >
+              <small style={{ marginLeft: 10, letterSpacing: 2 }}>{name.name}</small>
+            </div>
+            <div className='d-flex justify-content-between flex-wrap'>
+            {name.values.map(OddsMarket)}
+            </div>          
         </React.Fragment>
       )
     }
@@ -245,7 +257,14 @@ function App() {
             <Col lg={8} sm={8} className="custom-grid-box-main p-2">  
       
               <Row style={{ marginLeft: 2 }}>
-              <h5 className='header'> <img src={data.flag} className="img-fluid" style={{ width : 16 }}/> {data.country} | {data.league_name}</h5>
+              <h5 className='header'> 
+                <img 
+                  src={data.flag} 
+                  className="img-fluid"                 
+                  style={{ width : 16, marginRight: 5}}
+                /> 
+                  {data.country} | {data.league_name}
+              </h5>
               <div>
               <small style={{ marginRight: 5 }}>
                 Bet ID: B360{data.fixture_id} |
@@ -257,20 +276,21 @@ function App() {
                 {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </small>
               </div>
-            
-                  <Col lg={1} md={1} sm={1}>
 
+                <StyledFavorites>
+                  <Row>
+                    <Col className='d-inline-flex'>
                       <i className="bi bi-star" onClick={() => updateFavorite(data.fixture_id)}></i>
+                      <div style={{ marginTop: 2.5, marginLeft: 10 }}>
+                        <span>{data.home}</span>
+                        <i className="bi bi-dash"></i>
+                        <span>{data.away}</span>
+                      </div>                    
+                    </Col>
+                  </Row>
+                 
+                </StyledFavorites>
 
-                  </Col>
-            
-               
-                <Col className='d-flex'>
-                  <span>{data.home}</span>
-                  <i className="bi bi-dash-lg"></i>
-                  <span>{data.away}</span>
-                </Col>
-               
               </Row>
                      
             </Col>
@@ -316,7 +336,7 @@ function App() {
               {data.unserialized_odds.bookmakers[0].bets.map(MoreFixtureMarket)}
             </div>
 
-            <hr/>
+            <hr className='text-secondary'/>
             
           </React.Fragment>
           )
@@ -360,11 +380,11 @@ function App() {
         <div>            
             <main>
               <Row>
-                  <Col lg={9} md={12} sm={12}>
+                  <Col lg={9} md={12} sm={12} style={{ padding: 0, paddingLeft: 10 }}>
                   <StyledMain>
                    <TopNavBar/>
                    <CustomFilter onchange={onchange} onsubmit={onsubmit}/>
-                   {/* <hr/> */}
+
                    <StyleGameData>
                      {isSearchLoading ? <Spinner animation="grow"/> : ''}
                      {searchResults.length > 0 ? 
@@ -376,9 +396,8 @@ function App() {
                    </StyledMain>            
                   </Col>
                  
-                  <Col lg={3} md={12} sm={12}>
-                  
-                   <Betslip clicked={clicked}/>
+                  <Col lg={3} md={12} sm={12} style={{ padding: 0, paddingRight: 5 }}>                  
+                    <Betslip clicked={clicked}/>
                   </Col>
               </Row>
             </main>
@@ -487,9 +506,11 @@ const StyleSearch = styled.div`
  border: none;
  margin-left: -5px;
  max-width: 240px;
+ max-height: 32px;
  input[type=search] {
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
+  height: 100%;
  }
  button {
   border-top-left-radius: 0px;
@@ -498,9 +519,9 @@ const StyleSearch = styled.div`
 `
 const CustomFilter = ({ onchange, onsubmit }) => {
   return (
-    <Row className="d-flex align-items-center p-3">
+    <Row className="d-flex flex-row align-items-center p-2 card bg-success shadow-sm mb-2" >
       <Col>
-        <h3 className='text-light fw-bold'>Highlights</h3>
+        <h3 className='text-light fw-bold' style={{ letterSpacing: 1, margin: 0 }}>Highlights</h3>
       </Col>
       <Col lg="6" md="6" sm="6" className="d-flex">
         <StyleButton className='mx-auto d-flex align-items-center'>
@@ -513,16 +534,18 @@ const CustomFilter = ({ onchange, onsubmit }) => {
         </button>
         </StyleButton>      
       </Col>
-      <Col lg="3" md="3" sm="3" > 
-        <StyleSearch className='d-flex mx-auto'>
+      <Col lg="3" md="3" sm="3" className='d-flex justify-content-end'> 
+        <StyleSearch className='d-flex'>
           <input 
           type="search" 
           placeholder="Search" 
-          className="form-control"
+          className="form-control input-sm text-dark"
           onChange={onchange}
+          style={{ background: 'lightgray', borderRight: 'none', borderColor: 'gray' }}
           />
-          <button className='btn btn-secondary d-flex p-2' onClick={onsubmit}>
-          <i className="bi bi-search"></i>
+          <button className='btn btn-secondary d-flex align-items-center p-1' onClick={onsubmit}>        
+            <i className="bi bi-search" style={{ marginLeft: 3, marginRight: 5 }}></i>
+            <small className='text-light' style={{ marginTop: 3 }}>Search</small>
           </button>
         </StyleSearch>       
       </Col>
@@ -531,7 +554,7 @@ const CustomFilter = ({ onchange, onsubmit }) => {
 }
 const StyleSideNav = styled.div`
 background-color: #383838;
-width: 100%;
+ 
 overflow-x: scroll;
 overflow-y: hidden;
  
@@ -546,31 +569,6 @@ overflow-y: hidden;
   border-radius: 8px;
 }
 `
-
-const StyledSpan = styled.div`
-padding: 8px; 
-text-align: center;
- 
-display: flex;
-flex-wrap: nowrap;
-justify-content: start;
-a {
-  font-size: 12px;
-  text-decoration: none;
-  text-align: center;
-  color: #9c9c9c;
-  white-space: nowrap;
-  overflow: hidden;
-  margin-top: 8px;
-}
-.custom-box {
-  margin-left: 4px;
-  min-width: 102px;
-  max-width: 102px;
-}
-
-`
-
 const topNavLinks = [
   {
     name: 'Favorites',
@@ -636,28 +634,27 @@ const topNavLinks = [
 const TopNavBar = () => {
   
   const TopNavLinkItem = (link, i) => (
-    <div sm={1} key={i} className="custom-box d-flex flex-column">
- 
-      <FontAwesomeIcon 
-      icon={link.icon} 
-      className={`fa-2x text-secondary  d-block`}
-      />
-     
+    <div sm={1} key={i}>     
       <Link href={link.path} prefetch={false} className="icon-text-width">
         <a
           itemProp='url'
+          className='text-decoration-none text-secondary d-flex flex-column text-center p-2'         
         >
+          <FontAwesomeIcon 
+            icon={link.icon} 
+            className={`fa-2x text-secondary mb-2 mt-2`}
+          />
+          <small  style={{ whiteSpace: 'nowrap', width: '72px', overflow: 'hidden' }}>
           {link.name}
+          </small>
         </a>
       </Link>
     </div>
   )
 
   return (
-    <StyleSideNav>
-      <StyledSpan>
+    <StyleSideNav className='d-flex justify-content-between'>
         {topNavLinks.map(TopNavLinkItem)}
-      </StyledSpan>
     </StyleSideNav>
   )
 }
@@ -690,11 +687,7 @@ const StyleBetslip = styled.div`
     border-radius: 6px;
     margin-bottom: 16px;
   }
-  @media screen and (max-width: 576px) {
-    .inpt-xsm {
-      width: 50%;
-    }
-  }
+ 
   @media screen and (max-width: 990px) {
     .betcart-mb {
        display: none;
@@ -719,8 +712,7 @@ const StyleBetCart = styled.div`
     width: 82px;
     text-align: center;
     border-radius: 0px;
-    border-left: 1px solid; 
-    border-right: 1px solid;
+    border: none;
   }
   .custom-sm-btn {
     border: none;
@@ -1018,31 +1010,22 @@ const EmptyCart = () => {
     fetchUrlSessionSlip(code)
   }
     return (
-      <>
+      <div className='card bg-success p-1 shadow'>
         <div className='d-flex justify-content-between'>
-         <H5>BETSLIP</H5>
+         <h5 className='fw-bold text-light' style={{ marginLeft: 8, lineHeight: '24px', letterSpacing: 1 }}>BETSLIP</h5>
          <i className="bi bi-three-dots-vertical text-light"></i>
        </div>
-       <hr />
-     <div className='betslip-child'>
-       <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" className="bi bi-app-indicator text-muted d-block mx-auto m-3" viewBox="0 0 16 16">
-         <path d="M5.5 2A3.5 3.5 0 0 0 2 5.5v5A3.5 3.5 0 0 0 5.5 14h5a3.5 3.5 0 0 0 3.5-3.5V8a.5.5 0 0 1 1 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-5A4.5 4.5 0 0 1 1 10.5v-5A4.5 4.5 0 0 1 5.5 1H8a.5.5 0 0 1 0 1H5.5z"/>
-         <path d="M16 3a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-       </svg>
-       <span className='d-block fw-bold text-center'>You have not selected any bet</span>
-       <span className='d-block text-center'>Make your first pick to start playing.</span>
-       <hr/>
-       <span className='d-block m-3'>Or introduce your bet code:</span>
-       <Row className='m-1 align-items-center'>
-         <Col sm={8} md={8} lg={8} className="inpt-xsm">
-         <Input className="form-control" value={code} placeholder="Bet Code" onChange={handleBetCode}/>           
-         </Col>
-         <Col sm={4} md={4} className='text-center inpt-xsm' lg={4}>
-           <button className='btn btn-secondary' onClick={loadBetCode}>Add</button>
-         </Col>           
-       </Row>
-   </div>
-      </>
+        <div className='betslip-child shadow'>     
+          <span className='d-block fw-bold text-center mt-4'>You have not selected any bet</span>
+          <span className='d-block text-center'>Make your first pick to start playing.</span>
+          <hr/>
+          <div className='text-center mb-2'>
+              <span className='d-block m-2'>Or introduce your bet code:</span>
+              <input className="form-control w-100 p-2 mb-2" value={code} placeholder="Bet Code" onChange={handleBetCode}/>   
+              <button className='btn btn-secondary mt-2 w-100 shadow' onClick={loadBetCode}>Add Betslip Code</button>        
+          </div>      
+        </div>
+      </div>
     )
 }
 
@@ -1058,26 +1041,27 @@ const CartElements = (link, i) => {
   }
   
     return (
-      <React.Fragment key={i}>
-        
-        <div className='d-flex align-items-center justify-content-between'>
-          <div className='mt-2'>
-              <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
-              <Small>{link.betslip_teams}</Small>
+      <React.Fragment key={i}>  
+        <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px'}}>
+          <div className='d-flex align-items-center justify-content-between'>
+            <div className='mt-2'>
+                <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
+                <Small>{link.betslip_teams}</Small>
+            </div>
+            <button 
+            className='close-btn fw-bold'
+            onClick={() => removeSingleBetslipFixture(fixId)}
+            >
+              x
+            </button>
           </div>
-          <button 
-          className='close-btn fw-bold'
-          onClick={() => removeSingleBetslipFixture(fixId)}
-          >
-            x
-          </button>
-        </div>
-        <Small>{link.betslip_market}</Small>
-        <div className='d-flex align-items-center justify-content-between'>      
-            <Small>Your Pick: {link.betslip_picked}</Small>
-            <Small className='fw-bold'>{link.betslip_odds}</Small>
-        </div>
-        <hr/>     
+          <Small>{link.betslip_market}</Small>
+          <div className='d-flex align-items-center justify-content-between'>      
+              <Small>Your Pick: {link.betslip_picked}</Small>
+              <Small className='fw-bold'>{link.betslip_odds}</Small>
+          </div>
+          <hr className='mt-1 mb-1' style={{ margin: 0, color : '#FF7F50' }}/>  
+        </div>    
       </React.Fragment>
     )
 }
@@ -1199,7 +1183,7 @@ const BetCartFormElements = () => {
      
     }
     return (
-        <>
+        <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#505050', paddingBottom: '4px' }}>
         {slip?.data?.length !== 0 &&
          <div className='d-flex align-items-center justify-content-between'>
               <Small>Total Odds:</Small>
@@ -1213,13 +1197,13 @@ const BetCartFormElements = () => {
          <div className='d-flex align-items-center justify-content-between'>
           <Small>Amount (Kshs)</Small>
           <div className='d-flex'>
-            <button className='custom-sm-btn fw-bold' onClick={decrementBetAmount}>-</button>
+            <button className='custom-sm-btn fw-bold btn btn-secondary text-light' onClick={decrementBetAmount}>-</button>
             <InputNumber 
             value={betAmount}
             className="form-control custom-input"
             onChange={updateBetAmount}
             />
-            <button className='custom-sm-btn-right fw-bold' onClick={incrementBetAmount}>+</button>
+            <button className='custom-sm-btn-right fw-bold btn btn-secondary text-light' onClick={incrementBetAmount}>+</button>
           </div>
           <div className={`position-absolute position-tooltip ${betAmount >= 50 ? 'close-tooltip' : ''}`}>
             <i 
@@ -1229,50 +1213,45 @@ const BetCartFormElements = () => {
           </div>
          
         </div>
-         <div className='d-flex align-items-center justify-content-between'>
+         <div className='d-flex align-items-center justify-content-between mb-3'>
             <Small>Possible Payout (Kshs):</Small>
             <Small className='fw-bold text-warning'>
               {Number(possibleWin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Small>
         </div>
-        <div className='d-flex align-items-center justify-content-between' ref={congratulationsLinkBarRef}>
-          <button 
-          className='btn btn-danger btn-sm text-light w-100 ' 
-          style={{ marginRight: '3px' }}
-          onClick={() => removeBetslipCart()}
-          >
-            REMOVE ALL
-          </button>
-            <button 
-            ref={linkBarRef}      
-            disabled={!isAuthenticated || loading}
-            className=' text-dark w-100'
-            onClick={postBetslipCart}
-            style={{ 
-              border: 'none', 
-              color: 'rgba(0,0,0,0.6)',
-              cursor: `${!isAuthenticated ? 'not-allowed' : 'cursor'}`,
-              padding: '0.25rem 0.5rem',
-              borderRadius: 4,
-              fontSize: '0.875rem',
-              lineHeight: '1.5rem'
-            }}
-            >
-              {loading ? 
-               <Spinner
-               animation="grow"
-               size="sm"
-               style={{ marginRight: 5 }}
-             >
-             </Spinner>
-                      :
-              ''}             
-             {loading ? 'Loading...' : 'PLACE BET'}
-            </button>
-        </div>
+          <Row className='mb-3'>          
+            <Col lg={6} sm={12}>
+              <button 
+              ref={linkBarRef}      
+              disabled={!isAuthenticated || loading}
+              className='btn btn-light shadow-sm mb-1 text-dark w-100'
+              style={{ letterSpacing: 1 }}
+              onClick={postBetslipCart}
+              >
+                {loading ? 
+                <Spinner
+                animation="grow"
+                size="sm"
+              >
+              </Spinner>
+                        :
+                ''}             
+              {loading ? 'Loading...' : 'Place Bet'}
+              </button>
+            </Col>
+            <Col lg={6} sm={12} className="align-items-center">
+              <button 
+              className='btn btn-danger shadow-sm mb-1 text-light w-100 ' 
+              onClick={() => removeBetslipCart()}
+              style={{ letterSpacing: 1 }}
+              >                
+                Remove All
+              </button>
+            </Col>
+          </Row>
         </>
         }
-        </>
+        </div>
     )
 }
 
@@ -1290,41 +1269,37 @@ const openMobileBetslip = () => {
 }
 const BetslipCartHeader = () => {
   return (
-    <>
+    <div className='d-flex align-items-center justify-content-between p-3 rounded shadow card-header' style={{ borderBottom: '2px solid #FF7F50' }}>
      {slip?.data?.length !== 0 &&
       <div 
-      className='d-flex align-items-center justify-content-between p-2 bg-secondary' 
       onClick={openMobileBetslip}
       style={{ cursor: 'pointer' }}
       >
       {slip?.data?.length > 1 ? 
-      <>
-       <h6>
+      <div className='d-flex align-items-center'>
         {mobileCartHeight === 0 ? 
         <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
         <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
         }
-        Multi Bet ({slip?.data?.length})
-      </h6>
-      </>
+        <p className='fw-bold' style={{ margin: 0 }}>  Multi Bet ({slip?.data?.length})</p>
+      </div>
       :
-      <>      
-       <h6 className='d-flex align-items-center'>
+      <div className='d-flex align-items-center'>      
        {mobileCartHeight === 0 ? 
         <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
         <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
         }
-        Single Bet ({slip?.data?.length})
-       </h6>
-      </>
+        <p className='fw-bold' style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({slip?.data?.length})</p> 
+      </div>
       } 
-      <div  className='btn btn-light btn-sm text-dark'  onClick={toggleShareBtn}>
-        <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
-        <button   className='share-btn'>Share</button>
-      </div>  
+    
     </div>
       }
-    </>
+        <div className='btn btn-light btn-sm text-dark'  onClick={toggleShareBtn}>
+        <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
+        <button className='share-btn'>Share</button>
+      </div>  
+    </div>
   )
 }
 
@@ -1522,7 +1497,8 @@ return (
 const StyleMobileCartItems = styled.div`
   position: fixed;
   height: auto;
-  padding: 12px;
+  padding-right: 0;
+  padding-left: 12px;
   bottom: 0px;
   z-index: 3;
   background-color: #444;
@@ -1536,19 +1512,19 @@ const StyleMobileElements = styled.div`
   max-height: 320px;
   overflow-y: scroll;
   height: ${mobileCartHeight};
+  padding: 6px;
+  padding-bottom: 18px;
 `
 const MobileCartItems = () => {
   return (
-    <StyleMobileCartItems>
-      <StyleBetCart>
-      <BetslipCartHeader/>
-      <StyleMobileElements>
-        {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
-        <BetCartFormElements/>
-      </StyleMobileElements>
-  
-      </StyleBetCart>
-    
+    <StyleMobileCartItems className=' bg-success'>
+        <StyleBetCart >
+        <BetslipCartHeader/>
+        <StyleMobileElements>
+          {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
+          <BetCartFormElements/>
+        </StyleMobileElements>    
+        </StyleBetCart>
     </StyleMobileCartItems>
   )
 }
@@ -1639,7 +1615,7 @@ const BetslipSessionModal = () => {
   return (
     <>
      <StyleBetslip className='mx-auto'>
-      <StyleBetCart className='betcart-mb'>
+      <StyleBetCart className='betcart-mb card bg-success shadow'>
      
       <ShareContainer/> 
 
@@ -1685,7 +1661,7 @@ svg {
 const AddedFeatures = () => {
   
   return (
-    <StyledFeatures>
+    <StyledFeatures className='mt-4'>
       <h5>
         <i className="bi bi-lightning"></i>
         Features
