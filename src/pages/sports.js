@@ -1,8 +1,18 @@
 import React from "react";
 import App from ".";
-
-export default function Sports() {
+import axios from "../lib/axios";
+export default function Sports({ data }) {
     return (
-        <App/>
+        <App data={data}/>
     )
 }
+
+export async function getServerSideProps(context) {
+    const  data  = await axios.get('api/custom_fixture')
+     
+     return {
+      props: {
+        data: data.data.fixtures
+      },  
+    }
+  }

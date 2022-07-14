@@ -108,7 +108,8 @@ const StyledFavorites = styled.div`
   
 }
 `
-function App() {
+function App({data}) {
+
 
   const [clicked, setClicked] = useState(false)
   const [searchResults, setSearchResults] = useState([])
@@ -117,7 +118,7 @@ function App() {
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
- 
+
     if(!!currentSession === false) {
       sessionStorage.setItem('session_id', Date.now())
     }  
@@ -128,17 +129,17 @@ function App() {
 
     const { postBetslip } = useCustomBetslip()
     
-    const {error, isLoading, data} = useGetV1CustomFixtureQuery()
+    // const {error, isLoading, data} = useGetV1CustomFixtureQuery()
     
-    if(error)
-    {
-      return <span>Errors</span>
-    }
+    // if(error)
+    // {
+    //   return <span>Errors</span>
+    // }
 
-    if(isLoading)
-    {
-      return  <FootballLoader/>
-    } 
+    // if(isLoading)
+    // {
+    //   return  <FootballLoader/>
+    // } 
 
     const sendBetslip = async (e)  => {
       e.preventDefault()
@@ -246,9 +247,10 @@ function App() {
       });
 
     }  
+     
     return (
       <>
-        {data.fixtures.map((innerData,i) => {
+        {data.map((innerData,i) => {
           const date = new Date(innerData.fixture_date)
           const oddsData = JSON.parse(innerData.odds)
           return (
@@ -1715,6 +1717,16 @@ const Offers = () => {
       </div>
     </StyledFeatures>
   )
+}
+
+export async function getServerSideProps(context) {
+  const  data  = await axios.get('api/custom_fixture')
+   
+   return {
+    props: {
+      data: data.data.fixtures
+    },  
+  }
 }
 
 export default App;
