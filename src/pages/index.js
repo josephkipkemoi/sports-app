@@ -40,6 +40,7 @@ import { Spinner } from 'react-bootstrap';
 import useSocialShare from '../hooks/socialShare';
 import useAuth from '../hooks/auth';
 import Support from '../components/Support';
+import FootballLoader from '../components/FootballLoader';
 const ThemedBody = styled('div')`
  background-color: #585858;
 
@@ -136,7 +137,7 @@ function App() {
 
     if(isLoading)
     {
-      return <Spinner animation='grow'/>
+      return  <FootballLoader/>
     } 
 
     const sendBetslip = async (e)  => {
