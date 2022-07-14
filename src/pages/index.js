@@ -1069,7 +1069,7 @@ const CartElements = (link, i) => {
       <React.Fragment key={i}>  
         <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px'}}>
           <div className='d-flex align-items-center justify-content-between'>
-            <div className='mt-2'>
+            <div className='pt-2'>
                 <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
                 <Small>{link.betslip_teams}</Small>
             </div>
@@ -1294,7 +1294,7 @@ const openMobileBetslip = () => {
 }
 const BetslipCartHeader = () => {
   return (
-    <div className='d-flex align-items-center justify-content-between p-3 rounded shadow card-header' style={{ borderBottom: '2px solid #FF7F50' }}>
+    <div className='d-flex align-items-center justify-content-between p-2 rounded shadow-sm card-header bg-secondary' >
      {slip?.data?.length !== 0 &&
       <div 
       onClick={openMobileBetslip}
@@ -1509,20 +1509,22 @@ const StyleMobileElements = styled.div`
   max-height: 320px;
   overflow-y: scroll;
   height: ${mobileCartHeight};
-  padding: 6px;
-  padding-bottom: 18px;
 `
 const MobileCartItems = () => {
   return (
-    <StyleMobileCartItems className=' bg-success'>
-        <StyleBetCart >
-        <BetslipCartHeader/>
-        <StyleMobileElements>
-          {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
-          <BetCartFormElements/>
-        </StyleMobileElements>    
-        </StyleBetCart>
-    </StyleMobileCartItems>
+    <>
+      {slip.data?.length > 0 ? 
+      <StyleMobileCartItems className=' bg-success'>
+      <StyleBetCart >
+      <BetslipCartHeader/>
+      <StyleMobileElements>
+        {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
+        <BetCartFormElements/>
+      </StyleMobileElements>    
+      </StyleBetCart>
+  </StyleMobileCartItems>
+    : ''}
+    </>
   )
 }
 
