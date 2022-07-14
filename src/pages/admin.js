@@ -473,6 +473,11 @@ const CustomFixture = () => {
 
     const onselect = (e) => setFixtureDetails(prev => ({...prev, fixture_id: e.value})) 
 
+    const removeFixtures = async (e) => {
+        e.preventDefault()
+       await axios.delete('api/admin/fixtures/remove')
+
+    }
     return (
         <Card className="mt-4 border-0 bg-danger shadow">
             <Card.Header className="bg-primary">
@@ -543,14 +548,21 @@ const CustomFixture = () => {
                             </Form.Group>
                         </Col>
                       
-                        <div className="text-center">
+                        <div className="d-flex justify-content-center">
+                            <Button variant="primary" type="submit" onClick={removeFixtures}>
+                               Remove All
+                            </Button>
                             <Button variant="primary" type="submit" onClick={submitFixture}>
                               {isUpdated  ? 'Added' : ' Add Fixture'} 
                             </Button>
+                         
                         </div>
                 </Row>
+           
                 </Form>
+             
             </Card.Body>
+            
         </Card>
     )
 }
