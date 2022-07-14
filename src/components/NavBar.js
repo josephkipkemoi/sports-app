@@ -213,11 +213,11 @@ const BottomNavBar = ({ login }) => {
     const [isDepositModalOpen, setDepositModalOpen] = useState(false)
     const { isAuthenticated } = useAuth()
     const [userDetails, setUserDetails] = useState({
-        email: '',
+        phone_number: '',
         password: '',
     })
 
-    const { email, password } = userDetails;
+    const { phone_number, password } = userDetails;
 
     const [errors, setErrors] = useState([]);
     const [isLoading, setIsLoading] = useState(null);
@@ -227,7 +227,7 @@ const BottomNavBar = ({ login }) => {
     const loginUser = (e) => {
         e.preventDefault()
 
-        login({setErrors, setIsLoading, email, password})   
+        login({setErrors, setIsLoading, phone_number, password})   
       
     }
  
@@ -381,10 +381,10 @@ const BottomNavBar = ({ login }) => {
                             <Form.Group modalId="modal-ref" className="mb-3">
                                 <Form.Control 
                                 modalId="modal-ref" 
-                                name="email"
-                                type="email" 
+                                name="phone_number"
+                                type="number" 
                                 className="shadow-sm p-3" 
-                                placeholder="Email"
+                                placeholder="Phone number"
                                 onChange={handleUser}
                                 >
                                 </Form.Control>
