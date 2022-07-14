@@ -168,12 +168,9 @@ function App() {
       const awayTeam =   localStorage.getItem('away_team');
       const fixtureId = localStorage.getItem('fixture_id');
       const session_id = sessionStorage.getItem('session_id')
-      const market = data.fixtures.reduce(g => {
-        if(g.fixture_id == fixtureId) {
-           return JSON.parse(g.odds)[market_id].name 
-        }
-      })
-   
+      const fixture = data.fixtures.filter(g => g.fixture_id == fixtureId)
+      const market = JSON.parse(fixture[0].odds)[market_id].name
+
        postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
@@ -308,11 +305,11 @@ function App() {
                         odds={val.odd} 
                         className='btn-custom'
                         btn_id={i}
-                        home_team={data.home} 
+                        home_team={innerData.home} 
                         market={odd.name} 
-                        away_team={data.away} 
+                        away_team={innerData.away} 
                         picked={val.value}
-                        fixtureid={data.fixture_id}
+                        fixtureid={innerData.fixture_id}
                         onClick={sendBetslip}  
                         >{val.odd}</button>   
                                    
@@ -1611,7 +1608,7 @@ const BetslipSessionModal = () => {
     fetchUrlSessionSlip(sp_s , sharedSessionCode)
 
   }, [clicked, clickedd, sp_s])
-
+ 
   return (
     <>
      <StyleBetslip className='mx-auto'>
