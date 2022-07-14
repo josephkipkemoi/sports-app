@@ -137,10 +137,7 @@ function App() {
     if(isLoading)
     {
       return <Spinner animation='grow'/>
-    }
-
-    const response = data.fixtures.filter(val => val.unserialized_odds !== false)
-
+    } 
 
     const sendBetslip = async (e)  => {
       e.preventDefault()
@@ -170,9 +167,12 @@ function App() {
       const awayTeam =   localStorage.getItem('away_team');
       const fixtureId = localStorage.getItem('fixture_id');
       const session_id = sessionStorage.getItem('session_id')
-      const games = response.filter(g => g.fixture_id == fixtureId)
-      const market = games[0].unserialized_odds.bookmakers[0].bets[market_id]?.name
-
+      const market = data.fixtures.reduce(g => {
+        if(g.fixture_id == fixtureId) {
+           return JSON.parse(g.odds)[market_id].name 
+        }
+      })
+   
        postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
@@ -250,24 +250,25 @@ function App() {
     }  
     return (
       <>
-        {response.map((data,i) => {
-          const date = new Date(data.fixture_date)
+        {data.fixtures.map((innerData,i) => {
+          const date = new Date(innerData.fixture_date)
+          const oddsData = JSON.parse(innerData.odds)
           return (
-            <React.Fragment key={i + data.fixture_date}>
+            <React.Fragment key={i + innerData.fixture_date}>
             <Col lg={8} sm={8} className="card custom-grid-box-main p-2" style={{ borderRight: '0px', border: 'none' }}>  
       
               <Row style={{ marginLeft: 2 }}>
               <h5 className='header text-mute' style={{ letterSpacing: '1px' }}> 
                 <img 
-                  src={data.flag} 
+                  src={innerData.flag} 
                   className="img-fluid"                 
                   style={{ width : 16, marginRight: 5}}
                 /> 
-                  {data.country} | {data.league_name}
+                  {innerData.country} | {innerData.league_name}
               </h5>
               <div>
               <small style={{ marginRight: 5, lineHeight: '30px', letterSpacing: '1px' }}>
-                Bet ID: B360{data.fixture_id} |
+                Bet ID: B360{innerData.fixture_id} |
               </small>
               <small style={{ marginRight: 5, lineHeight: '30px', letterSpacing: '1px' }}>
                 {date.toLocaleDateString('en-GB')}
@@ -280,11 +281,11 @@ function App() {
                 <StyledFavorites>
                   <Row>
                     <Col className='d-inline-flex'>
-                      <i className="bi bi-star" onClick={() => updateFavorite(data.fixture_id)}></i>
+                      <i className="bi bi-star" onClick={() => updateFavorite(innerData.fixture_id)}></i>
                       <div style={{ marginTop: 2.5, marginLeft: 10 }}>
-                        <span className='text-light' style={{ letterSpacing : '1px' }}>{data.home}</span>
+                        <span className='text-light' style={{ letterSpacing : '1px' }}>{innerData.home}</span>
                         <i className="bi bi-dash"></i>
-                        <span className='text-light' style={{ letterSpacing : '1px' }}>{data.away}</span>
+                        <span className='text-light' style={{ letterSpacing : '1px' }}>{innerData.away}</span>
                       </div>                    
                     </Col>
                   </Row>
@@ -295,10 +296,11 @@ function App() {
                      
             </Col>
             <Col lg={4} sm={4} className="card d-flex flex-row align-items-center" style={{ background: '#505050', borderLeft: '0px', border: 'none' }}>
-              {data.unserialized_odds.bookmakers[0].bets.map(odd => {             
+   
+              {oddsData.map((odd) => {             
                 return odd.id === 1 && odd.values.map((val, i) => {
                    return (
-                     <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
+                     <div key={i} className='text-center mb-3 w-100'>
                         <span className='header text-center'>{val.value}</span>  
                          
                        <button 
@@ -321,11 +323,11 @@ function App() {
               <div className='text-center' style={{ position: 'relative' }}>
 
                 <Small 
-                  onClick={() => displayMoreMarkets(i, data.home, data.away, data.fixture_id)}
+                  onClick={() => displayMoreMarkets(i, innerData.home, innerData.away, innerData.fixture_id)}
                   className="d-flex align-items-center text-warning fw-bold"
                 >
                     <i className="bi bi-plus" ></i>    
-                    {data.unserialized_odds.bookmakers[0].bets.length}               
+                    {oddsData.length}               
                 </Small>
                 <small className='text-warning fw-bold' style={{ position: 'absolute', right: 0 }}> Markets</small> 
 
@@ -333,7 +335,7 @@ function App() {
                
             </Col>
             <div className='more-market' style={{ display: 'none' }}>
-              {data.unserialized_odds.bookmakers[0].bets.map(MoreFixtureMarket)}
+              {oddsData.map(MoreFixtureMarket)}
             </div>
 
             <hr className='text-secondary'/>
@@ -751,10 +753,6 @@ const StyleBetCart = styled.div`
  
 }
 `
-const StyleSpinner = styled.div`
- margin: 50% auto;
- width: 1rem;
-`
 const StyleShareContainer = styled.div`
 .h6-close {
   cursor: pointer;
@@ -772,6 +770,85 @@ const StyleShareContainer = styled.div`
 .social-hover:hover {
   opacity: .71;
 }
+`
+const StyleStars = styled.div`
+.custom-1 {
+  position: absolute;
+  margin-top: 20px;
+  margin-left: 40px;
+}
+.custom-2 {
+  position: absolute;
+  margin-top: 60px;
+  left: 70px;
+} 
+.custom-2-1 {
+  position: absolute;
+  margin-top: 20px;
+  right: -30px;
+} 
+.custom-3 {
+  position: absolute;
+  margin-top: 5px;
+  right: 10px;
+} 
+.custom-4 {
+  position: absolute;
+  margin-top: 15px;
+  right: -60px;
+} 
+.balloon-1 {
+  position: absolute;
+  margin-top: 0px;
+  right: 50px;
+}
+.balloon-2 {
+  position: absolute;
+  margin-top: 60px;
+  right: -80px;
+}
+`
+const StyleCongratulationsModalMidMenu = styled.div`
+h1,h2 {
+  line-height: 42px;
+}
+a {
+  line-height: 32px;
+}
+.small-position {
+  margin-top: 2px;
+  font-size: 14px;
+}
+`
+const StlyeInputClipboard = styled.div`
+  input {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  button {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+`
+const StyleCopied = styled.div`
+ position: absolute;
+ right: 0;  
+ margin-top: -20px;
+ margin-right: 25px;
+`
+const StyleMobileCartItems = styled.div`
+  position: fixed;
+  height: auto;
+  padding-right: 0;
+  padding-left: 12px;
+  bottom: 0px;
+  z-index: 3;
+  background-color: #444;
+  width: 100%;
+  margin: 0;
+  @media screen and (min-width: 990px) {
+    display: none;
+  }
 `
 export const Betslip = ({ clicked }) => {
   const [slip, setSlip] = useState([])
@@ -856,55 +933,7 @@ const BalanceModal = () => {
     )
 }
 
-const StyleStars = styled.div`
-.custom-1 {
-  position: absolute;
-  margin-top: 20px;
-  margin-left: 40px;
-}
-.custom-2 {
-  position: absolute;
-  margin-top: 60px;
-  left: 70px;
-} 
-.custom-2-1 {
-  position: absolute;
-  margin-top: 20px;
-  right: -30px;
-} 
-.custom-3 {
-  position: absolute;
-  margin-top: 5px;
-  right: 10px;
-} 
-.custom-4 {
-  position: absolute;
-  margin-top: 15px;
-  right: -60px;
-} 
-.balloon-1 {
-  position: absolute;
-  margin-top: 0px;
-  right: 50px;
-}
-.balloon-2 {
-  position: absolute;
-  margin-top: 60px;
-  right: -80px;
-}
-`
-const StyleCongratulationsModalMidMenu = styled.div`
-h1,h2 {
-  line-height: 42px;
-}
-a {
-  line-height: 32px;
-}
-.small-position {
-  margin-top: 2px;
-  font-size: 14px;
-}
-`
+
 const CongratulationModal = () => {
   const Stars = () => {
     return (
@@ -1301,22 +1330,7 @@ const BetslipCartHeader = () => {
   )
 }
 
-const StlyeInputClipboard = styled.div`
-  input {
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-  }
-  button {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-  }
-`
-const StyleCopied = styled.div`
- position: absolute;
- right: 0;  
- margin-top: -20px;
- margin-right: 25px;
-`
+
 const ShareContainer = () => {
   const [session, setSession] = useState('')
   const [isCopied, setIsCopied] = useState(false)
@@ -1492,20 +1506,7 @@ return (
     </Modal>
   )
 }
-const StyleMobileCartItems = styled.div`
-  position: fixed;
-  height: auto;
-  padding-right: 0;
-  padding-left: 12px;
-  bottom: 0px;
-  z-index: 3;
-  background-color: #444;
-  width: 100%;
-  margin: 0;
-  @media screen and (min-width: 990px) {
-    display: none;
-  }
-`
+
 const StyleMobileElements = styled.div`
   max-height: 320px;
   overflow-y: scroll;
