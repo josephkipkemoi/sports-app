@@ -520,11 +520,11 @@ const StyleSearch = styled.div`
 const CustomFilter = ({ onchange, onsubmit }) => {
   return (
     <Row className="d-flex flex-row align-items-center p-2 card bg-success shadow-sm mb-2" >
-      <Col>
+      <Col >
         <h4 className='text-light fw-bold' style={{ letterSpacing: 1, margin: 0 }}>Highlights</h4>
       </Col>
-      <Col lg="6" md="6" sm="6" className="d-flex">
-        <StyleButton className='mx-auto d-flex align-items-center'>
+      <Col className="d-flex justify-content-center">
+        <StyleButton className='d-flex align-items-center'>
         <button className='btn'>
           <i className="bi bi-printer"></i>
         </button>        
@@ -534,18 +534,17 @@ const CustomFilter = ({ onchange, onsubmit }) => {
         </button>
         </StyleButton>      
       </Col>
-      <Col lg="3" md="3" sm="3" className='d-flex justify-content-end'> 
+      <Col className='d-flex justify-content-end'> 
         <StyleSearch className='d-flex'>
           <input 
           type="search" 
           placeholder="Search" 
-          className="form-control input-sm text-dark"
+          className="form-control text-dark "
           onChange={onchange}
           style={{ background: 'lightgray', borderRight: 'none', borderColor: 'gray' }}
           />
           <button className='btn btn-secondary d-flex align-items-center p-1' onClick={onsubmit}>        
             <i className="bi bi-search" style={{ marginLeft: 3, marginRight: 5 }}></i>
-            <small className='text-light' style={{ marginTop: 3 }}>Search</small>
           </button>
         </StyleSearch>       
       </Col>

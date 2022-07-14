@@ -148,10 +148,6 @@ const socialLinks = [
         path: '/www.twitter.com/pageurl',
     },
     {
-        name: 'Youtube',
-        path: '/www.youtube.com/pageurl',
-    },
-    {
         name: 'Instagram',
         path: '/www.instagram.com/pageurl',
     }, 
