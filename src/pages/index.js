@@ -254,10 +254,10 @@ function App() {
           const date = new Date(data.fixture_date)
           return (
             <React.Fragment key={i + data.fixture_date}>
-            <Col lg={8} sm={8} className="custom-grid-box-main p-2">  
+            <Col lg={8} sm={8} className="card custom-grid-box-main p-2" style={{ borderRight: '0px', border: 'none' }}>  
       
               <Row style={{ marginLeft: 2 }}>
-              <h5 className='header'> 
+              <h5 className='header text-mute' style={{ letterSpacing: '1px' }}> 
                 <img 
                   src={data.flag} 
                   className="img-fluid"                 
@@ -266,10 +266,10 @@ function App() {
                   {data.country} | {data.league_name}
               </h5>
               <div>
-              <small style={{ marginRight: 5 }}>
+              <small style={{ marginRight: 5, lineHeight: '30px', letterSpacing: '1px' }}>
                 Bet ID: B360{data.fixture_id} |
               </small>
-              <small style={{ marginRight: 5 }}>
+              <small style={{ marginRight: 5, lineHeight: '30px', letterSpacing: '1px' }}>
                 {date.toLocaleDateString('en-GB')}
               </small>
               <small>
@@ -282,9 +282,9 @@ function App() {
                     <Col className='d-inline-flex'>
                       <i className="bi bi-star" onClick={() => updateFavorite(data.fixture_id)}></i>
                       <div style={{ marginTop: 2.5, marginLeft: 10 }}>
-                        <span>{data.home}</span>
+                        <span className='text-light' style={{ letterSpacing : '1px' }}>{data.home}</span>
                         <i className="bi bi-dash"></i>
-                        <span>{data.away}</span>
+                        <span className='text-light' style={{ letterSpacing : '1px' }}>{data.away}</span>
                       </div>                    
                     </Col>
                   </Row>
@@ -294,7 +294,7 @@ function App() {
               </Row>
                      
             </Col>
-            <Col lg={4} sm={4} className="d-flex align-items-center">
+            <Col lg={4} sm={4} className="card d-flex flex-row align-items-center" style={{ background: '#505050', borderLeft: '0px', border: 'none' }}>
               {data.unserialized_odds.bookmakers[0].bets.map(odd => {             
                 return odd.id === 1 && odd.values.map((val, i) => {
                    return (
@@ -521,7 +521,7 @@ const CustomFilter = ({ onchange, onsubmit }) => {
   return (
     <Row className="d-flex flex-row align-items-center p-2 card bg-success shadow-sm mb-2" >
       <Col>
-        <h3 className='text-light fw-bold' style={{ letterSpacing: 1, margin: 0 }}>Highlights</h3>
+        <h4 className='text-light fw-bold' style={{ letterSpacing: 1, margin: 0 }}>Highlights</h4>
       </Col>
       <Col lg="6" md="6" sm="6" className="d-flex">
         <StyleButton className='mx-auto d-flex align-items-center'>
@@ -699,9 +699,8 @@ const StyleBetslip = styled.div`
 const StyleBetCart = styled.div`
   color: #fff;
   .share-btn {
-    border: none;
-    color: #0f0f0f;
-    background-color: #fff;
+    line-height: 24px;
+    letter-spacing: 1px;
   }
   .close-btn {
     border: none;
@@ -1281,7 +1280,7 @@ const BetslipCartHeader = () => {
         <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
         <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
         }
-        <p className='fw-bold' style={{ margin: 0 }}>  Multi Bet ({slip?.data?.length})</p>
+        <p className='fw-bold' style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({slip?.data?.length})</p>
       </div>
       :
       <div className='d-flex align-items-center'>      
@@ -1295,10 +1294,10 @@ const BetslipCartHeader = () => {
     
     </div>
       }
-        <div className='btn btn-light btn-sm text-dark'  onClick={toggleShareBtn}>
-        <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
-        <button className='share-btn'>Share</button>
-      </div>  
+        <div className='btn btn-light btn-sm text-dark shadow-sm'  onClick={toggleShareBtn}>
+          <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
+          <span className='text-dark fw-bold share-btn' >Share</span>
+        </div>  
     </div>
   )
 }

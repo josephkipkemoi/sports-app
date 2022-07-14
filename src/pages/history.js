@@ -422,7 +422,8 @@ export const UserProfile = () => {
             <Link key={i} href={link.path}>
                 <a
                     itemProp='url'
-                    className='d-flex justify-content-between text-decoration-none text-dark d-block mb-3'
+                    className='d-flex justify-content-between text-decoration-none text-light d-block mb-3'
+                    style={{ letterSpacing: '1px' }}
                 >
                     {link.name}
                     <i className="bi bi-arrow-right-short"></i>
@@ -445,7 +446,7 @@ export const UserProfile = () => {
     
             const { amount } = data
             return (
-                <Span className='d-block fw-bold'>
+                <Span className='d-block fw-bold text-light'  style={{ letterSpacing: '1px' }}>
                     <FontAwesomeIcon 
                     icon={faRefresh} 
                     style={{ 
@@ -473,7 +474,7 @@ export const UserProfile = () => {
         const { user } = data;
 
         return (
-            <Span style={{ marginLeft: 10 }}>0{user?.phone_number}</Span>
+            <Span className='fw-bold' style={{ marginLeft: 10, letterSpacing: '1px' }} >+254{user?.phone_number}</Span>
         )
     }
        
@@ -482,9 +483,9 @@ export const UserProfile = () => {
         setUserId(userId)
     })
     return (
-        <StyleUserProfile className='card m-2 p-2'>
-            <Card style={{  backgroundColor: '#ebeded' }}>
-                <Card.Header className="bg-dark text-light d-flex">
+        <StyleUserProfile className='card m-2 p-2 bg-success'>
+            <Card className=' shadow text-light p-2 m-2' style={{ background: '#505050' }}>
+                <Card.Header className="bg-light text-dark d-flex m-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-person-bounding-box" viewBox="0 0 16 16">
                         <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
                         <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
@@ -492,7 +493,7 @@ export const UserProfile = () => {
                     <UserProfileElement/>
                 </Card.Header>
                 <Card.Body>
-                    <Span className='d-block'>Balance</Span>
+                    <Span className='d-block text-light' style={{ letterSpacing: '1px' }}>Balance</Span>
                     <BalanceElement/>
                     <hr/>
 
@@ -553,16 +554,16 @@ const HistoryFilter = () => {
         setDates(prev => ({...prev, [e.target.name]: e.target.value}))
     }
     return (
-        <div className='history-header mb-3 card m-2 p-2'>
+        <div className='history-header mb-3 card m-2 p-2 bg-success'>
             <div>
                 <StyleHeaderNav className='d-flex p-2'>
                     <Link href="history?his_tab=sbets&tab=all">
                         <a
                             itemProp='url'
-                            className='text-decoration-none text-dark'
+                            className='text-decoration-none text-light'
                         >
                             <h5 
-                            className={`${his_tab === 'sbets' ? 'fw-bold active-h5' : ''}  p-3`}
+                            className={`${his_tab === 'sbets' ? 'fw-bold active-h5' : ''}  p-3 text-light`}
                             >
                                 Sports Bets
                             </h5>
@@ -571,7 +572,7 @@ const HistoryFilter = () => {
                     <Link href="history?his_tab=jbets&tab=j_all">
                         <a
                            itemProp='url'
-                           className='text-decoration-none text-dark'  
+                           className='text-decoration-none text-light'  
                         >
                             <h5 
                             className={`${his_tab === 'jbets' ? 'fw-bold active-h5' : ''}  p-3`}
@@ -583,26 +584,26 @@ const HistoryFilter = () => {
                 </StyleHeaderNav>          
             </div>
             <Row className='d-flex p-2 '>
-            <Col sm="12" md="9" lg="9">
-                <StyleFilterBtn className="d-flex ">
+            <Col sm="12" md="9" lg="9" className="d-flex mb-2">
+                <StyleFilterBtn >
                     <Link href="history?his_tab=sbets&tab=all">
                         <a itemProp="url">
  
-                            <button className={`btn btn-outline-secondary ${tab === 'all' && 'active'}`}>
+                            <button className={`btn btn-outline-light ${tab === 'all' && 'active'}`}>
                                 All
                             </button>
                         </a>
                     </Link>
                     <Link href="history?his_tab=sbets&tab=settled">
                         <a itemProp='url'>
-                            <button className={`btn btn-outline-secondary ${tab === 'settled' && 'active'}`}>
+                            <button className={`btn btn-outline-light ${tab === 'settled' && 'active'}`}>
                                 Settled
                             </button>
                         </a>
                     </Link>
                     <Link href="history?his_tab=sbets&tab=unsettled">
                         <a itemProp='url'>
-                            <button className={`btn btn-outline-secondary ${tab === 'unsettled' && 'active'}`}>
+                            <button className={`btn btn-outline-light ${tab === 'unsettled' && 'active'}`}>
                                 Unsettled
                             </button>
                         </a>
@@ -610,11 +611,11 @@ const HistoryFilter = () => {
                     
                 </StyleFilterBtn>               
             </Col>
-            <Col sm="12" md="3" lg="3">
+            <Col sm="12" md="3" lg="3" className='d-flex'>
                 <StyleSearch >
                     <button 
                     type="search" 
-                    className='btn btn-outline-secondary d-flex justify-content-between float-end'
+                    className='btn btn-outline-light d-flex justify-content-between float-end'
                     onClick={openModal}
                     >
                         <span>All Dates </span>    

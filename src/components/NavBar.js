@@ -40,7 +40,7 @@ nav a:hover, a:active {
 const topNavLinks = [
     {
         name: 'Sports',
-        path: '/sports'
+        path: '/sports?tab=soccer'
     },
     {
         name: 'Jackpot',
@@ -117,7 +117,7 @@ export default function NavBar({ logout, login }) {
 const midnavLinks = [
     {
         name: 'Sports',
-        path: '/sports',
+        path: '/sports?tab=soccer',
         class: 'sports'
     },
     {
@@ -248,7 +248,7 @@ const BottomNavBar = ({ login }) => {
         <>
             <StyleAuthenticated className="d-flex">
                 <Link href="/notifications">
-                    <a className="btn btn-warning btn-sm text-dark">
+                    <a className="btn btn-light btn-sm text-dark shadow-sm border-0">
                         <i className="bi bi-bell"></i>
                         <small></small> 
                     </a>
@@ -257,28 +257,32 @@ const BottomNavBar = ({ login }) => {
                 <Link href="/profile" prefetch={false}>
                     <a 
                         itemProp="url"
-                        className="btn btn-secondary btn-sm" 
+                        className="d-flex align-items-center btn btn-success btn-sm shadow-sm" 
                         style={{ marginLeft: 5 }}
                     >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
                         <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
                     </svg>  
-                        Profile      
+                      <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>Profile</span>        
                     </a>                
                                
                 </Link>
                 <Link href="/history?his_tab=sbets&tab=all" prefetch={false}>
                     <a
                         itemProp="url"
-                        className="btn btn-secondary btn-sm"
+                        className="btn btn-success btn-sm shadow-sm"
                         style={{ marginLeft: 5 }}
                     >
                         <i className="bi bi-card-list w-100" style={{ marginRight: 3 }}></i>
-                        My Bets
+                        <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>
+                            My Bets
+                        </span> 
                     </a>
                 </Link>
-                <button className="btn btn-secondary btn-sm" style={{ marginLeft: 5 }} onClick={openDepositModal}>
-                    Deposit
+                <button className="btn btn-success btn-sm shadow-sm" style={{ marginLeft: 5 }} onClick={openDepositModal}>
+                    <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>
+                        Deposit
+                    </span>
                 </button>
             </StyleAuthenticated>            
         </>
@@ -290,7 +294,8 @@ const BottomNavBar = ({ login }) => {
                 <Link href={link.path}>
                     <a
                         itemProp="url"
-                        className="text-decoration-none mobile m-1  "
+                        className="text-decoration-none mobile m-1"
+                        style={{ letterSpacing: '1px' }}
                     >
                         {link.name}
                     </a>
