@@ -5,18 +5,26 @@ import Container from "react-bootstrap/Container";
 
 const StyleResults = styled.div`
     height: 100vh;
-    background: #fff;
+    background: #505050;
+    .card-bb {
+        margin: 15vh auto;
+    }
+    h5, span {
+        letter-spacing: 1px;
+    }
 `
 export default function Results() {
     return (
         <StyleResults>
-          <Container>
-                <Card >
-                    <Card.Header >
-                        <h3>Results</h3>
+          <Container className="pt-3">
+                <Card className="bg-light" style={{ border: 'none' }}>
+                    <Card.Header className="bg-success text-center text-light">
+                        <h5>Results</h5>
                     </Card.Header>
-                    <Card.Body>
-                       
+                    <Card.Body className="text-center">
+                        <div className="card-bb">
+                            <span>Check again later!</span>
+                        </div>
                     </Card.Body>
                 </Card>
             </Container>
