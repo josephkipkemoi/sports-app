@@ -11,8 +11,10 @@ import  Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import Select from "react-select";
 import { InputNumber } from "../components/Html";
-import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery, useGetAllFixturesIdsQuery } from "../hooks/admin";
+import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery, useGetAllFixturesIdsQuery, useGetAllCustomerMessagesQuery } from "../hooks/admin";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
+import Collapse from "react-bootstrap/Collapse";
+import { PhoneSvgIcon } from "../components/Svg";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -27,6 +29,10 @@ const adminLinks = [
     {
         name: 'Fixtures & Odds',
         path: 'admin?tab=fixtures'
+    },
+    {
+        name: 'Customer Feedback',
+        path: 'admin?tab=feedback'
     }
 ]
  
@@ -93,7 +99,63 @@ export default function Admin() {
              />
              }
             {tab === 'users' && <UsersProfileComponent/>}
+            {tab === 'feedback' && <CustomerFeedback/>}
         </StyledAdmin>
+    )
+}
+
+const CustomerFeedback = () => {
+    const {data, error, isLoading } = useGetAllCustomerMessagesQuery()
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+    if(isLoading) {
+        return <Spinner animation="grow"/>
+    }
+
+    const MessageItems = (link, i) => {
+        const [open, setOpen] = useState(false);
+         return (
+            <React.Fragment key={i}>
+                <div className=" m-1 d-flex flex-row">                    
+                                <Button                        
+                                aria-controls="example-collapse-text"
+                                aria-expanded={open}
+                                onClick={() => setOpen(!open)}
+                                className="d-flex"
+                                >
+                                    <PhoneSvgIcon width="16" height="16"/>
+                                    <small className="text-light bg-primary">
+                                        {link.phone_number}
+                                    </small>
+                                </Button>
+                                                  
+                                <Collapse in={open}>
+                                    <div id="example-collapse-text" className="card p-2 shadow" style={{ marginLeft: 15 }}>
+                                       <span>
+                                       {link.name} | {link.email}
+                                        </span> 
+                                       <p>
+                                        {link.message}
+                                       </p> 
+                                    </div>
+                                </Collapse>
+                </div>    
+                <hr/>        
+            </React.Fragment>
+        )
+    }
+    return (
+        <Card className="mt-2"> 
+            <Card.Header className="bg-primary text-light">
+                <h3 className="fw-bold">Feedback</h3>
+            </Card.Header>
+            <Card.Body>                
+                {data.messages.map(MessageItems)}
+            </Card.Body>
+        </Card>
     )
 }
 

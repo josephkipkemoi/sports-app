@@ -16,6 +16,9 @@ export const AdminApi = createApi({
         }),
         getAllFixturesIds: builder.query({
             query: () => 'api/admin/fixtures/ids'
+        }),
+        getAllCustomerMessages: builder.query({
+            query: () => 'api/support/messages'
         })
     })
 })
@@ -24,5 +27,6 @@ export const {
      useGetAllUsersQuery,
      useGetAdminUserBalanceByIdQuery,
      useGetAllFixturesIdsQuery,
+     useGetAllCustomerMessagesQuery,
 } = AdminApi
 
