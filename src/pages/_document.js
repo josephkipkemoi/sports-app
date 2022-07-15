@@ -1,7 +1,6 @@
 import React from "react";
 import Document, {Html, Head, Main, NextScript} from "next/document";
 import { ServerStyleSheet } from "styled-components";
-
 export default class MyDocument extends Document {
 
     render() {
@@ -13,7 +12,7 @@ export default class MyDocument extends Document {
                     rel="stylesheet" 
                     integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" 
                     crossOrigin="anonymous"
-                />
+                 />
                 
                 <link 
                     rel="stylesheet" 

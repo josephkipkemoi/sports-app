@@ -42,7 +42,7 @@ import useAuth from '../hooks/auth';
 import Support from '../components/Support';
 import FootballLoader from '../components/FootballLoader';
 const ThemedBody = styled('div')`
- background-color: #585858;
+ background-color: #424242;
 
  button {
   color: ${props => props.theme.colors.h5Color};
@@ -52,15 +52,17 @@ const ThemedBody = styled('div')`
 const StyleGameData = styled('div')`
 height: 100vh;
 .custom-grid-box-main, .custom-grid-hide {
-  background: ${props => props.theme.colors.btnColor};
+  background: #424242;
   color: #c3c3c3; 
 }
 .header {
-  background: ${props => props.theme.colors.btnColor};
-  color: #c3c3c3;
+  background: #424242;
+  color: #ffffff;
+  letter-spacing: 1px;
+  font-weight: 600;
  }
 .custom-grid-box {
-  background-color: ${props => props.theme.colors.btnColor};
+  background: #424242;
   text-align: center;
   border-top: 1px solid #636363;
 }
@@ -69,7 +71,7 @@ height: 100vh;
   cursor: pointer;
   padding: 24px 12px;
   width: 100%;
-  background: ${props => props.theme.colors.btnColor};
+  background: #424242;
   transition: .3s ease-out;
 }
  
@@ -95,7 +97,7 @@ height: 100vh;
 `
 
 const StyledMain = styled.div`
-background-color: ${props => props.theme.colors.btnColor};
+background: #424242;
 max-height: 100vh;
 overflow-y: scroll;
 overflow-x: hidden;
@@ -111,10 +113,17 @@ const StyledFavorites = styled.div`
 function App({data}) {
 
 
-  const [clicked, setClicked] = useState(false)
   const [searchResults, setSearchResults] = useState([])
   const [isSearchLoading, setIsSearchLoading] = useState(false)
+  const router = useRouter()
   
+  const dispatchEvent = () => {
+    if(router.asPath === '/') {
+      router.push('?a')
+    } else {
+      router.push('/')
+    }
+  }
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -123,7 +132,8 @@ function App({data}) {
       sessionStorage.setItem('session_id', Date.now())
     }  
 
-  },[clicked])
+
+  },[])
 
    const GameElement = () => {
 
@@ -151,7 +161,7 @@ function App({data}) {
       const fixtureId = e.target.getAttribute('fixtureid');
       const session_id = sessionStorage.getItem('session_id')
 
-       postBetslip({
+      const res = await postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
         betslip_teams: homeTeam + ' v ' + awayTeam,
@@ -159,8 +169,10 @@ function App({data}) {
         betslip_picked: picked,
         betslip_odds: odds 
       })
- 
-      setClicked(prev => !prev)
+  
+      if(res === 200) {
+        dispatchEvent() 
+      } 
     }
 
     const sendBetslip2 = async (e,odds, market_id, picked)  => {
@@ -169,10 +181,11 @@ function App({data}) {
       const awayTeam =   localStorage.getItem('away_team');
       const fixtureId = localStorage.getItem('fixture_id');
       const session_id = sessionStorage.getItem('session_id')
-      const fixture = data.fixtures.filter(g => g.fixture_id == fixtureId)
+      const fixture = data.filter(g => g.fixture_id == fixtureId)
       const market = JSON.parse(fixture[0].odds)[market_id].name
-
-       postBetslip({
+ 
+   
+       const res = await postBetslip({
         fixture_id: fixtureId+session_id,
         session_id: session_id,
         betslip_teams: homeTeam + ' v ' + awayTeam,
@@ -180,8 +193,11 @@ function App({data}) {
         betslip_picked: picked,
         betslip_odds: odds 
       })
- 
-      setClicked(prev => !prev)
+
+      if(res === 200) {
+        dispatchEvent() 
+      } 
+     
     }
 
     const displayMoreMarkets = (index, home, away, fixture_id) => {
@@ -191,6 +207,7 @@ function App({data}) {
       localStorage.setItem('fixture_id', fixture_id)
   
       const elements = document.getElementsByClassName('more-market')[index]
+ 
        if( elements.style.display === 'none') {
         elements.style.display = 'block'
 
@@ -215,7 +232,7 @@ function App({data}) {
                   onClick={(e) => sendBetslip2(e,odds.odd,i,odds.value)}  
                   >
                   <span className='d-block'>{odds.value}</span>
-                  <span className='fw-bold text-light'>{odds.odd}</span>
+                  <span className='fw-bold ' style={{ color: '#ffffff' }}>{odds.odd}</span>
                   </button>
                 </div>   
           </React.Fragment>
@@ -283,9 +300,9 @@ function App({data}) {
                     <Col className='d-inline-flex'>
                       <i className="bi bi-star" onClick={() => updateFavorite(innerData.fixture_id)}></i>
                       <div style={{ marginTop: 2.5, marginLeft: 10 }}>
-                        <span className='text-light' style={{ letterSpacing : '1px' }}>{innerData.home}</span>
+                        <span style={{ letterSpacing : '1px', color: '#ffffff', fontWeight: 500  }}>{innerData.home}</span>
                         <i className="bi bi-dash"></i>
-                        <span className='text-light' style={{ letterSpacing : '1px' }}>{innerData.away}</span>
+                        <span style={{ letterSpacing : '1px', color: '#ffffff', fontWeight: 500  }}>{innerData.away}</span>
                       </div>                    
                     </Col>
                   </Row>
@@ -295,7 +312,7 @@ function App({data}) {
               </Row>
                      
             </Col>
-            <Col lg={4} sm={4} className="card d-flex flex-row align-items-center" style={{ background: '#505050', borderLeft: '0px', border: 'none' }}>
+            <Col lg={4} sm={4} className="card d-flex flex-row align-items-center" style={{ background: '#424242', borderLeft: '0px', border: 'none' }}>
    
               {oddsData.map((odd) => {             
                 return odd.id === 1 && odd.values.map((val, i) => {
@@ -354,8 +371,9 @@ function App({data}) {
     const {tab} = router.query
 
     return (
-    <Row  className="custom-grid p-2">     
-       {router.asPath === '/'  && <GameElement />}
+    <Row  className="custom-grid p-2">   
+       <GameElement/>  
+       {/* {router.asPath === '/'  && <GameElement />} */}
        { tab === 'soccer' && <GameElement />}
        {tab === 'favorites' && <FavoritesElement/>}
     </Row>
@@ -399,7 +417,7 @@ function App({data}) {
                   </Col>
                  
                   <Col lg={3} md={12} sm={12} style={{ padding: 0, paddingRight: 5 }}>                  
-                    <Betslip clicked={clicked}/>
+                    <Betslip />
                   </Col>
               </Row>
             </main>
@@ -528,11 +546,11 @@ const CustomFilter = ({ onchange, onsubmit }) => {
       <Col className="d-flex justify-content-center">
         <StyleButton className='d-flex align-items-center'>
         <button className='btn'>
-          <i className="bi bi-printer"></i>
+          <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>
         </button>        
         <button className='background-none'>
-          <i className="bi bi-arrow-clockwise text-light p-1"></i>
-          <small className='text-light'>Refresh</small>
+          <i className="bi bi-arrow-clockwise p-1" style={{ color: '#ffffff' }}></i>
+          <small style={{ color: '#ffffff', letterSpacing: '1px' }}>Refresh</small>
         </button>
         </StyleButton>      
       </Col>
@@ -543,10 +561,10 @@ const CustomFilter = ({ onchange, onsubmit }) => {
           placeholder="Search" 
           className="form-control text-dark "
           onChange={onchange}
-          style={{ background: 'lightgray', borderRight: 'none', borderColor: 'gray' }}
+          style={{ background: '#ffffff', borderRight: 'none', borderColor: 'gray' }}
           />
           <button className='btn btn-secondary d-flex align-items-center p-1' onClick={onsubmit}>        
-            <i className="bi bi-search" style={{ marginLeft: 3, marginRight: 5 }}></i>
+            <i className="bi bi-search" style={{ marginLeft: 3, marginRight: 5, color: '#ffffff' }}></i>
           </button>
         </StyleSearch>       
       </Col>
@@ -643,9 +661,9 @@ const TopNavBar = () => {
         >
           <FontAwesomeIcon 
             icon={link.icon} 
-            className={`fa-2x text-secondary mb-2 mt-2`}
+            className={`fa-2x mb-2 mt-2 text-success`}
           />
-          <small  style={{ whiteSpace: 'nowrap', width: '72px', overflow: 'hidden' }}>
+          <small  style={{ whiteSpace: 'nowrap', width: '72px', overflow: 'hidden', color: '#ffffff', letterSpacing: '1px' }}>
           {link.name}
           </small>
         </a>
@@ -850,7 +868,8 @@ const StyleMobileCartItems = styled.div`
     display: none;
   }
 `
-export const Betslip = ({ clicked }) => {
+export const Betslip = () => {
+
   const [slip, setSlip] = useState([])
   const [oddsTotal, setOddsTotal] = useState(0)
   const [shareCode, setShareCode] = useState(null)
@@ -858,7 +877,7 @@ export const Betslip = ({ clicked }) => {
   const [isModalOpen, setModalOpen] = useState(false);
 
   const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false);
-  const [clickedd, setClicked] = useState(false)
+
   const { isAuthenticated } = useAuth({ middleware: 'guest' })
   const [userId, setUserId] = useState(null)
   const [loading, setLoading] = useState(null)
@@ -868,6 +887,14 @@ export const Betslip = ({ clicked }) => {
   const { sp_s } = router.query
   const closeMenu = () => setModalOpen(false)
   const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
+
+  const dispatchEvent = () => {
+    if(router.asPath === '/') {
+      router.push('?a')
+    } else {
+      router.push('/')
+    }
+  }
 
   const fetchUrlSessionSlip = (shared_code_url, shared_code_storage) => {
     if(shared_code_url) {
@@ -1059,11 +1086,14 @@ const EmptyCart = () => {
 const CartElements = (link, i) => {
  
    const fixId = String(link.fixture_id).slice(0,6) + link.session_id 
-   const removeSingleBetslipFixture = (fixture_id) => {
+   const removeSingleBetslipFixture = async (fixture_id) => {
    
-    axios.delete(`api/betslips/fixtures/${fixture_id}`)
+    const res = await axios.delete(`api/betslips/fixtures/${fixture_id}`)
+    
+    if(res.status === 200) {
+      dispatchEvent()
+    }
  
-    setClicked(prev => !prev)
   
   }
   
@@ -1113,7 +1143,7 @@ const BetCartFormElements = () => {
       sessionStorage.removeItem('share_code')
       router.push('/')
       axios.delete(`api/betslips/sessions/${sessionId}`)  
-      setClicked(prev => !prev)
+      dispatchEvent()
     }
 
     const possibleWin = betAmount * oddsTotal 
@@ -1210,7 +1240,7 @@ const BetCartFormElements = () => {
      
     }
     return (
-        <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#505050', paddingBottom: '4px' }}>
+        <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#424242', paddingBottom: '4px' }}>
         {slip?.data?.length !== 0 &&
          <div className='d-flex align-items-center justify-content-between'>
               <Small>Total Odds:</Small>
@@ -1296,7 +1326,10 @@ const openMobileBetslip = () => {
 }
 const BetslipCartHeader = () => {
   return (
-    <div className='d-flex align-items-center justify-content-between p-2 rounded shadow-sm card-header bg-secondary' >
+    <div 
+    className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
+    style={{ backgroundColor: '#ffffff', color: '#424242', borderTopRightRadius: '6px', borderTopLeftRadius: '6px'}} 
+    >
      {slip?.data?.length !== 0 &&
       <div 
       onClick={openMobileBetslip}
@@ -1395,6 +1428,7 @@ useEffect(() => {
   setUserId(userId)
   fetchSocialLinks(sessionId)
   setSession(sessionId)
+
 }, [])
 
 return (
@@ -1563,7 +1597,7 @@ const BetslipSessionModal = () => {
         })
         .then(d => {
           if(d === 200) {
-            setClicked(prev => !prev)
+            dispatchEvent()
             setSessionModalOpen(false)
             router.push('/')
           }
@@ -1610,13 +1644,13 @@ const BetslipSessionModal = () => {
     fetchBetslips(currentSession)
     fetchBetslipOddsTotal(currentSession)
     fetchUrlSessionSlip(sp_s , sharedSessionCode)
+   
+  }, [router.asPath, sp_s])
 
-  }, [clicked, clickedd, sp_s])
- 
   return (
     <>
      <StyleBetslip className='mx-auto'>
-      <StyleBetCart className='betcart-mb card bg-success shadow'>
+      <StyleBetCart className='betcart-mb card bg-success shadow' style={{ border: 'none' }}>
      
       <ShareContainer/> 
 
