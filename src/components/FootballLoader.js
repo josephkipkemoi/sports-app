@@ -4,7 +4,7 @@ import styled from "styled-components";
 const StyleFootballLoader = styled.div`
  
 .box {
-    margin: 5vh auto;
+    margin: zvh auto;
     width: 40px;
     height: 140px;
     position: relative;

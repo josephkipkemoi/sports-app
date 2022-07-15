@@ -57,7 +57,7 @@ const History = () => {
                                 </div>
                                 <div className='d-flex align-items-center'>
                                     <small className='fw-bold text-secondary'>Result: </small>
-                                    <span className='d-block'>0:0</span>
+                                    <span className='d-block'></span>
                                 </div>
                             </div>
                         </div>
