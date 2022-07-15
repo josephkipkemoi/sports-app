@@ -64,4 +64,7 @@ line-height: 24px;
 
 export const Small = styled('small')`
 line-height: 30px;
+color: #ffffff;
+font-weight: 600;
+letter-spacing: 1px;
 `

@@ -275,14 +275,14 @@ function App({data}) {
             <Col lg={8} sm={8} className="card custom-grid-box-main p-2" style={{ borderRight: '0px', border: 'none' }}>  
       
               <Row style={{ marginLeft: 2 }}>
-              <h5 className='header text-mute' style={{ letterSpacing: '1px' }}> 
+              <h6 className='header text-mute' style={{ letterSpacing: '1px' }}> 
                 <img 
                   src={innerData.flag} 
                   className="img-fluid"                 
                   style={{ width : 16, marginRight: 5}}
                 /> 
                   {innerData.country} | {innerData.league_name}
-              </h5>
+              </h6>
               <div>
               <small style={{ marginRight: 5, lineHeight: '30px', letterSpacing: '1px' }}>
                 Bet ID: B360{innerData.fixture_id} |
@@ -318,7 +318,7 @@ function App({data}) {
                 return odd.id === 1 && odd.values.map((val, i) => {
                    return (
                      <div key={i} className='text-center mb-3 w-100'>
-                        <span className='header text-center'>{val.value}</span>  
+                        <small className='header text-center'>{val.value}</small>  
                          
                        <button 
                         odds={val.odd} 
@@ -1099,7 +1099,7 @@ const CartElements = (link, i) => {
   
     return (
       <React.Fragment key={i}>  
-        <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px'}}>
+        <div style={{ paddingTop: '7px', paddingRight: '14px', paddingLeft: '14px'}}>
           <div className='d-flex align-items-center justify-content-between'>
             <div className='pt-2'>
                 <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
