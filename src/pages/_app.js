@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
 import { Provider } from "react-redux";
 import { store } from "../store/store";
-import {
+import styled, {
     createGlobalStyle,
     ThemeProvider as StyledThemeProvider
 } from 'styled-components';
@@ -18,6 +18,9 @@ import NavWrapper from '../components/NavWrapper';
 import Script from "next/script";
 import useAuth from "../hooks/auth";
 import Loader from "../components/Loader";
+import Image from "next/image";
+
+
 if(typeof document !== 'undefined') {
     if(!window.sayHello) {
         console.log('Contact Developer: jkemboe@gmail.com')
@@ -51,7 +54,15 @@ const GlobalStyles = createGlobalStyle`
     }
 }
 `
-
+const StyleLoader = styled.div`
+position: absolute;
+margin-left: auto;
+margin-right: auto;
+margin-top: 40vh;
+left: 0;
+right: 0;
+text-align: center;
+`
 function ThemeProvider({ children }) {
     return (
         <ThemeContext.Provider value={Theme}>
@@ -103,10 +114,19 @@ export default function MyApp({ Component, pageProps }) {
                             <Component  {...pageProps}/>
                         </Provider>
                     </NavWrapper>    : 
-                      
-                <Loader/> 
+                      <div className="bg-success" style={{ height: '100vh' }}>
+                        <StyleLoader>
+                            <Image src="/logo.png" height="46" width="92"/>
+                            <h5 className="d-block fw-bold mt-4" style={{ letterSpacing: '2px', color: '#ffffff' }}>
+                                www.pinaclebet.com
+                            </h5>
+                            <Loader/> 
+                        </StyleLoader>                        
+                    </div>
+            
                     }
-                  
+                    
+           
                 </Hydrate>
             </QueryClientProvider>       
             </ThemeProvider>

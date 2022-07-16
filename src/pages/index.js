@@ -138,18 +138,6 @@ function App({data}) {
    const GameElement = () => {
 
     const { postBetslip } = useCustomBetslip()
-    
-    // const {error, isLoading, data} = useGetV1CustomFixtureQuery()
-    
-    // if(error)
-    // {
-    //   return <span>Errors</span>
-    // }
-
-    // if(isLoading)
-    // {
-    //   return  <FootballLoader/>
-    // } 
 
     const sendBetslip = async (e)  => {
       e.preventDefault()
@@ -169,12 +157,12 @@ function App({data}) {
         betslip_picked: picked,
         betslip_odds: odds 
       })
-  
+
       if(res === 200) {
         dispatchEvent() 
       } 
     }
-
+   
     const sendBetslip2 = async (e,odds, market_id, picked)  => {
  
       const homeTeam = localStorage.getItem('home_team');
@@ -1066,17 +1054,23 @@ const EmptyCart = () => {
     return (
       <div className='card bg-success p-1 shadow'>
         <div className='d-flex justify-content-between'>
-         <h5 className='fw-bold text-light' style={{ marginLeft: 8, lineHeight: '24px', letterSpacing: 1 }}>BETSLIP</h5>
+         <h5 className='fw-bold' style={{ marginLeft: 8, lineHeight: '24px', letterSpacing: 1, color: '#ffffff' }}>BETSLIP</h5>
          <i className="bi bi-three-dots-vertical text-light"></i>
        </div>
         <div className='betslip-child shadow'>     
-          <span className='d-block fw-bold text-center mt-4'>You have not selected any bet</span>
-          <span className='d-block text-center'>Make your first pick to start playing.</span>
+          <span className='d-block fw-bold text-center mt-4' style={{ color: '#ffffff', letterSpacing: 1 }}>You have not selected any bet</span>
+          <span className='d-block text-center' style={{ color: '#ffffff', letterSpacing: 1 }}>Make your first pick to start playing.</span>
           <hr/>
           <div className='text-center mb-2'>
-              <span className='d-block m-2'>Or introduce your bet code:</span>
-              <input className="form-control w-100 p-2 mb-2" value={code} placeholder="Bet Code" onChange={handleBetCode}/>   
-              <button className='btn btn-secondary mt-2 w-100 shadow' onClick={loadBetCode}>Add Betslip Code</button>        
+              <span className='d-block m-2' style={{ color: '#ffffff', letterSpacing: 1 }}>Or introduce your bet code:</span>
+              <Row className='p-2'>
+                <Col>
+                  <input className="form-control p-2 shadow w-100" value={code} placeholder="Bet Code" onChange={handleBetCode}/>   
+                </Col>
+                <Col>
+                  <button className='btn btn-secondary p-2 shadow w-100' onClick={loadBetCode}>Add Betslip Code</button>        
+                </Col>
+              </Row>
           </div>      
         </div>
       </div>

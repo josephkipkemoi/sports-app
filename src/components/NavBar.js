@@ -6,10 +6,11 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import useClickOutside from "../hooks/useClickOutside";
-import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 import useAuth from "../hooks/auth";
-import { Col, Row } from "react-bootstrap";
- import { useGetAuthUserQuery } from "../hooks/customAuth";
+import  Col  from "react-bootstrap/Col";
+import  Row  from "react-bootstrap/Row";
+import Image from "next/image";
+
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
     display: inline-flex;
@@ -94,7 +95,9 @@ export default function NavBar({ logout, login }) {
         <nav className="navbar navbar-expand-lg navbar-light">
                 <div className="container-fluid">
                     <Link href="/">
-                        <a className="navbar-brand text-light" itemProp="url">Bet360</a>
+                        <a className="navbar-brand text-light bg-success rounded p-2 d-flex" itemProp="url">
+                            <Image src="/logo.png" width="48" height="24"/>
+                        </a>
                     </Link>
                     <button className="navbar-toggler bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon "></span>

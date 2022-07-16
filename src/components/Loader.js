@@ -2,165 +2,51 @@ import React from "react";
 import styled from "styled-components";
 
 const StyleLoader = styled.div`
-.container {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    width: 200px;
+.lds-facebook {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-facebook div {
+  display: inline-block;
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  background: #fff;
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+.lds-facebook div:nth-child(1) {
+  left: 8px;
+  animation-delay: -0.24s;
+}
+.lds-facebook div:nth-child(2) {
+  left: 32px;
+  animation-delay: -0.12s;
+}
+.lds-facebook div:nth-child(3) {
+  left: 56px;
+  animation-delay: 0;
+}
+@keyframes lds-facebook {
+  0% {
+    top: 8px;
+    height: 64px;
   }
-  h2 {
-    position: absolute;
-    top: 35%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    letter-spacing: 3px;
+  50%, 100% {
+    top: 24px;
+    height: 32px;
   }
-  .dash {
-    margin: 0 15px;
-    width: 35px;
-    height: 15px;
-    border-radius: 8px;
-    background: #FF2CBD;
-    box-shadow: 0 0 10px 0 #FECDFF;
-  }
-  
-  .uno {
-    margin-right: -18px;
-    transform-origin: center left;
-    animation: spin 3s linear infinite;  
-  }
-  
-  .dos {
-    transform-origin: center right;
-    animation: spin2 3s linear infinite;
-    animation-delay: .2s;
-  }
-  
-  .tres {
-    transform-origin: center right;
-    animation: spin3 3s linear infinite;
-    animation-delay: .3s;
-  }
-  
-  .cuatro {
-    transform-origin: center right;
-    animation: spin4 3s linear infinite;
-    animation-delay: .4s;
-  }
-  
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    25% {
-      transform: rotate(360deg);
-    }
-    30% {
-      transform: rotate(370deg);
-    }
-    35% {
-      transform: rotate(360deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  
-  @keyframes spin2 {
-    0% {
-      transform: rotate(0deg);
-    }
-    20% {
-      transform: rotate(0deg);
-    }
-    30% {
-      transform: rotate(-180deg);
-    }
-    35% {
-      transform: rotate(-190deg);
-    }
-    40% {
-      transform: rotate(-180deg);
-    }
-    78% {
-      transform: rotate(-180deg);
-    }
-    95% {
-      transform: rotate(-360deg);
-    }
-    98% {
-      transform: rotate(-370deg);
-    }
-    100% {
-      transform: rotate(-360deg);
-    }
-  }
-  
-  @keyframes spin3 {
-    0% {
-      transform: rotate(0deg);
-    }
-    27% {
-      transform: rotate(0deg);  
-    }
-    40% {
-      transform: rotate(180deg);
-    }
-    45% {
-      transform: rotate(190deg);
-    }
-    50% {
-      transform: rotate(180deg);
-    }
-    62% {
-      transform: rotate(180deg);
-    }
-    75% {
-      transform: rotate(360deg);
-    }
-    80% {
-      transform: rotate(370deg);
-    }
-    85% {
-      transform: rotate(360deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-  
-  @keyframes spin4 {
-    0% {
-      transform: rotate(0deg);
-    }
-    38% {
-      transform: rotate(0deg);
-    }
-    60% {
-      transform: rotate(-360deg);
-    }
-    65% {
-      transform: rotate(-370deg);
-    }
-    75% {
-      transform: rotate(-360deg);
-    }
-    100% {
-      transform: rotate(-360deg);
-    }
-  }
+}
+
 `
 export default function Loader() {
     return (
         <StyleLoader>
-        <h2 className="fw-bold text-danger">BET360</h2>
-        <div className="container">
-            <div className="dash uno"></div>
-            <div className="dash dos"></div>
-            <div className="dash tres"></div>
-            <div className="dash cuatro"></div>
+        <div class="lds-facebook">
+          <div></div>
+          <div></div>
+          <div></div>
         </div>
         </StyleLoader>
     )
