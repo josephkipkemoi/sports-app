@@ -111,19 +111,12 @@ const StyledFavorites = styled.div`
 }
 `
 function App({data}) {
-
+  console.log(data)
 
   const [searchResults, setSearchResults] = useState([])
   const [isSearchLoading, setIsSearchLoading] = useState(false)
   const router = useRouter()
-  
-  const dispatchEvent = () => {
-    if(router.asPath === '/') {
-      router.push('?a')
-    } else {
-      router.push('/')
-    }
-  }
+
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -187,7 +180,14 @@ function App({data}) {
       } 
      
     }
-
+  
+    const dispatchEvent = () => {
+      if(router.asPath === '/') {
+        router.push('?a')
+      } else {
+        router.push('/')
+      }
+    }
     const displayMoreMarkets = (index, home, away, fixture_id) => {
 
       localStorage.setItem('home_team', home)
@@ -257,6 +257,7 @@ function App({data}) {
       <>
         {data.map((innerData,i) => {
           const date = new Date(innerData.fixture_date)
+          console.log(innerData)
           const oddsData = JSON.parse(innerData.odds)
           return (
             <React.Fragment key={i + innerData.fixture_date}>
