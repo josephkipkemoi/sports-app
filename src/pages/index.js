@@ -111,10 +111,10 @@ const StyledFavorites = styled.div`
 }
 `
 function App({data}) {
-  console.log(data)
 
   const [searchResults, setSearchResults] = useState([])
   const [isSearchLoading, setIsSearchLoading] = useState(false)
+  const [betslip, setBetslip] = useState([])
   const router = useRouter()
 
   useEffect(() => {
@@ -142,18 +142,29 @@ function App({data}) {
       const fixtureId = e.target.getAttribute('fixtureid');
       const session_id = sessionStorage.getItem('session_id')
 
-      const res = await postBetslip({
+      // const res = await postBetslip({
+      //   fixture_id: fixtureId+session_id,
+      //   session_id: session_id,
+      //   betslip_teams: homeTeam + ' v ' + awayTeam,
+      //   betslip_market: market,
+      //   betslip_picked: picked,
+      //   betslip_odds: odds 
+      // })
+
+      setBetslip(prev => 
+        ([{
+          ...prev,
         fixture_id: fixtureId+session_id,
         session_id: session_id,
         betslip_teams: homeTeam + ' v ' + awayTeam,
         betslip_market: market,
         betslip_picked: picked,
         betslip_odds: odds 
-      })
+      }]))
 
-      if(res === 200) {
-        dispatchEvent() 
-      } 
+      // if(res === 200) {
+      //   dispatchEvent() 
+      // } 
     }
    
     const sendBetslip2 = async (e,odds, market_id, picked)  => {
@@ -166,18 +177,28 @@ function App({data}) {
       const market = JSON.parse(fixture[0].odds)[market_id].name
  
    
-       const res = await postBetslip({
+      //  const res = await postBetslip({
+      //   fixture_id: fixtureId+session_id,
+      //   session_id: session_id,
+      //   betslip_teams: homeTeam + ' v ' + awayTeam,
+      //   betslip_market: market,  
+      //   betslip_picked: picked,
+      //   betslip_odds: odds 
+      // })
+      setBetslip(prev => 
+        ([{
+          ...prev,
         fixture_id: fixtureId+session_id,
         session_id: session_id,
         betslip_teams: homeTeam + ' v ' + awayTeam,
-        betslip_market: market,  
+        betslip_market: market,
         betslip_picked: picked,
         betslip_odds: odds 
-      })
+      }]))
 
-      if(res === 200) {
-        dispatchEvent() 
-      } 
+      // if(res === 200) {
+      //   dispatchEvent() 
+      // } 
      
     }
   
@@ -405,7 +426,7 @@ function App({data}) {
                   </Col>
                  
                   <Col lg={3} md={12} sm={12} style={{ padding: 0, paddingRight: 5 }}>                  
-                    <Betslip />
+                    <Betslip slip={betslip}/>
                   </Col>
               </Row>
             </main>
@@ -856,9 +877,9 @@ const StyleMobileCartItems = styled.div`
     display: none;
   }
 `
-export const Betslip = () => {
+export const Betslip = ( { slip } ) => {
 
-  const [slip, setSlip] = useState([])
+  const [, setSlip] = useState([])
   const [oddsTotal, setOddsTotal] = useState(0)
   const [shareCode, setShareCode] = useState(null)
   const [balance, setBalance] = useState(0)
@@ -1133,14 +1154,15 @@ const BetCartFormElements = () => {
       setBetAmount(Number(e.target.value));  
     }
     const removeBetslipCart = () => {
-      const sessionId = sessionStorage.getItem('session_id')
-      sessionStorage.removeItem('share_code')
-      router.push('/')
-      axios.delete(`api/betslips/sessions/${sessionId}`)  
+      // const sessionId = sessionStorage.getItem('session_id')
+      // sessionStorage.removeItem('share_code')
+      // router.push('/')
+      // axios.delete(`api/betslips/sessions/${sessionId}`)  
+      
       dispatchEvent()
     }
 
-    const possibleWin = betAmount * oddsTotal 
+    const possibleWin = betAmount * slip[0].betslip_odds 
 
     const postBetslipCartToDb = async (session_id, user_id, bet_amount, total_odds, final_payout) => {
      
@@ -1211,7 +1233,7 @@ const BetCartFormElements = () => {
       setBalance(amount)
       return (
         <>
-         {!!isAuthenticated && slip?.data?.length !== 0 ? 
+         {!!isAuthenticated && slip?.length !== 0 ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
             <Small>Balance:</Small>
             <Small className='fw-bold'>
@@ -1235,15 +1257,15 @@ const BetCartFormElements = () => {
     }
     return (
         <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#424242', paddingBottom: '4px' }}>
-        {slip?.data?.length !== 0 &&
+        {slip?.length !== 0 &&
          <div className='d-flex align-items-center justify-content-between'>
               <Small>Total Odds:</Small>
-              <Small className='fw-bold'>{oddsTotal}</Small>
+              <Small className='fw-bold'>{slip[0].betslip_odds}</Small>
          </div>
         }
        
         <UserBalanceElement/>
-         {slip?.data?.length !== 0 &&
+         {slip?.length !== 0 &&
          <>
          <div className='d-flex align-items-center justify-content-between'>
           <Small>Amount (Kshs)</Small>
@@ -1324,12 +1346,12 @@ const BetslipCartHeader = () => {
     className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
     style={{ backgroundColor: '#ffffff', color: '#424242', borderTopRightRadius: '6px', borderTopLeftRadius: '6px'}} 
     >
-     {slip?.data?.length !== 0 &&
+     {slip?.length !== 0 &&
       <div 
       onClick={openMobileBetslip}
       style={{ cursor: 'pointer' }}
       >
-      {slip?.data?.length > 1 ? 
+      {slip?.length > 1 ? 
       <div className='d-flex align-items-center'>
         {mobileCartHeight === 0 ? 
         <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
@@ -1343,7 +1365,7 @@ const BetslipCartHeader = () => {
         <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
         <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
         }
-        <p className='fw-bold' style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({slip?.data?.length})</p> 
+        <p className='fw-bold' style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({slip?.length})</p> 
       </div>
       } 
     
@@ -1543,12 +1565,12 @@ const StyleMobileElements = styled.div`
 const MobileCartItems = () => {
   return (
     <>
-      {slip.data?.length > 0 ? 
+      {slip?.length > 0 ? 
       <StyleMobileCartItems className=' bg-success'>
       <StyleBetCart >
       <BetslipCartHeader/>
       <StyleMobileElements>
-        {slip?.data?.length !== 0 && slip.data?.map(CartElements)}   
+        {slip?.length !== 0 && slip?.map(CartElements)}   
         <BetCartFormElements/>
       </StyleMobileElements>    
       </StyleBetCart>
@@ -1648,8 +1670,8 @@ const BetslipSessionModal = () => {
      
       <ShareContainer/> 
 
-      {slip?.data?.length > 0 ? 
-      <> <BetslipCartHeader/>{ slip.data?.map(CartElements)} <BetCartFormElements/></> : 
+      {slip?.length > 0 ? 
+      <> <BetslipCartHeader/>{ slip?.map(CartElements)} <BetCartFormElements/></> : 
       <EmptyCart/>}
     
       <BetslipSessionModal/>
