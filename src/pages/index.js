@@ -257,7 +257,6 @@ function App({data}) {
       <>
         {data.map((innerData,i) => {
           const date = new Date(innerData.fixture_date)
-          console.log(innerData)
           const oddsData = JSON.parse(innerData.odds)
           return (
             <React.Fragment key={i + innerData.fixture_date}>
