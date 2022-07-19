@@ -89,7 +89,7 @@ export default function MyApp({ Component, pageProps }) {
                 <Head title="Best Sports App in E. Africa">
                     <meta charset="utf-8" />
                     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-                    <meta property="og:image" content="https://i.pinimg.com/originals/cf/46/f9/cf46f940746533138b5e67cd40730e97.jpg" />
+                    <meta property="og:image" content="/logo.png" />
                     <meta property="og:description" content="Pinaclebet | Best Sports App in East Africa"/>
                     <meta property="og:url" content="https://www.pinaclebet.com"/>
                     <meta property="og:image:width" content="1200"/>
