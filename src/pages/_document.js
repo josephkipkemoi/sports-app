@@ -10,7 +10,7 @@ export default class MyDocument extends Document {
                 <meta property="og:site_name" content="Pinaclebet"/>
                     <meta property="og:title" content="Best Sports App in East Africa"/>
                     <meta name="msapplication-TileImage" content="https://ibb.co/5vFwY3K"/> 
-                    <meta property="og:image" itemProp="image" content="https://ibb.co/5vFwY3K" />
+                    <meta property="og:image" itemProp="image" content="/logo.png" />
                     <meta property="og:image:type" content="image/png"/>
                     <meta property="og:description" content="Pinaclebet | Best Sports App in East Africa"/>
                     <meta property="og:url" content="https://www.pinaclebet.com"/>
