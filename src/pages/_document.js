@@ -7,6 +7,16 @@ export default class MyDocument extends Document {
         return (
             <Html>
                 <Head>
+                <meta property="og:site_name" content="Pinaclebet"/>
+                    <meta property="og:title" content="Best Sports App in East Africa"/>
+                    <meta name="msapplication-TileImage" content="https://ibb.co/5vFwY3K"/> 
+                    <meta property="og:image" itemProp="image" content="https://ibb.co/5vFwY3K" />
+                    <meta property="og:image:type" content="image/png"/>
+                    <meta property="og:description" content="Pinaclebet | Best Sports App in East Africa"/>
+                    <meta property="og:url" content="https://www.pinaclebet.com"/>
+                    <meta property="og:image:width" content="733"/>
+                    <meta property="og:image:height" content="362"/>
+                    <meta property="og:type" content="website"/>
                 <link 
                     href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" 
                     rel="stylesheet" 

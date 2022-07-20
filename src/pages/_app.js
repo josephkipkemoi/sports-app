@@ -89,17 +89,8 @@ export default function MyApp({ Component, pageProps }) {
                 <Head title="Best Sports App in E. Africa">
                     <meta charset="utf-8" />
                     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            
-                    <meta property="og:site_name" content="Pinaclebet"/>
-                    <meta property="og:title" content="Best Sports App in East Africa"/>
-                    <meta name="msapplication-TileImage" content="https://ibb.co/5vFwY3K"/> 
-                    <meta property="og:image" itemProp="image" content="https://ibb.co/5vFwY3K" />
-                    <meta property="og:image:type" content="image/png"/>
-                    <meta property="og:description" content="Pinaclebet | Best Sports App in East Africa"/>
-                    <meta property="og:url" content="https://www.pinaclebet.com"/>
-                    <meta property="og:image:width" content="733"/>
-                    <meta property="og:image:height" content="362"/>
-                    <meta property="og:type" content="website"/>
+
+                
 
                 </Head>
                 {/* Add Google Tag Manager
