@@ -10,8 +10,8 @@ export default class MyDocument extends Document {
                 <meta property="og:site_name" content="Pinaclebet"/>
                     <meta property="og:title" content="Best Sports App in East Africa"/>
                     <meta name="msapplication-TileImage" content="https://ibb.co/5vFwY3K"/> 
-                    <meta property="og:image" itemProp="image" content="https://lh3.googleusercontent.com/Ev6Q2_uH9N6FzE7TgZyUrbppS_8XM7XvMzOSEWPA2lzEWE3ZzrFtOnDyNIEKRzDGAVfCrw0lMbGrUqqIzqWTJk8LsUV37NRrCJgb6-NUQEJ6WkxEM-ue1dimXSkfgI2i0neFyjFQs_7jkqVdKN5KcJ7h5xR68eavJlz8s1D6r0G8KJFAtvsBHEDNWoFIuT9-zmzwH52IyEGBiiTL7fZh26sMAw01leYgIKUnPiLxN30f-WrIpKwjvfIL31xn6OsvMkF-K3nQBCZGOfoeZ0_tqc3-jiuI5BOhJDkTkxbEpjXqdRPh0KrxRR12bnl8QmKS3xd2UT7O1wabz9BqyG1k4ReQl110k_pZfPMvcWi9khFcLP3CjbYh4zs7KeCoIitwstfuWOZBcmta3GeAo8_1lMPZ9B_N3VEFSVr39-_ElnuqT3G6dcwLGPxFjGxwKi0-Mj2lYSdcafyNsR7xMR2Xhkl25Hf9yAWlqCo4vi6O0dL0UUVjth_yAmXfpxNfSaqtaKp0oPG661lR5S23v3iE7uBjx4uIg7QJ-6MAumRaydrX9wIRzDBPohnRlVXCC7-eX9GmezW888QT__U9vXjKjSGSVZfK_Xh9McgUfX3695KaxReBFPW6rZ419VA11xpB-Yd6IJs4IDGOCe86d3ORdEd2K__Z3K-YMReUTS5x26yBMc-T7AZivVNBJ_WAQ0IsBn4maO2Us6pf5Me22atoh6nJNk3kBGSxiXQb2lksLxjzd03gyXEopHv9_m4dme_3XtH5F8HOTAQACpwnSqWkXWliG-C67Z1QVJKBsKzIE0bViFWNuudlkNs1HARy6WdAbcJjLvQ96NtxmuMfniq7gRA9SfNtS4HgoAoUTCCQJ9Y=w733-h362-no?authuser=0" />
-                    {/* <meta property="og:image:type" content="image/png"/> */}
+                    <meta property="og:image" itemProp="image" content="https://i.postimg.cc/yNKjQHH1/logo.png" />
+                    <meta property="og:image:type" content="image/png"/>
                     <meta property="og:description" content="Pinaclebet | Best Sports App in East Africa"/>
                     <meta property="og:url" content="https://www.pinaclebet.com"/>
                     <meta property="og:image:width" content="733"/>
