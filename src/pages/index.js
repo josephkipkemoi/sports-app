@@ -161,6 +161,15 @@ function App({data}) {
         betslip_picked: picked,
         betslip_odds: odds 
       }]))
+  
+      await postBetslip({
+          fixture_id: fixtureId+session_id,
+          session_id: session_id,
+          betslip_teams: homeTeam + ' v ' + awayTeam,
+          betslip_market: market,
+          betslip_picked: picked,
+          betslip_odds: odds 
+        })
 
       // if(res === 200) {
       //   dispatchEvent() 
@@ -195,6 +204,15 @@ function App({data}) {
         betslip_picked: picked,
         betslip_odds: odds 
       }]))
+
+      await postBetslip({
+          fixture_id: fixtureId+session_id,
+          session_id: session_id,
+          betslip_teams: homeTeam + ' v ' + awayTeam,
+          betslip_market: market,  
+          betslip_picked: picked,
+          betslip_odds: odds 
+        })
 
       // if(res === 200) {
       //   dispatchEvent() 
