@@ -1152,6 +1152,7 @@ const BetCartFormElements = () => {
     }
 
     const setNewSessionStorage = () => {
+      sessionStorage.removeItem('session_id')
      sessionStorage.setItem('session_id', Date.now())
     }
     const postBetslipCart = async (e) => {
@@ -1171,6 +1172,8 @@ const BetCartFormElements = () => {
       const res = await axios.post('api/users/fixtures/cart', {
         user_id: userId,
         cart_id: sessionId,
+        bet_amount: betAmount,
+        possible_payout: possibleWin,
         cart: JSON.stringify(betData)
       })
 
