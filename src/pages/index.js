@@ -116,6 +116,8 @@ function App({data}) {
   const [isSearchLoading, setIsSearchLoading] = useState(false)
   const [betslip, setBetslip] = useState([])
   const router = useRouter()
+  const [ids, setIds] = useState([])
+  const fixIds = [...new Set(ids)]
 
   useEffect(() => {
 
@@ -131,8 +133,10 @@ function App({data}) {
    const GameElement = () => {
 
     const { postBetslip } = useCustomBetslip()
+  
 
-    const sendBetslip = async (e)  => {
+
+     const sendBetslip = async (e)  => {
       e.preventDefault()
       const homeTeam = e.target.getAttribute('home_team');
       const awayTeam =  e.target.getAttribute('away_team');
@@ -142,40 +146,21 @@ function App({data}) {
       const fixtureId = e.target.getAttribute('fixtureid');
       const session_id = sessionStorage.getItem('session_id')
 
-      // const res = await postBetslip({
-      //   fixture_id: fixtureId+session_id,
-      //   session_id: session_id,
-      //   betslip_teams: homeTeam + ' v ' + awayTeam,
-      //   betslip_market: market,
-      //   betslip_picked: picked,
-      //   betslip_odds: odds 
-      // })
-
-      setBetslip(prev => 
-        ([{
-          ...prev,
-        fixture_id: fixtureId+session_id,
+      const cart = {
+        fixture_id: fixtureId,
         session_id: session_id,
         betslip_teams: homeTeam + ' v ' + awayTeam,
         betslip_market: market,
         betslip_picked: picked,
         betslip_odds: odds 
-      }]))
-  
-      await postBetslip({
-          fixture_id: fixtureId+session_id,
-          session_id: session_id,
-          betslip_teams: homeTeam + ' v ' + awayTeam,
-          betslip_market: market,
-          betslip_picked: picked,
-          betslip_odds: odds 
-        })
+      }
 
-      // if(res === 200) {
-      //   dispatchEvent() 
-      // } 
+      sessionStorage.setItem(fixtureId, JSON.stringify(cart))
+
+      setIds(prev => prev.concat(fixtureId))
+  
     }
-   
+    
     const sendBetslip2 = async (e,odds, market_id, picked)  => {
  
       const homeTeam = localStorage.getItem('home_team');
@@ -184,39 +169,19 @@ function App({data}) {
       const session_id = sessionStorage.getItem('session_id')
       const fixture = data.filter(g => g.fixture_id == fixtureId)
       const market = JSON.parse(fixture[0].odds)[market_id].name
- 
-   
-      //  const res = await postBetslip({
-      //   fixture_id: fixtureId+session_id,
-      //   session_id: session_id,
-      //   betslip_teams: homeTeam + ' v ' + awayTeam,
-      //   betslip_market: market,  
-      //   betslip_picked: picked,
-      //   betslip_odds: odds 
-      // })
-      setBetslip(prev => 
-        ([{
-          ...prev,
-        fixture_id: fixtureId+session_id,
+
+      const cart = {
+        fixture_id: fixtureId,
         session_id: session_id,
         betslip_teams: homeTeam + ' v ' + awayTeam,
         betslip_market: market,
         betslip_picked: picked,
         betslip_odds: odds 
-      }]))
+      }
 
-      await postBetslip({
-          fixture_id: fixtureId+session_id,
-          session_id: session_id,
-          betslip_teams: homeTeam + ' v ' + awayTeam,
-          betslip_market: market,  
-          betslip_picked: picked,
-          betslip_odds: odds 
-        })
+      sessionStorage.setItem(fixtureId, JSON.stringify(cart))
 
-      // if(res === 200) {
-      //   dispatchEvent() 
-      // } 
+      setIds(prev => prev.concat(fixtureId))
      
     }
   
@@ -444,7 +409,7 @@ function App({data}) {
                   </Col>
                  
                   <Col lg={3} md={12} sm={12} style={{ padding: 0, paddingRight: 5 }}>                  
-                    <Betslip slip={betslip}/>
+                    <Betslip ids={fixIds}/>
                   </Col>
               </Row>
             </main>
@@ -895,8 +860,8 @@ const StyleMobileCartItems = styled.div`
     display: none;
   }
 `
-export const Betslip = ( { slip } ) => {
-
+export const Betslip = ( { ids } ) => {
+ 
   const [, setSlip] = useState([])
   const [oddsTotal, setOddsTotal] = useState(0)
   const [shareCode, setShareCode] = useState(null)
@@ -912,7 +877,10 @@ export const Betslip = ( { slip } ) => {
   const linkBarRef = useRef();
   const router = useRouter()
   const { sp_s } = router.query
+  const [betData, setBetData] = useState([])
+
   const closeMenu = () => setModalOpen(false)
+
   const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
 
   const dispatchEvent = () => {
@@ -948,21 +916,6 @@ export const Betslip = ( { slip } ) => {
 
   }
  
-
-  const fetchBetslips = (session) => {
-
-      axios
-        .get(`api/betslips/${session}`)
-        .then(d => setSlip(d.data))
-        .catch(e => console.error(e.message))
-  }
-
-  const fetchBetslipOddsTotal = (session) => {
-      axios
-        .get(`api/betslips/sessions/${session}/odds-total`)
-        .then(d => setOddsTotal(Number(d.data.odds_total).toFixed(2)))
-        .catch(e => console.error(e.message))
-  }
 
 const BalanceModal = () => {
     return (
@@ -1117,17 +1070,13 @@ const EmptyCart = () => {
 }
 
 const CartElements = (link, i) => {
- 
-   const fixId = String(link.fixture_id).slice(0,6) + link.session_id 
-   const removeSingleBetslipFixture = async (fixture_id) => {
+
+  const fixId = String(link?.fixture_id).slice(0,6)  
+   const removeSingleBetslipFixture = (fixture_id) => {
    
-    const res = await axios.delete(`api/betslips/fixtures/${fixture_id}`)
-    
-    if(res.status === 200) {
-      dispatchEvent()
-    }
- 
+   sessionStorage.removeItem(fixture_id)
   
+   dispatchEvent()
   }
   
     return (
@@ -1136,7 +1085,7 @@ const CartElements = (link, i) => {
           <div className='d-flex align-items-center justify-content-between'>
             <div className='pt-2'>
                 <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
-                <Small>{link.betslip_teams}</Small>
+                <Small>{link && link.betslip_teams}</Small>
             </div>
             <button 
             className='close-btn fw-bold'
@@ -1145,10 +1094,10 @@ const CartElements = (link, i) => {
               x
             </button>
           </div>
-          <Small>{link.betslip_market}</Small>
+          <Small>{link && link.betslip_market}</Small>
           <div className='d-flex align-items-center justify-content-between'>      
-              <Small>Your Pick: {link.betslip_picked}</Small>
-              <Small className='fw-bold'>{link.betslip_odds}</Small>
+              <Small>Your Pick: {link && link.betslip_picked}</Small>
+              <Small className='fw-bold'>{link && link.betslip_odds}</Small>
           </div>
           <hr className='mt-1 mb-1' style={{ margin: 0, color : '#FF7F50' }}/>  
         </div>    
@@ -1158,7 +1107,8 @@ const CartElements = (link, i) => {
 
 const BetCartFormElements = () => {
     const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
- 
+    const possibleWin = betAmount * oddsTotal
+
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
 
     const decrementBetAmount = () => {
@@ -1172,31 +1122,21 @@ const BetCartFormElements = () => {
       setBetAmount(Number(e.target.value));  
     }
     const removeBetslipCart = () => {
-      // const sessionId = sessionStorage.getItem('session_id')
-      // sessionStorage.removeItem('share_code')
-      // router.push('/')
-      // axios.delete(`api/betslips/sessions/${sessionId}`)  
-      
+      sessionStorage.clear()
       dispatchEvent()
     }
 
-    const possibleWin = betAmount * slip[0].betslip_odds 
-
-    const postBetslipCartToDb = async (session_id, user_id, bet_amount, total_odds, final_payout) => {
+    // const postBetslipCartToDb = async (session_id, user_id, bet_amount, total_odds, final_payout) => {
      
-      const res = await axios.post('api/checkout', {
-        session_id,
-        user_id,
-        total_odds,
-        final_payout,
-        stake_amount: bet_amount
-      })
+    //   const res = await axios.post('api/checkout', {
+    //     session_id,
+    //     user_id,
+    //     total_odds,
+    //     final_payout,
+    //     stake_amount: bet_amount
+    //   })
 
-      if(res.status === 200) {
-        setLoading(false)
-        setCongratulationModalOpen(true)
-      }
-    }
+    // }
 
 
     const postBalanceAfterPlacing = async () => {
@@ -1214,7 +1154,7 @@ const BetCartFormElements = () => {
     const setNewSessionStorage = () => {
      sessionStorage.setItem('session_id', Date.now())
     }
-    const postBetslipCart = (e) => {
+    const postBetslipCart = async (e) => {
       e.preventDefault()   
       setLoading(true)
 
@@ -1225,10 +1165,20 @@ const BetCartFormElements = () => {
         setLoading(false)
         return
       }   
+      const sessionId = Number(sessionStorage.getItem('session_id'))
+      const userId = Number(localStorage.getItem('u_i'))
 
-      const sessionId = Number(sessionStorage.getItem('session_id'));
-  
-      postBetslipCartToDb(sessionId, userId, betAmount, Number(oddsTotal), possibleWin)
+      const res = await axios.post('api/users/fixtures/cart', {
+        user_id: userId,
+        cart_id: sessionId,
+        cart: JSON.stringify(betData)
+      })
+
+      if(res.status === 200) {
+        setLoading(false)
+        setCongratulationModalOpen(true)
+      }
+
       postBalanceAfterPlacing()
       setNewSessionStorage()
   
@@ -1251,7 +1201,7 @@ const BetCartFormElements = () => {
       setBalance(amount)
       return (
         <>
-         {!!isAuthenticated && slip?.length !== 0 ? 
+         {!!isAuthenticated && betData?.length !== 0 ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
             <Small>Balance:</Small>
             <Small className='fw-bold'>
@@ -1273,17 +1223,28 @@ const BetCartFormElements = () => {
     }
      
     }
+
+    let res = 1
+    
+    betData.forEach(n => res = res * n.betslip_odds )
+  
+    setOddsTotal(res.toFixed(2))
+
+    
+   
     return (
         <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#424242', paddingBottom: '4px' }}>
-        {slip?.length !== 0 &&
+        {betData?.length !== 0 &&
          <div className='d-flex align-items-center justify-content-between'>
               <Small>Total Odds:</Small>
-              <Small className='fw-bold'>{slip[0].betslip_odds}</Small>
+              <Small className='fw-bold'>
+                {oddsTotal}
+              </Small>
          </div>
         }
        
         <UserBalanceElement/>
-         {slip?.length !== 0 &&
+         {betData?.length !== 0 &&
          <>
          <div className='d-flex align-items-center justify-content-between'>
           <Small>Amount (Kshs)</Small>
@@ -1364,18 +1325,18 @@ const BetslipCartHeader = () => {
     className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
     style={{ backgroundColor: '#ffffff', color: '#424242', borderTopRightRadius: '6px', borderTopLeftRadius: '6px'}} 
     >
-     {slip?.length !== 0 &&
+     {betData?.length !== 0 &&
       <div 
       onClick={openMobileBetslip}
       style={{ cursor: 'pointer' }}
       >
-      {slip?.length > 1 ? 
+      {betData?.length > 1 ? 
       <div className='d-flex align-items-center'>
         {mobileCartHeight === 0 ? 
         <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
         <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
         }
-        <p className='fw-bold' style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({slip?.data?.length})</p>
+        <p className='fw-bold' style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({betData?.length})</p>
       </div>
       :
       <div className='d-flex align-items-center'>      
@@ -1383,7 +1344,7 @@ const BetslipCartHeader = () => {
         <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
         <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
         }
-        <p className='fw-bold' style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({slip?.length})</p> 
+        <p className='fw-bold' style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({betData?.length})</p> 
       </div>
       } 
     
@@ -1583,12 +1544,12 @@ const StyleMobileElements = styled.div`
 const MobileCartItems = () => {
   return (
     <>
-      {slip?.length > 0 ? 
+      {betData?.length > 0 ? 
       <StyleMobileCartItems className=' bg-success'>
       <StyleBetCart >
       <BetslipCartHeader/>
       <StyleMobileElements>
-        {slip?.length !== 0 && slip?.map(CartElements)}   
+        {betData?.length !== 0 && betData?.map(CartElements)}   
         <BetCartFormElements/>
       </StyleMobileElements>    
       </StyleBetCart>
@@ -1671,16 +1632,26 @@ const BetslipSessionModal = () => {
     </>
   )
 }
+ 
+const fetchSessionFixtures = () => {
+  const res = ids.map(el => {
+    const data = JSON.parse(sessionStorage.getItem(el))
+  
+    return data
+   })
+
+  const filtered = res.filter(r => !!r)
+  // const totalOdds = filtered.length > 0 && filtered?.reduce((n,i) => console.log( n.betslip_odds * i.betslip_odds))
+  
+  setBetData(filtered)
+}
 
   useEffect(() => {
-    const currentSession = sessionStorage.getItem('session_id')
     const sharedSessionCode = sessionStorage.getItem('share_code')
-    fetchBetslips(currentSession)
-    fetchBetslipOddsTotal(currentSession)
     fetchUrlSessionSlip(sp_s , sharedSessionCode)
-   
-  }, [router.asPath, sp_s])
-
+    fetchSessionFixtures()
+  }, [router.asPath, sp_s, ids])
+ 
   return (
     <>
      <StyleBetslip className='mx-auto'>
@@ -1688,8 +1659,8 @@ const BetslipSessionModal = () => {
      
       <ShareContainer/> 
 
-      {slip?.length > 0 ? 
-      <> <BetslipCartHeader/>{ slip?.map(CartElements)} <BetCartFormElements/></> : 
+      {betData?.length > 0 ? 
+      <> <BetslipCartHeader/>{ betData?.map(CartElements)} <BetCartFormElements/></> : 
       <EmptyCart/>}
     
       <BetslipSessionModal/>
