@@ -13,7 +13,7 @@ import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import { useRouter } from 'next/router';
 import { useGetAllBetHistoryQuery } from '../hooks/betslip';
 import { useGetAuthUserQuery } from '../hooks/customAuth';
-import {    useGetAllUserHistoryBetslipQuery, 
+import {    useGetAllUserHistoryBetslipV1Query, 
             useGetPaginatedHistoryQuery, 
             useGetSettledHistoryBetslipQuery, 
             useGetUnsettledHistoryBetslipQuery, 
@@ -75,6 +75,7 @@ const JackpotHistory = () => <NoBetslipHistory/>
 
 
 const Pagination = (data) => {
+
     const PaginationItems = (name, i) => {
         return (
            <React.Fragment key={i}>
@@ -105,9 +106,9 @@ const Pagination = (data) => {
 }
 
 const AllTabHistory = ({ user_id }) => {
-    
-    const { data, error, isLoading } = useGetAllUserHistoryBetslipQuery(user_id)
-    
+
+    const { data, error, isLoading } = useGetAllUserHistoryBetslipV1Query(user_id)
+ 
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
     }
@@ -117,17 +118,27 @@ const AllTabHistory = ({ user_id }) => {
         <Spinner className='mt-5' animation="grow" size="lg"/>
     </div>
     }
+ 
+    const openMoreMarkets = (i) => {
+        const elements = document.getElementsByClassName('history-more-markets')[i];
+        
+        if( elements.style.display === 'none') {
+            elements.style.display = 'block'
+        } else {
+            elements.style.display = 'none'
+        }
+    }
 
     const BetHistoryElements = (name, i) => {
-    
+        const historyData = JSON.parse(name.cart)
+   
         return (
-            <React.Fragment key={i} >
-                <Link href={`history/${name.session_id}`}>
-                    <a
-                        itemProp='url'
-                        className='text-decoration-none text-dark'
+            <React.Fragment key={i} >         
+                    <div 
+                    className="card p-3 mt-1 cursor-pointer" 
+                    style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none' }}
+                    onClick={() => openMoreMarkets(i)}
                     >
-                    <div className="card p-3 m-2 cursor-pointer" >
                     <div className='d-flex justify-content-between'>
                         <div>
                         <Span className='text-secondary'>
@@ -144,39 +155,63 @@ const AllTabHistory = ({ user_id }) => {
                     </div>
                     <div>
                         <small>Bet ID:</small>
-                        <small>{name.session_id}</small>
+                        <small>{name.cart_id}</small>
                     </div>
                     <div 
-                    className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                    className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
                     >   
                         <span>Bet Status</span> 
-                        <Span className='text-warning'>{name.betslip_status}</Span>
+                        <Span className='text-warning'>{name.bet_status}</Span>
                     </div>
                     <div className='d-sm-flex justify-content-between mt-2 p-1'>
                         <div>
                             <Span>Stake Amount: </Span>
-                            <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                            <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                         </div>
                         <div>
                             <Span>Final Payout: </Span>
-                            <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                            <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                         </div>  
                     </div>                               
                     </div>
-                    </a>
-                </Link>
-          
+                    <div 
+                    className={`card p-3 mb-2 history-more-markets`}
+                    style={{ 
+                        borderTopRightRadius: 0, 
+                        borderTopLeftRadius: 0, 
+                        borderTop: 'none',
+                        display:'none' 
+                    }}
+                    >
+                    {historyData.map((d,i) => {       
+                        return (
+                            <div className='card p-3 mb-2 shadow '>
+                                <div>
+                                    <small>Game ID: {d.fixture_id}</small>
+                                    <span className='d-block text-center bg-success rounded text-light p-1 m-1'>{d.betslip_teams}</span>
+                                </div>                        
+                                <div className='d-flex justify-content-between'>
+                                    <span>Market: {d.betslip_market}</span>
+                                    <span>Odds: {d.betslip_odds}</span>
+                                </div>
+                                <div className='d-flex justify-content-between'>
+                                    <span>Picked: {d.betslip_picked}</span>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    </div>
             </React.Fragment>
         )
     }
  
     return (
         <>
-         {data?.data.data.length > 0 ?
-         data.data.data.map(BetHistoryElements) : 
+         {data?.data.length > 0 ?
+         data.data.map(BetHistoryElements) : 
           <NoBetslipHistory/>}  
 
-          {data?.data.data.length >= 5 && <Pagination data={data.data}/>} 
+          {data?.data.length >= 5 && <Pagination data={data}/>} 
         </>
     )
 }
@@ -184,6 +219,7 @@ const AllTabHistory = ({ user_id }) => {
 const SettledHistory = ({ user_id }) => {
  
     const { data, error, isLoading } = useGetSettledHistoryBetslipQuery(user_id)
+
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
     }
@@ -194,13 +230,14 @@ const SettledHistory = ({ user_id }) => {
     }
 
     const SettledItems = (name , i) => {
+        const historyData = JSON.parse(name.cart)
                 return (
                     <React.Fragment key={i}>
-                        <Link href={`history/${name.session_id}`}>
-                            <a
-                                itemProp='url'
-                                className='text-decoration-none text-dark'
-                            >
+                        <div 
+                        className="card p-3 mt-1 cursor-pointer" 
+                        style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none' }}
+                        onClick={() => openMoreMarkets(i)}
+                        >
                             <div className="card p-3 m-2">
                             <div className='d-flex justify-content-between'>
                                 <div>
@@ -218,39 +255,65 @@ const SettledHistory = ({ user_id }) => {
                             </div>
                             <div>
                                 <small>Bet ID:</small>
-                                <small>{name.session_id}</small> 
+                                <small>{name.card_id}</small> 
                             </div>
                             <div 
-                            className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                            className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
                             >   
                                 <span>Bet Status</span>
-                                <Span className="text-white fw-bold">{name.betslip_status}</Span>
+                                <Span className="text-white fw-bold">{name.bet_status}</Span>
                             </div>
                             <div className='d-sm-flex justify-content-between mt-2 p-1'>
                                 <div>
                                     <Span>Stake Amount: </Span>
-                                    <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                    <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                                 </div>
                                 <div>
                                     <Span>Final Payout: </Span>
-                                    <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                    <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                                 </div>  
                             </div>
                                        
                         </div>
-                            </a>
-                        </Link>
+                        </div>
+                        <div 
+                        className={`card p-3 mb-2 history-more-markets`}
+                        style={{ 
+                            borderTopRightRadius: 0, 
+                            borderTopLeftRadius: 0, 
+                            borderTop: 'none',
+                            display:'none' 
+                        }}
+                        >
+                    {historyData.map((d,i) => {       
+                        return (
+                            <div className='card p-3 mb-2 shadow ' key={i+d.fixture_id}>
+                                <div>
+                                    <small>Game ID: {d.fixture_id}</small>
+                                    <span className='d-block text-center bg-success rounded text-light p-1 m-1'>{d.betslip_teams}</span>
+                                </div>                        
+                                <div className='d-flex justify-content-between'>
+                                    <span>Market: {d.betslip_market}</span>
+                                    <span>Odds: {d.betslip_odds}</span>
+                                </div>
+                                <div className='d-flex justify-content-between'>
+                                    <span>Picked: {d.betslip_picked}</span>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    </div>
                     </React.Fragment>
                 )
             }
     
     return (
         <>
-        {data.data.data.length > 0 ? 
-        data.data.data.map(SettledItems) : 
+        {data.data.length > 0 ? 
+        data.data.map(SettledItems) : 
         <NoBetslipHistory/>}
 
-        {data?.data.data.length >= 5 && <Pagination data={data.data}/>} 
+        {data?.data.length >= 5 && <Pagination data={data}/>} 
         </>
     )
 }
@@ -284,7 +347,7 @@ const SearchFilterResults = ({ user_id }) => {
                         <small>{name.session_id}</small>
                     </div>
                     <div 
-                    className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                    className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
                     >   
                     <span>Bet Status</span>
                         {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
@@ -327,16 +390,25 @@ const UnsettledHistory = ({ user_id }) => {
                     <Spinner className='mt-5' animation="grow" size="lg"/>
                 </div>
     }
-
+    const openMoreMarkets = (i) => {
+        const elements = document.getElementsByClassName('history-more-markets-unsettled')[i];
+        
+        if( elements.style.display === 'none') {
+            elements.style.display = 'block'
+        } else {
+            elements.style.display = 'none'
+        }
+    }
     const UnsettledItems = (name, i) => {
+        const historyData = JSON.parse(name.cart)
         return (
-            <React.Fragment key={i}>
-                <Link href={`history/${name.session_id}`}>
-                    <a
-                        itemProp='url'
-                        className='text-decoration-none text-dark'
+            <React.Fragment key={i} >
+                <div 
+                    className="card p-3 mt-1 cursor-pointer " 
+                    style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none' }}
+                    onClick={() => openMoreMarkets(i)}
                     >
-                        <div className="card p-3 m-2 cursor-pointer">
+                        <div className=" cursor-pointer">
                             <div className='d-flex d-flex justify-content-between'>
                                 <div>
                                     <Span className='text-secondary'>
@@ -353,40 +425,64 @@ const UnsettledHistory = ({ user_id }) => {
                             </div>
                             <div>
                                 <small>Bet ID:</small>
-                                <small>{name.session_id}</small>
+                                <small>{name.cart_id}</small>
                             </div>
                             <div 
-                            className="mt-2 d-flex align-items-center justify-content-between bg-secondary p-2 rounded text-light"
+                            className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
                             >   
                             <span>Bet Status</span>
                                 {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
-                                <Span className="text-warning">{name.betslip_status}</Span>
+                                <Span className="text-warning">{name.bet_status}</Span>
                             </div>
                             <div className='d-sm-flex justify-content-between mt-2 p-1'>
                                 <div>
                                     <Span>Stake Amount: </Span>
-                                    <Span className="fw-bold">KES {name.stake_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                    <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                                 </div>
                                 <div>
                                     <Span>Final Payout: </Span>
-                                    <Span className="fw-bold">KES {name.final_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                                    <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                                 </div>  
-                            </div>
-                                    
+                            </div>                                    
                         </div>
-                    </a>
-                </Link>
-               
+                </div>
+                <div 
+                    className={`card p-3 mb-2 history-more-markets-unsettled`}
+                    style={{ 
+                        borderTopRightRadius: 0, 
+                        borderTopLeftRadius: 0, 
+                        borderTop: 'none',
+                        display:'none' 
+                    }}
+                    >
+                    {historyData.map((d,i) => {       
+                        return (
+                            <div className='card p-3 mb-2 shadow ' key={i+d.fixture_id}>
+                                <div>
+                                    <small>Game ID: {d.fixture_id}</small>
+                                    <span className='d-block text-center bg-success rounded text-light p-1 m-1'>{d.betslip_teams}</span>
+                                </div>                        
+                                <div className='d-flex justify-content-between'>
+                                    <span>Market: {d.betslip_market}</span>
+                                    <span>Odds: {d.betslip_odds}</span>
+                                </div>
+                                <div className='d-flex justify-content-between'>
+                                    <span>Picked: {d.betslip_picked}</span>
+                                </div>
+                            </div>
+                        )
+                    })}
+                    </div>            
             </React.Fragment>
         )
     }
     return (
         <>
-            {data.data.data.length > 0 ? 
-            data.data.data.map(UnsettledItems) :
+            {data.data.length > 0 ? 
+            data.data.map(UnsettledItems) :
             <NoBetslipHistory/>}
             
-          {data?.data.data.length >= 5 && <Pagination data={data.data}/>} 
+          {data?.data.length >= 5 && <Pagination data={data}/>} 
         </>
     )
 }

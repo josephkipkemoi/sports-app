@@ -11,11 +11,14 @@ export const HistoryApi = createApi({
         getAllUserHistoryBetslip: builder.query({
             query: (user_id) => `${user_id}/betslips`
         }),
+        getAllUserHistoryBetslipV1: builder.query({
+            query: (user_id) => `fixtures/carts?user_id=${user_id}&bet_status=Active`
+        }),
         getSettledHistoryBetslip: builder.query({
-            query: (user_id) => `betslips/status?user_id=${user_id}&bet_status=Lost`
+            query: (user_id) => `fixtures/carts?user_id=${user_id}&bet_status=Lost`
         }),
         getUnsettledHistoryBetslip: builder.query({
-            query: (user_id) => `betslips/status?user_id=${user_id}&bet_status=Active`
+            query: (user_id) => `fixtures/carts?user_id=${user_id}&bet_status=Active`
         }),
         removeSingleHistoryBetslip: builder.query({
             query: (user_id, session_id) => `betslips/delete?user_id=${user_id}&session_id=${session_id}`
@@ -28,6 +31,7 @@ export const HistoryApi = createApi({
 
 export const {
     useGetAllUserHistoryBetslipQuery,
+    useGetAllUserHistoryBetslipV1Query,
     useGetSettledHistoryBetslipQuery,
     useGetUnsettledHistoryBetslipQuery,
     useRemoveSingleHistoryBetslipQuery,
