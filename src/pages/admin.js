@@ -43,6 +43,9 @@ export default function Admin() {
     const [fixtureLoaded, setFixtureLoaded] = useState(false)
     const [fixtureOddsLoading, setFixtureOddsLoading] = useState(false)
     const [fixtureOddsLoaded, setFixtureOddsLoaded] = useState(false)
+    const [auth, setAuth] = useState('')
+    const [hideAdmin, setHideAdmin] = useState(true)
+
     const postFixtureIds = async () => {
         setFixtureIdLoading(true)
         const res = await axios.post('api/custom_fixture/post');
@@ -75,7 +78,17 @@ export default function Admin() {
             </Link>
         )
     }
+ 
+    const authuser = (e) => {
+        setAuth(e.target.value)
+    }
 
+    const submitauth = () => {
+        if(auth === '32959035') {
+            setHideAdmin(false)
+        }
+    }
+    
     return (
         <StyledAdmin className="p-3 container bg-danger">
             <div className="text-center p-2">
@@ -83,10 +96,14 @@ export default function Admin() {
                     <i className="bi bi-headset" style={{ marginRight: 5 }}></i>
                     Command Center
                 </h1>
+                <input type="text" className="bg-secondary" onChange={authuser}/>
+                <button onClick={submitauth}>Auth</button>
             </div>
-            <nav className="bg-light p-3 shadow-lg rounded">
+
+            {hideAdmin ? '' :  <nav className="bg-light p-3 shadow-lg rounded">
                 {adminLinks.map(AdminLinkItems)}
-            </nav>
+            </nav>}
+       
 
             {tab === 'fixtures' && 
              <FixturesComponent 
@@ -106,7 +123,7 @@ export default function Admin() {
 
 const CustomerFeedback = () => {
     const {data, error, isLoading } = useGetAllCustomerMessagesQuery()
-
+    const [open, setOpen] = useState(false);
     if(error) {
         return <span>Error</span>
     }
@@ -116,7 +133,7 @@ const CustomerFeedback = () => {
     }
 
     const MessageItems = (link, i) => {
-        const [open, setOpen] = useState(false);
+
          return (
             <React.Fragment key={i}>
                 <div className=" m-1 d-flex flex-row">                    
