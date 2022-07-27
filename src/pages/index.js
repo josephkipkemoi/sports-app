@@ -36,7 +36,7 @@ import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import axios from '../lib/axios';
 import { useRouter } from 'next/router';
 import useClickOutside from '../hooks/useClickOutside';
-import { Spinner } from 'react-bootstrap';
+import { Card, Spinner } from 'react-bootstrap';
 import useSocialShare from '../hooks/socialShare';
 import useAuth from '../hooks/auth';
 import Support from '../components/Support';
@@ -1671,7 +1671,9 @@ const fetchSessionFixtures = () => {
       </StyleBetCart>
       <CongratulationModal/>
       <BalanceModal/>
-      <AddedFeatures/>
+      <MpesaInfo/>
+      <ContactSupport/>
+      <AddedFeatures/>     
       <Offers/>
     </StyleBetslip>
     <MobileCartItems/>
@@ -1701,6 +1703,66 @@ svg {
 }
 `
 
+const StyleMpesaInfo = styled.div`
+ h6 {
+  text-align: center;
+  color: #fff;
+  letter-spacing: 2px;
+ }
+ span {
+  line-height: 24px;
+  color: #fff;
+  letter-spacing: 2px;
+ }
+ .header {
+  background-color: #424242;
+ }
+`
+const MpesaInfo = () => {
+  return (
+    <StyleMpesaInfo>
+      <Card className='bg-success mt-3 rounded shadow'>
+        <Card.Header className='header'>
+          <h6 className='fw-bold'>PAYBILL NUMBERS</h6>
+        </Card.Header>
+        <Card.Body>
+        <div className='d-flex justify-content-between'>
+          <span>MPESA</span>
+          <span className='fw-bold'>4075207</span>
+        </div>  
+        </Card.Body>
+      </Card>    
+    </StyleMpesaInfo>
+  )
+}
+
+
+const ContactSupport = () => {
+  return (
+    <StyleMpesaInfo>
+        <Card className='bg-success mt-3 rounded shadow'>
+        <Card.Header className='text-center text-white'>
+          <h6 className='fw-bold'>CUSTOMER CARE</h6>
+        </Card.Header>
+        <Card.Body>
+        <div className='d-flex flex-column align-items-center text-center'>
+          <span>We offer 24/7 customer care attention to {configData.APP_NAME} players</span>
+          <div className='d-flex text-white'>
+          <i className="bi bi-telephone" style={{ marginRight: 10 }}></i>
+          <span className='fw-bold'>        
+            0763-388-846
+          </span>
+          </div>
+          <div className='d-flex text-white'>
+            <i className="bi bi-envelope-open" style={{ marginRight: 10 }}></i>
+            <span><b className='fw-bold'>customercare@pinaclebet.com</b></span>
+          </div>
+        </div>  
+        </Card.Body>
+      </Card>    
+    </StyleMpesaInfo>
+  )
+}
 const AddedFeatures = () => {
   
   return (

@@ -6,6 +6,7 @@ import Select from 'react-select';
 import  useAuth  from '../hooks/auth';
 import { validateNumber } from '../lib/validation';
 import Support from '../components/Support';
+import config from '../../config.json';
 
 const StyleRegistration = styled.div`
 background-color: #ebeded;
@@ -174,7 +175,7 @@ export default function Register() {
                     type="submit" className='w-100'
                     onClick={submitForm}
                     >
-                        Join SportsApp
+                        Join {config.APP_NAME}
                     </Button>
                 </Form>               
             </Container>      
