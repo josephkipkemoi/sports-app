@@ -71,10 +71,12 @@ height: 100vh;
   cursor: pointer;
   padding: 24px 12px;
   width: 100%;
-  background: #424242;
+  // background: #424242;
   transition: .3s ease-out;
 }
- 
+.active-btn {
+  background: ${props => props.theme.colors.headerColor};
+}
 .btn-custom:hover {
   background: ${props => props.theme.colors.headerColor};
 }
@@ -110,13 +112,16 @@ const StyledFavorites = styled.div`
   
 }
 `
+
 function App({data}) {
 
   const [searchResults, setSearchResults] = useState([])
   const [isSearchLoading, setIsSearchLoading] = useState(false)
   const [betslip, setBetslip] = useState([])
   const router = useRouter()
-  const [ids, setIds] = useState([])
+
+
+  const [ids, setId] = useState([])
   const fixIds = [...new Set(ids)]
 
   useEffect(() => {
@@ -131,13 +136,12 @@ function App({data}) {
   },[])
 
    const GameElement = () => {
-
-    const { postBetslip } = useCustomBetslip()
   
+    const ids = []
+     const sendBetslip = (e)  => {
 
-
-     const sendBetslip = async (e)  => {
-      e.preventDefault()
+      // const btns = document.getElementsByClassName('btn-custom')
+      
       const homeTeam = e.target.getAttribute('home_team');
       const awayTeam =  e.target.getAttribute('away_team');
       const odds = e.target.getAttribute('odds');
@@ -154,14 +158,14 @@ function App({data}) {
         betslip_picked: picked,
         betslip_odds: odds 
       }
-
+      
       sessionStorage.setItem(fixtureId, JSON.stringify(cart))
 
-      setIds(prev => prev.concat(fixtureId))
-  
+      setId(prev => prev.concat(fixtureId))
+
     }
     
-    const sendBetslip2 = async (e,odds, market_id, picked)  => {
+    const sendBetslip2 = (e,odds, market_id, picked)  => {
  
       const homeTeam = localStorage.getItem('home_team');
       const awayTeam =   localStorage.getItem('away_team');
@@ -181,17 +185,14 @@ function App({data}) {
 
       sessionStorage.setItem(fixtureId, JSON.stringify(cart))
 
-      setIds(prev => prev.concat(fixtureId))
+      if(ids.includes(fixtureId) === false) {
+        ids.push(fixtureId)
+        sessionStorage.setItem('fixture_ids', JSON.stringify(ids))
+      }
      
     }
-  
-    const dispatchEvent = () => {
-      if(router.asPath === '/') {
-        router.push('?a')
-      } else {
-        router.push('/')
-      }
-    }
+
+
     const displayMoreMarkets = (index, home, away, fixture_id) => {
 
       localStorage.setItem('home_team', home)
@@ -217,7 +218,8 @@ function App({data}) {
           <React.Fragment key={ii+i+odds.odd}>         
                 <div className='d-sm-flex m-1' style={{ width: '30%'}}>
                   <button 
-                  className='btn-custom d-sm-flex justify-content-between flex-wrap '                  
+                  className='btn btn-success w-100 actd-sm-flex justify-content-between flex-wrap'   
+                  id="fix-btn"
                   odds={odds.odd} 
                   market={i} 
                   picked={odds.value}
@@ -256,14 +258,27 @@ function App({data}) {
       });
 
     }  
+
+    const activatBtn = (index,i) => {
+
+      const clickedBtn = document.getElementsByClassName('active-btn')[index]
+
+      const btn = clickedBtn.getElementsByClassName('active-btn-btn')
+
+      for(let i = 0; i < btn.length; i++) {
+            btn[i].classList.remove('active')
+      }
+
+      btn[i].classList.add('active')
+    }
      
     return (
       <>
-        {data.map((innerData,i) => {
+        {data.map((innerData,index) => {
           const date = new Date(innerData.fixture_date)
           const oddsData = JSON.parse(innerData.odds)
           return (
-            <React.Fragment key={i + innerData.fixture_date}>
+            <React.Fragment key={index + innerData.fixture_date}>
             <Col lg={8} sm={8} className="card custom-grid-box-main p-2" style={{ borderRight: '0px', border: 'none' }}>  
       
               <Row style={{ marginLeft: 2 }}>
@@ -304,26 +319,30 @@ function App({data}) {
               </Row>
                      
             </Col>
-            <Col lg={4} sm={4} className="card d-flex flex-row align-items-center" style={{ background: '#424242', borderLeft: '0px', border: 'none' }}>
+            <Col lg={4} sm={4} className="card d-flex flex-row align-items-center active-btn" style={{ background: '#424242', borderLeft: '0px', border: 'none' }}>
    
               {oddsData.map((odd) => {             
                 return odd.id === 1 && odd.values.map((val, i) => {
-                   return (
-                     <div key={i} className='text-center mb-3 w-100'>
+                  return (
+                     <div key={i} className='text-center mb-3 w-100 '>
                         <small className='header text-center'>{val.value}</small>  
-                         
-                       <button 
-                        odds={val.odd} 
-                        className='btn-custom'
-                        btn_id={i}
-                        home_team={innerData.home} 
-                        market={odd.name} 
-                        away_team={innerData.away} 
-                        picked={val.value}
-                        fixtureid={innerData.fixture_id}
-                        onClick={sendBetslip}  
-                        >{val.odd}</button>   
-                                   
+                        <div onClick={() => activatBtn(index,i)}>
+                        
+                          <button 
+                            odds={val.odd} 
+                            className='btn text-white active-btn-btn p-3'
+                            id="fix-btn"
+                            btn_id={i}
+                            home_team={innerData.home} 
+                            market={odd.name} 
+                            away_team={innerData.away} 
+                            picked={val.value}
+                            fixtureid={innerData.fixture_id}
+                            onClick={sendBetslip}  
+                          >
+                            {val.odd}
+                          </button>   
+                        </div>                     
                      </div>
                    )
                  })
@@ -332,7 +351,7 @@ function App({data}) {
               <div className='text-center' style={{ position: 'relative' }}>
 
                 <Small 
-                  onClick={() => displayMoreMarkets(i, innerData.home, innerData.away, innerData.fixture_id)}
+                  onClick={() => displayMoreMarkets(index, innerData.home, innerData.away, innerData.fixture_id)}
                   className="d-flex align-items-center text-warning fw-bold"
                 >
                     <i className="bi bi-plus" ></i>    
@@ -386,7 +405,7 @@ function App({data}) {
       setIsSearchLoading(false)
     }
   }
-
+ 
   return (
     <ThemedBody>
         <div>            
@@ -860,14 +879,14 @@ const StyleMobileCartItems = styled.div`
     display: none;
   }
 `
-export const Betslip = ( { ids } ) => {
+export const Betslip = ({ ids }) => {
  
   const [, setSlip] = useState([])
   const [oddsTotal, setOddsTotal] = useState(0)
   const [shareCode, setShareCode] = useState(null)
   const [balance, setBalance] = useState(0)
   const [isModalOpen, setModalOpen] = useState(false);
-
+  const [clickEvent, setClickEvent] = useState(false)
   const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false);
 
   const { isAuthenticated } = useAuth({ middleware: 'guest' })
@@ -877,11 +896,13 @@ export const Betslip = ( { ids } ) => {
   const linkBarRef = useRef();
   const router = useRouter()
   const { sp_s } = router.query
-  const [betData, setBetData] = useState([])
+  // const [betData, setBetData] = useState([])
 
   const closeMenu = () => setModalOpen(false)
 
   const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
+
+
 
   const dispatchEvent = () => {
     if(router.asPath === '/') {
@@ -1032,80 +1053,10 @@ const CongratulationModal = () => {
     )
 }
 
-const EmptyCart = () => {
-  const [code, setCode] = useState('')
 
-  const handleBetCode = (e) => {
-    const betCode = e.target.value
-    setCode(betCode)
-  }
-  const loadBetCode = () => {
-    sessionStorage.setItem('share_code', code)
-    fetchUrlSessionSlip(code)
-  }
-    return (
-      <div className='card bg-success p-1 shadow'>
-        <div className='d-flex justify-content-between'>
-         <h5 className='fw-bold' style={{ marginLeft: 8, lineHeight: '24px', letterSpacing: 1, color: '#ffffff' }}>BETSLIP</h5>
-         <i className="bi bi-three-dots-vertical text-light"></i>
-       </div>
-        <div className='betslip-child shadow'>     
-          <span className='d-block fw-bold text-center mt-4' style={{ color: '#ffffff', letterSpacing: 1 }}>You have not selected any bet</span>
-          <span className='d-block text-center' style={{ color: '#ffffff', letterSpacing: 1 }}>Make your first pick to start playing.</span>
-          <hr/>
-          <div className='text-center mb-2'>
-              <span className='d-block m-2' style={{ color: '#ffffff', letterSpacing: 1 }}>Or introduce your bet code:</span>
-              <Row className='p-2'>
-                <Col>
-                  <input className="form-control p-2 shadow w-100" value={code} placeholder="Bet Code" onChange={handleBetCode}/>   
-                </Col>
-                <Col>
-                  <button className='btn btn-secondary p-2 shadow w-100' onClick={loadBetCode}>Add Betslip Code</button>        
-                </Col>
-              </Row>
-          </div>      
-        </div>
-      </div>
-    )
-}
-
-const CartElements = (link, i) => {
-
-  const fixId = String(link?.fixture_id).slice(0,6)  
-   const removeSingleBetslipFixture = (fixture_id) => {
-   
-   sessionStorage.removeItem(fixture_id)
-  
-   dispatchEvent()
-  }
-  
-    return (
-      <React.Fragment key={i}>  
-        <div style={{ paddingTop: '7px', paddingRight: '14px', paddingLeft: '14px'}}>
-          <div className='d-flex align-items-center justify-content-between'>
-            <div className='pt-2'>
-                <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
-                <Small>{link && link.betslip_teams}</Small>
-            </div>
-            <button 
-            className='close-btn fw-bold'
-            onClick={() => removeSingleBetslipFixture(fixId)}
-            >
-              x
-            </button>
-          </div>
-          <Small>{link && link.betslip_market}</Small>
-          <div className='d-flex align-items-center justify-content-between'>      
-              <Small>Your Pick: {link && link.betslip_picked}</Small>
-              <Small className='fw-bold'>{link && link.betslip_odds}</Small>
-          </div>
-          <hr className='mt-1 mb-1' style={{ margin: 0, color : '#FF7F50' }}/>  
-        </div>    
-      </React.Fragment>
-    )
-}
 
 const BetCartFormElements = () => {
+
     const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
     const possibleWin = betAmount * oddsTotal
 
@@ -1125,19 +1076,6 @@ const BetCartFormElements = () => {
       sessionStorage.clear()
       dispatchEvent()
     }
-
-    // const postBetslipCartToDb = async (session_id, user_id, bet_amount, total_odds, final_payout) => {
-     
-    //   const res = await axios.post('api/checkout', {
-    //     session_id,
-    //     user_id,
-    //     total_odds,
-    //     final_payout,
-    //     stake_amount: bet_amount
-    //   })
-
-    // }
-
 
     const postBalanceAfterPlacing = async () => {
       await axios.post(`api/users/${userId}/balance/decrement`, {
@@ -1232,9 +1170,7 @@ const BetCartFormElements = () => {
     betData.forEach(n => res = res * n.betslip_odds )
   
     setOddsTotal(res.toFixed(2))
-
-    
-   
+ 
     return (
         <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#424242', paddingBottom: '4px' }}>
         {betData?.length !== 0 &&
@@ -1310,10 +1246,9 @@ const BetCartFormElements = () => {
     )
 }
 
-const [modalOpen, setIsModalOpen] = useState(false)
 const [mobileCartHeight, setMobileCartHeight] = useState(0)
 
-const toggleShareBtn = () => setIsModalOpen(prev => !prev)
+// const toggleShareBtn = () => setIsModalOpen(prev => !prev)
 const openMobileBetslip = () => {
   if(mobileCartHeight === 0) {
     setMobileCartHeight('auto')
@@ -1322,45 +1257,149 @@ const openMobileBetslip = () => {
     setMobileCartHeight(0)
   }
 }
-const BetslipCartHeader = () => {
+
+
+const StyleMobileElements = styled.div`
+  max-height: 320px;
+  overflow-y: scroll;
+  height: ${mobileCartHeight};
+`
+// const MobileCartItems = () => {
+//   return (
+//     <>
+//       {betData?.length > 0 ? 
+//       <StyleMobileCartItems className=' bg-success'>
+//       <StyleBetCart >
+//       <BetslipCartHeader/>
+//       {/* <StyleMobileElements>
+//         {betData?.length !== 0 && betData?.map(CartElements)}   
+//         <BetCartFormElements/>
+//       </StyleMobileElements>     */}
+//       </StyleBetCart>
+//   </StyleMobileCartItems>
+//     : ''}
+//     </>
+//   )
+// }
+
+const BetslipSessionModal = () => {
+  const closeMenu = () => setSessionModalOpen(false)
+
+  const  {postBetslip} = useCustomBetslip()
+  const [currentSession, setCurrentSession] = useState(null)
+  const  sessionSlip = useGetBetslipQuery(sp_s)
+  const [isSessionModalOpen, setSessionModalOpen] = useState(false)
+
+  const checkSlipSession = () => {
+    if(sp_s !== undefined) {
+       setSessionModalOpen(true)
+    }
+    if(sp_s === undefined) {
+      setSessionModalOpen(false)
+    }
+  }
+
+  const postSessionCart = () => {
+    sessionStorage.setItem('share_code', sp_s)
+    if(sessionSlip.isSuccess) {
+      sessionSlip.data.data.map(name => {
+        const {betslip_market, betslip_odds,betslip_picked,betslip_teams, fixture_id } = name
+     
+      if(currentSession) { postBetslip({
+          fixture_id: fixture_id,
+          session_id: currentSession,
+          betslip_teams: betslip_teams,
+          betslip_market,
+          betslip_picked,
+          betslip_odds
+        })
+        .then(d => {
+          if(d === 200) {
+            dispatchEvent()
+            setSessionModalOpen(false)
+            router.push('/')
+          }
+        })}
+      
+      })
+    }
+    setClicked(prev => !prev)
+            setSessionModalOpen(false)
+            router.push('/')
+   
+  }
+
+  // useEffect(() => {
+  //   const currentSession = sessionStorage.getItem('session_id')
+  //   setCurrentSession(currentSession)
+  //   checkSlipSession()
+  // }, [])
   return (
-    <div 
-    className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-    style={{ backgroundColor: '#ffffff', color: '#424242', borderTopRightRadius: '6px', borderTopLeftRadius: '6px'}} 
-    >
-     {betData?.length !== 0 &&
-      <div 
-      onClick={openMobileBetslip}
-      style={{ cursor: 'pointer' }}
-      >
-      {betData?.length > 1 ? 
-      <div className='d-flex align-items-center'>
-        {mobileCartHeight === 0 ? 
-        <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
-        <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
-        }
-        <p className='fw-bold' style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({betData?.length})</p>
-      </div>
-      :
-      <div className='d-flex align-items-center'>      
-       {mobileCartHeight === 0 ? 
-        <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
-        <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
-        }
-        <p className='fw-bold' style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({betData?.length})</p> 
-      </div>
-      } 
-    
-    </div>
-      }
-        <div className='btn btn-light btn-sm text-dark shadow-sm'  onClick={toggleShareBtn}>
-          <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
-          <span className='text-dark fw-bold share-btn' >Share</span>
-        </div>  
-    </div>
+    <>
+      <Modal show={isSessionModalOpen}>
+        <Modal.Header>
+          <h4>Load Betslip</h4>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <h4>Bet Code: {sp_s}</h4>
+            <Col>
+              <button className='btn btn-primary w-100' onClick={postSessionCart}>CONFIRM</button>
+            </Col>
+            <Col>
+              <button className='btn btn-danger w-100' onClick={closeMenu}>CANCEL</button>
+            </Col>
+          </Row>
+        </Modal.Body>
+      </Modal>
+    </>
   )
 }
+ 
+const fetchSessionFixtures = () => {
+  const res = [0].map(el => {
+    const data = JSON.parse(sessionStorage.getItem(el))
+  
+    return data
+   })
 
+  const filtered = res.filter(r => !!r)
+  // const totalOdds = filtered.length > 0 && filtered?.reduce((n,i) => console.log( n.betslip_odds * i.betslip_odds))
+  
+  setBetData(filtered)
+}
+
+  // useEffect(() => {
+  //   const sharedSessionCode = sessionStorage.getItem('share_code')
+  //   fetchUrlSessionSlip(sp_s , sharedSessionCode)
+  //   fetchSessionFixtures()
+  // }, [router.asPath, sp_s])
+
+
+  return (
+    <>
+     <StyleBetslip className='mx-auto'>
+      <StyleBetCart className='betcart-mb card bg-success shadow' style={{ border: 'none' }}>
+     
+      {/* <ShareContainer/>  */}
+
+      <BetslipContainer ids={ids}/>
+      <BetslipSessionModal/>
+
+      </StyleBetCart>
+      <CongratulationModal/>
+      <BalanceModal/>
+      <MpesaInfo/>
+      <ContactSupport/>
+      <AddedFeatures/>     
+      <Offers/>
+    </StyleBetslip>
+    {/* <MobileCartItems/> */}
+
+    </>
+   
+  )
+}
 
 const ShareContainer = () => {
   const [session, setSession] = useState('')
@@ -1368,6 +1407,10 @@ const ShareContainer = () => {
   const [copiedSmall, setCopiedSmall] = useState('none')
   const [copiedSmall2, setCopiedSmall2] = useState('none')
   const [isCodeCopied, setIsCodeCopied] = useState(false)
+  const [modalOpen, setIsModalOpen] = useState(false)
+
+  const toggleShareBtn = () => setIsModalOpen(prev => !prev)
+
   const fullUrl = `https://www.bet360.co.ke?sp_s=${session}`
   const codeSession = session
 
@@ -1420,14 +1463,17 @@ const ShareContainer = () => {
     })
   }
 
-useEffect(() => {
-  const sessionId = sessionStorage.getItem('session_id')
-  const userId = localStorage.getItem('u_i');
-  setUserId(userId)
-  fetchSocialLinks(sessionId)
-  setSession(sessionId)
+// useEffect(() => {
+//   const sessionId = sessionStorage.getItem('session_id')
+//   const userId = localStorage.getItem('u_i');
+//   setUserId(userId)
+//   fetchSocialLinks(sessionId)
+//   setSession(sessionId)
 
-}, [])
+//  window.addEventListener('click', () => {
+//     console.log('clicked')
+//   })
+// }, [])
 
 return (
     <Modal show={modalOpen} className="mt-5">
@@ -1539,150 +1585,470 @@ return (
   )
 }
 
-const StyleMobileElements = styled.div`
-  max-height: 320px;
-  overflow-y: scroll;
-  height: ${mobileCartHeight};
-`
-const MobileCartItems = () => {
-  return (
+
+const BetslipContainer = ({ ids }) => {
+  const [betData, setBetData] = useState([])
+  const [loading, setLoading] = useState(null)
+  const [clicked, setClicked] = useState(false)
+  const [userId, setUserId] = useState(null)
+  // const { isAuthenticated } = useAuth({ middleware: 'guest' })
+  const toggleShareBtn = () => setIsModalOpen(prev => !prev)
+
+const BetslipCartHeader = ({ length }) => {
+    return (
+      <div 
+      className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
+      style={{ backgroundColor: '#ffffff', color: '#424242', borderTopRightRadius: '6px', borderTopLeftRadius: '6px'}} 
+      >
+       {length !== 0 &&
+        <div 
+        onClick={'openMobileBetslip'}
+        style={{ cursor: 'pointer' }}
+        >
+        {length > 1 ? 
+        <div className='d-flex align-items-center'>
+          {30 === 0 ? 
+          <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
+          <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
+          }
+          <p className='fw-bold' style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({length})</p>
+        </div>
+        :
+        <div className='d-flex align-items-center'>      
+         {30 === 0 ? 
+          <i className="bi bi-chevron-double-up mobile-down" style={{ marginRight: 5 }}></i>:   
+          <i className="bi bi-chevron-double-down mobile-down" style={{ marginRight: 5 }}></i>
+          }
+          <p className='fw-bold' style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({length})</p> 
+        </div>
+        } 
+      
+      </div>
+        }
+          <div className='btn btn-light btn-sm text-dark shadow-sm'  onClick={toggleShareBtn}>
+            <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
+            <span className='text-dark fw-bold share-btn' >Share</span>
+          </div>  
+      </div>
+    )
+  }
+  
+const EmptyCart = () => {
+    const [code, setCode] = useState('')
+  
+    const handleBetCode = (e) => {
+      const betCode = e.target.value
+      setCode(betCode)
+    }
+    const loadBetCode = () => {
+      sessionStorage.setItem('share_code', code)
+      fetchUrlSessionSlip(code)
+    }
+      return (
+        <div className='card bg-success p-1 shadow'>
+          <div className='d-flex justify-content-between'>
+           <h5 className='fw-bold' style={{ marginLeft: 8, lineHeight: '24px', letterSpacing: 1, color: '#ffffff' }}>BETSLIP</h5>
+           <i className="bi bi-three-dots-vertical text-light"></i>
+         </div>
+          <div className='betslip-child shadow'>     
+            <span className='d-block fw-bold text-center mt-4' style={{ color: '#ffffff', letterSpacing: 1 }}>You have not selected any bet</span>
+            <span className='d-block text-center' style={{ color: '#ffffff', letterSpacing: 1 }}>Make your first pick to start playing.</span>
+            <hr/>
+            <div className='text-center mb-2'>
+                <span className='d-block m-2' style={{ color: '#ffffff', letterSpacing: 1 }}>Or introduce your bet code:</span>
+                <Row className='p-2'>
+                  <Col>
+                    <input className="form-control p-2 shadow w-100" value={code} placeholder="Bet Code" onChange={handleBetCode}/>   
+                  </Col>
+                  <Col>
+                    <button className='btn btn-secondary p-2 shadow w-100' onClick={loadBetCode}>Add Betslip Code</button>        
+                  </Col>
+                </Row>
+            </div>      
+          </div>
+        </div>
+      )
+  }
+
+
+const CartElements = (link, i) => {
+  
+    const fixId = String(link?.fixture_id).slice(0,6)  
+     const removeSingleBetslipFixture = (fixture_id) => {
+     
+     sessionStorage.removeItem(fixture_id)
+    }
+    
+      return (
+        <React.Fragment key={i}>  
+          <div style={{ paddingTop: '7px', paddingRight: '14px', paddingLeft: '14px'}}>
+            <div className='d-flex align-items-center justify-content-between'>
+              <div className='pt-2'>
+                  <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
+                  <Small>{link && link.betslip_teams}</Small>
+              </div>
+              <button 
+              className='close-btn fw-bold'
+              id="close-btn"
+              onClick={() => removeSingleBetslipFixture(fixId)}
+              >
+                x
+              </button>
+            </div>
+            <Small>{link && link.betslip_market}</Small>
+            <div className='d-flex align-items-center justify-content-between'>      
+                <Small>Your Pick: {link && link.betslip_picked}</Small>
+                <Small className='fw-bold'>{link && link.betslip_odds}</Small>
+            </div>
+            <hr className='mt-1 mb-1' style={{ margin: 0, color : '#FF7F50' }}/>  
+          </div>    
+        </React.Fragment>
+      )
+  }
+
+const fetchIds = () => {
+  // const ids = JSON.parse(sessionStorage.getItem('fixture_ids'))
+
+  const result = ids?.map(id => {
+    const data = JSON.parse(sessionStorage.getItem(id))
+    console.log(data)
+    return data
+  })
+
+  return result
+}
+
+const listenToClickEvent = () => {
+  window.addEventListener('click', (e) => {
+ 
+    if(e.target.id === 'fix-btn' || e.target.id === 'close-btn') {
+      setClicked(prev => !prev)
+    }
+  })
+}
+
+useEffect(() => {
+  listenToClickEvent()
+  const userId = localStorage.getItem('u_i')
+  setUserId(userId)
+}, [])
+
+const data = fetchIds()?.filter(v => !!v)
+
+return (
     <>
-      {betData?.length > 0 ? 
-      <StyleMobileCartItems className=' bg-success'>
-      <StyleBetCart >
-      <BetslipCartHeader/>
-      <StyleMobileElements>
-        {betData?.length !== 0 && betData?.map(CartElements)}   
-        <BetCartFormElements/>
-      </StyleMobileElements>    
-      </StyleBetCart>
-  </StyleMobileCartItems>
-    : ''}
+      <ShareContainer/>
+      {data?.length > 0 ?
+      <>
+         <BetslipCartHeader length={data?.length}/>
+         {data?.map(CartElements)}
+         <BetCartFormElements 
+         betData={data}
+         userId={userId}
+         />
+      </>
+      : <EmptyCart/>}
+    
     </>
   )
 }
 
-const BetslipSessionModal = () => {
-  const closeMenu = () => setSessionModalOpen(false)
 
-  const  {postBetslip} = useCustomBetslip()
-  const [currentSession, setCurrentSession] = useState(null)
-  const  sessionSlip = useGetBetslipQuery(sp_s)
-  const [isSessionModalOpen, setSessionModalOpen] = useState(false)
+ 
+const BetCartFormElements = ({ betData, userId }) => {
+  const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false)
+  const [loading, setLoading] = useState(null)
+  const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
+  const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
 
-  const checkSlipSession = () => {
-    if(sp_s !== undefined) {
-       setSessionModalOpen(true)
+  const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
+  
+  const {data, refetch} = useGetBalanceByUserIdQuery(userId)
+
+    const decrementBetAmount = () => {
+      if(betAmount <= 50) {
+        return
+      }
+      setBetAmount(prev => prev -= configData.INCREMENT_DECREMENT_AMOUNT)
     }
-    if(sp_s === undefined) {
-      setSessionModalOpen(false)
-    }
-  }
 
-  const postSessionCart = () => {
-    sessionStorage.setItem('share_code', sp_s)
-    if(sessionSlip.isSuccess) {
-      sessionSlip.data.data.map(name => {
-        const {betslip_market, betslip_odds,betslip_picked,betslip_teams, fixture_id } = name
-     
-      if(currentSession) { postBetslip({
-          fixture_id: fixture_id,
-          session_id: currentSession,
-          betslip_teams: betslip_teams,
-          betslip_market,
-          betslip_picked,
-          betslip_odds
-        })
-        .then(d => {
-          if(d === 200) {
-            dispatchEvent()
-            setSessionModalOpen(false)
-            router.push('/')
-          }
-        })}
-      
+    const updateBetAmount = (e) => {
+      setBetAmount(Number(e.target.value));  
+    }
+    const removeBetslipCart = () => {
+      sessionStorage.clear()
+    }
+
+    const postBalanceAfterPlacing = async () => {
+      const res = await axios.post(`api/users/${userId}/balance/decrement`, {
+        'user_id': userId,
+        'amount': betAmount
+      } ,
+      {
+        headers: {
+          'x-sportsapp-key': configData.SPORTS_APP_KEY
+        }
       })
-    }
-    setClicked(prev => !prev)
-            setSessionModalOpen(false)
-            router.push('/')
-   
-  }
 
-  useEffect(() => {
-    const currentSession = sessionStorage.getItem('session_id')
-    setCurrentSession(currentSession)
-    checkSlipSession()
-  }, [])
-  return (
-    <>
-      <Modal show={isSessionModalOpen}>
-        <Modal.Header>
-          <h4>Load Betslip</h4>
-        </Modal.Header>
-        <Modal.Body>
-          <Row>
-            <h4>Bet Code: {sp_s}</h4>
-            <Col>
-              <button className='btn btn-primary w-100' onClick={postSessionCart}>CONFIRM</button>
+      if(res.status === 200) {
+        refetch()
+      }
+    }
+
+    const setNewSessionStorage = () => {
+      sessionStorage.clear()
+      sessionStorage.setItem('session_id', Date.now())
+    }
+
+    const postBetslipCart = async () => {
+      setLoading(true)
+
+      const balanceAfterPlacing = data.amount - betAmount
+  
+      if(data.amount < betAmount || balanceAfterPlacing < 0) {
+        setModalOpen(true)
+        setLoading(false)
+        return
+      }   
+      const sessionId = Number(sessionStorage.getItem('session_id'))
+      const userId = Number(localStorage.getItem('u_i'))
+
+      const res = await axios.post('api/users/fixtures/cart', {
+        user_id: userId,
+        cart_id: sessionId,
+        bet_amount: betAmount,
+        possible_payout: possibleWin,
+        cart: JSON.stringify(betData)
+      })
+
+      if(res.status === 200) {
+        setLoading(false)
+        setCongratulationModalOpen(true)
+      }
+
+      postBalanceAfterPlacing()
+      setNewSessionStorage()
+   
+    } 
+
+    let res = 1
+    
+    betData.forEach(n => res = res * n.betslip_odds )
+
+    const linkBarRef = useRef();
+    const possibleWin = res * betAmount
+
+    return (
+        <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#424242', paddingBottom: '4px' }}>
+        {betData?.length !== 0 &&
+         <div className='d-flex align-items-center justify-content-between'>
+              <Small>Total Odds:</Small>
+              <Small className='fw-bold'>
+                {res.toFixed(2)}
+              </Small>
+         </div>
+        }
+       
+        <UserBalanceElement userId={userId}/>
+         {betData?.length !== 0 &&
+         <>
+         <div className='d-flex align-items-center justify-content-between'>
+          <Small>Amount (Kshs)</Small>
+          <div className='d-flex'>
+            <button className='custom-sm-btn fw-bold btn btn-secondary text-light' onClick={decrementBetAmount}>-</button>
+            <InputNumber 
+            value={betAmount}
+            className="form-control custom-input"
+            onChange={updateBetAmount}
+            />
+            <button className='custom-sm-btn-right fw-bold btn btn-secondary text-light' onClick={incrementBetAmount}>+</button>
+          </div>
+          <div className={`position-absolute position-tooltip ${betAmount >= 50 ? 'close-tooltip' : ''}`}>
+            <i 
+            className="bi bi-info bg-secondary text-light fw-bold rounded-circle custom-label" 
+            style={{ marginRight: '3px' }}></i>
+            <Small>Minimum stake <b className='fw-bold'>Ks 50.00</b></Small>
+          </div>
+         
+        </div>
+         <div className='d-flex align-items-center justify-content-between mb-3'>
+            <Small>Possible Payout (Kshs):</Small>
+            <Small className='fw-bold text-warning'>
+              {Number(possibleWin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </Small>
+        </div>
+          <Row className='mb-3'>          
+            <Col lg={6} sm={12}>
+              <button 
+              ref={linkBarRef}      
+              disabled={loading}
+              className='btn btn-light shadow-sm mb-1 text-dark w-100'
+              style={{ letterSpacing: 1 }}
+              onClick={() => postBetslipCart()}
+              >
+                {loading ? 
+                <Spinner
+                animation="grow"
+                size="sm"
+              >
+              </Spinner>
+                        :
+                ''}             
+              {loading ? 'Loading...' : 'Place Bet'}
+              </button>
             </Col>
-            <Col>
-              <button className='btn btn-danger w-100' onClick={closeMenu}>CANCEL</button>
+            <Col lg={6} sm={12} className="align-items-center">
+              <button 
+              className='btn btn-danger shadow-sm mb-1 text-light w-100' 
+              id="close-btn"
+              onClick={() => removeBetslipCart()}
+              style={{ letterSpacing: 1 }}
+              >                
+                Remove All
+              </button>
             </Col>
           </Row>
-        </Modal.Body>
-      </Modal>
-    </>
-  )
-}
- 
-const fetchSessionFixtures = () => {
-  const res = ids.map(el => {
-    const data = JSON.parse(sessionStorage.getItem(el))
-  
-    return data
-   })
-
-  const filtered = res.filter(r => !!r)
-  // const totalOdds = filtered.length > 0 && filtered?.reduce((n,i) => console.log( n.betslip_odds * i.betslip_odds))
-  
-  setBetData(filtered)
+        </>
+        }
+        <CongratulationModal isModalOpen={isCongratulationModalOpen} closeModal={closeCongratulationsMenu}/>
+        </div>
+    )
 }
 
-  useEffect(() => {
-    const sharedSessionCode = sessionStorage.getItem('share_code')
-    fetchUrlSessionSlip(sp_s , sharedSessionCode)
-    fetchSessionFixtures()
-  }, [router.asPath, sp_s, ids])
- 
-  return (
-    <>
-     <StyleBetslip className='mx-auto'>
-      <StyleBetCart className='betcart-mb card bg-success shadow' style={{ border: 'none' }}>
-     
-      <ShareContainer/> 
 
-      {betData?.length > 0 ? 
-      <> <BetslipCartHeader/>{ betData?.map(CartElements)} <BetCartFormElements/></> : 
-      <EmptyCart/>}
+const UserBalanceElement = ({ userId }) => {
+
+  if(userId) {
+    const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(userId)
     
-      <BetslipSessionModal/>
-
-      </StyleBetCart>
-      <CongratulationModal/>
-      <BalanceModal/>
-      <MpesaInfo/>
-      <ContactSupport/>
-      <AddedFeatures/>     
-      <Offers/>
-    </StyleBetslip>
-    <MobileCartItems/>
-
-    </>
+    if(error) {
+      return <span>Error...</span>
+    }
+    if(isLoading) {
+      return ''
+    }
+    
+    const { amount } = data;
+  
+    return (
+      <>
+       { true ? 
+        <div className='d-flex align-items-center justify-content-between mb-1'>
+          <Small>Balance:</Small>
+          <Small className='fw-bold'>
+            <FontAwesomeIcon 
+            icon={faRefresh} 
+            onClick={() => refetch()}
+            style={{ 
+              cursor: 'pointer',
+              paddingRight: 8, 
+              paddingLeft: 8,
+            }}
+            />
+            KES {amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+          </Small>
+        </div>
+        : ''
+      }
+      </>
+    )
+  }
    
-  )
 }
- 
+
+const CongratulationModal = ({ isModalOpen, closeModal }) => {
+
+  const Stars = () => {
+    return (
+      <div className='d-flex justify-content-center mt-3' style={{ position: 'absolute', width: '50%' }}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light" viewBox="0 0 16 16">
+          <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-stars text-warning custom-1" viewBox="0 0 16 16">
+          <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-balloon-fill text-warning" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8.48 10.901C11.211 10.227 13 7.837 13 5A5 5 0 0 0 3 5c0 2.837 1.789 5.227 4.52 5.901l-.244.487a.25.25 0 1 0 .448.224l.04-.08c.009.17.024.315.051.45.068.344.208.622.448 1.102l.013.028c.212.422.182.85.05 1.246-.135.402-.366.751-.534 1.003a.25.25 0 0 0 .416.278l.004-.007c.166-.248.431-.646.588-1.115.16-.479.212-1.051-.076-1.629-.258-.515-.365-.732-.419-1.004a2.376 2.376 0 0 1-.037-.289l.008.017a.25.25 0 1 0 .448-.224l-.244-.487ZM4.352 3.356a4.004 4.004 0 0 1 3.15-2.325C7.774.997 8 1.224 8 1.5c0 .276-.226.496-.498.542-.95.162-1.749.78-2.173 1.617a.595.595 0 0 1-.52.341c-.346 0-.599-.329-.457-.644Z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-balloon-fill text-warning balloon-1" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8.48 10.901C11.211 10.227 13 7.837 13 5A5 5 0 0 0 3 5c0 2.837 1.789 5.227 4.52 5.901l-.244.487a.25.25 0 1 0 .448.224l.04-.08c.009.17.024.315.051.45.068.344.208.622.448 1.102l.013.028c.212.422.182.85.05 1.246-.135.402-.366.751-.534 1.003a.25.25 0 0 0 .416.278l.004-.007c.166-.248.431-.646.588-1.115.16-.479.212-1.051-.076-1.629-.258-.515-.365-.732-.419-1.004a2.376 2.376 0 0 1-.037-.289l.008.017a.25.25 0 1 0 .448-.224l-.244-.487ZM4.352 3.356a4.004 4.004 0 0 1 3.15-2.325C7.774.997 8 1.224 8 1.5c0 .276-.226.496-.498.542-.95.162-1.749.78-2.173 1.617a.595.595 0 0 1-.52.341c-.346 0-.599-.329-.457-.644Z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-balloon-fill text-warning balloon-2" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8.48 10.901C11.211 10.227 13 7.837 13 5A5 5 0 0 0 3 5c0 2.837 1.789 5.227 4.52 5.901l-.244.487a.25.25 0 1 0 .448.224l.04-.08c.009.17.024.315.051.45.068.344.208.622.448 1.102l.013.028c.212.422.182.85.05 1.246-.135.402-.366.751-.534 1.003a.25.25 0 0 0 .416.278l.004-.007c.166-.248.431-.646.588-1.115.16-.479.212-1.051-.076-1.629-.258-.515-.365-.732-.419-1.004a2.376 2.376 0 0 1-.037-.289l.008.017a.25.25 0 1 0 .448-.224l-.244-.487ZM4.352 3.356a4.004 4.004 0 0 1 3.15-2.325C7.774.997 8 1.224 8 1.5c0 .276-.226.496-.498.542-.95.162-1.749.78-2.173 1.617a.595.595 0 0 1-.52.341c-.346 0-.599-.329-.457-.644Z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light custom-2" viewBox="0 0 16 16">
+          <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-warning custom-2-1" viewBox="0 0 16 16">
+          <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light custom-3" viewBox="0 0 16 16">
+          <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light custom-4" viewBox="0 0 16 16">
+          <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
+        </svg>
+      </div>
+    )
+  }
+    return (
+      <Modal show={isModalOpen} className="mt-5">
+      <Modal.Body modalId="modal-ref" className="p-4 bg-primary rounded" >
+        <Span 
+        modalId="modal-ref" 
+        className='fw-bold p-2 d-block mb-2 float-end' 
+        onClick={closeModal} 
+        style={{ cursor: 'pointer', width: 32 }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-x-circle-fill text-light" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+          </svg>
+        </Span>  
+        <StyleStars>
+          <Stars/>
+        </StyleStars>
+        <div className='d-flex justify-content-center mt-5 pt-4 w-100' style={{ zIndex: 2 }}>
+            <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="104" height="104" 
+            fill="currentColor" 
+            className="bi bi-trophy-fill text-warning " 
+            viewBox="0 0 16 16">
+              <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935z"/>
+            </svg>
+          </div>
+        <StyleCongratulationsModalMidMenu className='text-center mt-3 mb-3'>
+          <h1 modalId="modal-ref" className='fw-bold text-light'>Congratulations!</h1>
+          <h3 className='mt-2 mb-4 text-light'>You have placed your bet successfully!</h3>
+          <div className='d-flex'>
+            <Link href='#'>
+              <a
+                itemProp='url'
+                className='btn btn-light w-100 mt-2 m-1 shadow-lg d-flex justify-content-center'
+              >
+                <i className="bi bi-share" style={{ marginRight: 5 }}></i>
+                <small className='small-position'>Share</small>
+              </a>
+              </Link>
+              <Link href='/history?his_tab=sbets&tab=all'>
+              <a
+                itemProp='url'
+                className='btn btn-warning w-100 mt-2 m-1 shadow-lg d-flex justify-content-center'
+              >
+                <i className="bi bi-card-list" style={{ marginRight: 5 }}></i>
+                <small className='small-position'>View Bet</small>               
+              </a>
+          </Link>
+          </div>
+        
+        </StyleCongratulationsModalMidMenu>
+      
+      </Modal.Body>                            
+   </Modal>
+    )
+}
+
+  
 const StyledFeatures = styled.div`
 .feature-box {
   padding: 8px;
@@ -1718,6 +2084,7 @@ const StyleMpesaInfo = styled.div`
   background-color: #424242;
  }
 `
+
 const MpesaInfo = () => {
   return (
     <StyleMpesaInfo>
@@ -1763,6 +2130,7 @@ const ContactSupport = () => {
     </StyleMpesaInfo>
   )
 }
+
 const AddedFeatures = () => {
   
   return (
