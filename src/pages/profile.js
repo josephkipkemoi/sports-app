@@ -5,6 +5,10 @@ import styled from "styled-components"
 import useAuth from "../hooks/auth"
 import { useGetBalanceByUserIdQuery } from "../hooks/balance"
 import configData from '../../config.json';
+import generateTimestamp from "../hooks/generateTimestamp";
+import generateBase64Encoding from "../hooks/generateBase64Encoding"
+import config from '../../config.json';
+
 import { 
     InputNumber, 
     Span,
@@ -82,6 +86,9 @@ const AuthUserProfile = () => {
                 return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
             }
             const { user } = data 
+
+            sessionStorage.setItem('u_phone_no', user?.phone_number)
+   
             return (
                  <Span className="d-block fw-bold mt-3">
                   (254) {user?.phone_number}    
@@ -216,13 +223,29 @@ const DepositComponent = () => {
     //     }
     // }
 
+    const deposit = async () => {
+        const short_code = config.BUSINESS_SHORT_CODE;
+        const passkey = config.BUSINESS_PASSKEY;
+        const timestamp = generateTimestamp().toString();
+        const phone_number = Number('254' + sessionStorage.getItem('u_phone_no'))
+        const password = generateBase64Encoding(short_code, passkey, timestamp);
+ 
+        axios.post('api/mpesa/push', {
+            phone_number,
+            timestamp,
+            amount: depositAmount         
+        })
+           
+     
+    }
+
     const fetchMpesa = async () => {
-        const res = await axios.get('api/mpesa/transaction')
-        console.log(res)
+        // const res = await axios.get('api/mpesa/transaction')
+        // console.log(res)
     }
     useEffect(() => {
         const userId = localStorage.getItem('u_i')
-        fetchMpesa()
+        // fetchMpesa()
         setUserId(userId)
     }, [])
     return (
@@ -275,7 +298,7 @@ const DepositComponent = () => {
             <Small className="d-block text-danger">
                 Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Small>
-            <Button variant="warning" >
+            <Button variant="warning" onClick={deposit}>
                 Deposit
             </Button>
         </div>
