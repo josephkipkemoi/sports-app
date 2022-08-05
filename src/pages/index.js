@@ -308,7 +308,7 @@ function App({data}) {
                 <StyledFavorites>
                   <Row>
                     <Col className='d-inline-flex'>
-                      <i className="bi bi-star" onClick={() => updateFavorite(innerData.fixture_id)}></i>
+                      <i className="bi bi-star-fill" onClick={() => updateFavorite(innerData.fixture_id)}></i>
                       <div style={{ marginTop: 2.5, marginLeft: 10 }}>
                         <span style={{ letterSpacing : '1px', color: '#ffffff', fontWeight: 500  }}>{innerData.home}</span>
                         <i className="bi bi-dash"></i>
@@ -432,10 +432,11 @@ function App({data}) {
                      ''}
                      <div style={{ position:  'relative' }}>
                       <Tooltip 
-                        message="To view all available markets for game Click here"
+                        message="To view all available markets for each game Click here"
                         number={1}
                         top={0}
                         right={50}
+                        caret_position="right"
                       /> 
                       <GamesData/>
                      </div>
@@ -1174,6 +1175,7 @@ const EmptyCart = () => {
               number={2}
               right={100}
               top={40}
+              caret_position="down"
             />
           </div>
           <div className='betslip-child shadow'>     
@@ -1754,7 +1756,10 @@ const StlyeTooltip = styled.div`
     background: #fff;
     max-width: 240px;
     z-index: 2;
-  
+    letter-spacing: 2px;
+    button {
+      letter-spacing: 1px;
+    }
   .tool-message {
     text-align: right;
   }
@@ -1772,9 +1777,16 @@ const StlyeTooltip = styled.div`
   .header-message {
     margin-left: 5px;
   }
+  .caret {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-top: 29px;
+    margin-right: -12px;
+  }
 `
 
-const Tooltip = ({ message, number, top, right }) => {
+const Tooltip = ({ message, number, top, right, caret_position }) => {
   const [display, setDisplay] = useState('none')
    
   const tooltips = document.getElementsByClassName('tool-tip')
@@ -1813,35 +1825,38 @@ const Tooltip = ({ message, number, top, right }) => {
 
   return (
    <StlyeTooltip 
-      className={`shadow-lg rounded d-${display} tool-tip tool-tip-1`}
+      className={`shadow-lg rounded d-${display} tool-tip tool-tip-1 p-1 bg-white`}
       style={{ top: `${top}px`, right: `${right}px` }}
       >
-            <Card>
+            <Card className='bg-white border-0'>
             <Card.Body className="card-tooltip tool-message">
               <small className='text-dark'>
                 {message}
               </small>
             </Card.Body>
-            <Card.Footer className="card-tooltip">
+            <Card.Footer className="card-tooltip" style={{ padding: 0, margin: 0 }}>
               <div className='d-flex justify-content-between'>
                 <button 
-                  className='d-flex align-items-center btn btn-secondary m-1 btn-sm text-white'
+                  className='d-flex align-items-center btn btn-secondary m-1 btn-sm text-white shadow-sm'
                   onClick={closeDisplay}
                 >
-                  <i className="bi bi-x-octagon"></i>
+                  <i className="bi bi-x-octagon-fill"></i>
                   <small style={{ marginLeft: 5 }}>Hide tips</small> 
                 </button>
                 <button 
-                className='btn btn-primary m-1 btn-sm text-white d-flex align-items-center'
+                className='btn btn-primary m-1 btn-sm text-white d-flex align-items-center shadow-sm'
                 onClick={switchDisplay}
                 >
-                  <small>Continue</small>
+                  <small>Next</small>
+                  <i className="bi bi-caret-right-fill" style={{ marginRight: -5}}></i>
                   <i className="bi bi-caret-right-fill"></i>
                 </button>
               </div>  
-            </Card.Footer>   
-         
+            </Card.Footer> 
             </Card>
+            <div className='caret'>
+              <i className={`bi bi-caret-${caret_position}-fill text-white`}></i>
+            </div>
         </StlyeTooltip>
   )
 }
