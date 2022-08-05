@@ -43,7 +43,7 @@ const StyleLoader = styled.div`
 export default function Loader() {
     return (
         <StyleLoader>
-        <div class="lds-facebook">
+        <div className="lds-facebook">
           <div></div>
           <div></div>
           <div></div>
