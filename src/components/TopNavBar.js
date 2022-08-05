@@ -17,13 +17,14 @@ import  {
     faSignal,
     faCalendar,
 }  from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
 
 const StyleSideNav = styled.div`
 background-color: #383838;
  
 overflow-x: scroll;
 overflow-y: hidden;
- 
+
 ::-webkit-scrollbar {
   height: 6px;
 }
@@ -99,6 +100,8 @@ const topNavLinks = [
 ]
 
 export default function TopNavBar() {
+    const router = useRouter()
+    const { pathname } = router
     const TopNavLinkItem = (link, i) => (
         <div sm={1} key={i}>     
           <Link href={link.path} prefetch={false} className="icon-text-width">
@@ -108,9 +111,12 @@ export default function TopNavBar() {
             >
               <FontAwesomeIcon 
                 icon={link.icon} 
-                className={`fa-2x mb-2 mt-2 text-success`}
+                className={`fa-2x mb-2 mt-2 ${link.path === pathname ? 'text-warning' : 'text-success'} `}
               />
-              <small  style={{ whiteSpace: 'nowrap', width: '72px', overflow: 'hidden', color: '#ffffff', letterSpacing: '1px' }}>
+              {console.log()}
+              <small 
+              className={`${link.path === pathname ? 'text-warning' : 'text-white'}`}
+              style={{ whiteSpace: 'nowrap', width: '72px', overflow: 'hidden', letterSpacing: '1px' }}>
               {link.name}
               </small>
             </a>

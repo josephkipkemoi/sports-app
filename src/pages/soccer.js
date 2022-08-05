@@ -6,6 +6,7 @@ import CustomerInfo from "../components/CustomerInfo";
 import CustomFilter from "../components/CustomFilter";
 import TopNavBar from "../components/TopNavBar";
 import BetslipContainer from "../components/BetslipContainer";
+
 const StyleSoccer = styled.div`
     height: 100vh;
 `
