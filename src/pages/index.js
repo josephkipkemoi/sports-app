@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import axios from '../lib/axios';
 import styled from 'styled-components';
 import Row  from 'react-bootstrap/Row';
 import Col  from 'react-bootstrap/Col';
 
 import TopNavBar from '../components/TopNavBar';
-
-import Card from 'react-bootstrap/Card';
-
 import Support from '../components/Support';
 import GameComponent from '../components/GameComponent';
 import CustomerInfo from '../components/CustomerInfo';
-
 import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';

@@ -113,7 +113,7 @@ export default function TopNavBar() {
                 icon={link.icon} 
                 className={`fa-2x mb-2 mt-2 ${link.path === pathname ? 'text-warning' : 'text-success'} `}
               />
-              {console.log()}
+ 
               <small 
               className={`${link.path === pathname ? 'text-warning' : 'text-white'}`}
               style={{ whiteSpace: 'nowrap', width: '72px', overflow: 'hidden', letterSpacing: '1px' }}>

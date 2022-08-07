@@ -57,7 +57,7 @@ export default function CustomFilter({ heading }) {
         </Col>
         <Col className="d-flex justify-content-center">
           <StyleButton className='d-flex align-items-center'>
-          <button className='btn'>
+          <button className='btn' onClick={() => window.print()}>
             <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>
           </button>        
           <button className='background-none'>

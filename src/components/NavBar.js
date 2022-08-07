@@ -41,7 +41,7 @@ nav a:hover, a:active {
 const topNavLinks = [
     {
         name: 'Sports',
-        path: '/sports?tab=soccer'
+        path: '/soccer'
     },
     {
         name: 'Jackpot',
@@ -120,7 +120,7 @@ export default function NavBar({ logout, login }) {
 const midnavLinks = [
     {
         name: 'Sports',
-        path: '/sports?tab=soccer',
+        path: '/soccer',
         class: 'sports'
     },
     {
