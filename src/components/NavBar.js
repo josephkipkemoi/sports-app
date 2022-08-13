@@ -10,6 +10,9 @@ import useAuth from "../hooks/auth";
 import  Col  from "react-bootstrap/Col";
 import  Row  from "react-bootstrap/Row";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { SearchComponent } from "./CustomFilter";
+import CurrentTime from "./CurrentTime";
 
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
@@ -194,7 +197,13 @@ const StyleBottomNavBar = styledComponents.div`
         .mobile {
             display: none; 
         }
+        .time {
+           position: absolute;
+           margin-top: 35px ;
+        }
     }
+
+  
 `
 const StyleAuthenticated = styledComponents.div`
  span {
@@ -209,6 +218,12 @@ const StyleAuthenticated = styledComponents.div`
     margin-right: -5px;
 }
  
+`
+const StyleAuthenticatedMobile = styledComponents.div`
+display: flex;
+@media screen and (max-width: 990px) {
+     display: none;
+  }
 `
  
 const BottomNavBar = ({ login }) => {
@@ -247,49 +262,63 @@ const BottomNavBar = ({ login }) => {
 
     const ErrorElement = () => errors.map(error => <div id="modal-ref" className="d-block text-danger text-center fw-bold" key={error}>{error}</div>)
 
-    const AuthenticatedItems = () => (
+    const AuthenticatedItems = () => {
+        const [screenSize, setScreenSize] = useState(0)
+        const router = useRouter()
+        const { pathname } = router
+    
+        useEffect(() => {
+            setScreenSize(window.screen.width)
+        }, [])
+    return (
         <>
-            <StyleAuthenticated className="d-flex">
+            <StyleAuthenticated className="d-flex align-items-center">
                 <Link href="/notifications">
                     <a className="btn btn-light btn-sm text-dark shadow-sm border-0">
                         <i className="bi bi-bell"></i>
                         <small></small> 
                     </a>
                 </Link>
-             
-                <Link href="/profile" prefetch={false}>
-                    <a 
-                        itemProp="url"
-                        className="d-flex align-items-center btn btn-success btn-sm shadow-sm" 
-                        style={{ marginLeft: 5 }}
-                    >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
-                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                    </svg>  
+                <SearchComponent customClass="custom-search"/>
+                {pathname === '/' && screenSize >= 990 ?
+                 <StyleAuthenticatedMobile >
+                 <Link href="/profile" prefetch={false}>
+                      <a 
+                          itemProp="url"
+                          className="d-flex align-items-center btn btn-success btn-sm shadow-sm" 
+                          style={{ marginLeft: 5 }}
+                      >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person" viewBox="0 0 16 16">
+                          <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                      </svg>  
                       <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>Profile</span>        
-                    </a>                
-                               
-                </Link>
-                <Link href="/history?his_tab=sbets&tab=all" prefetch={false}>
-                    <a
-                        itemProp="url"
-                        className="btn btn-success btn-sm shadow-sm"
-                        style={{ marginLeft: 5 }}
-                    >
-                        <i className="bi bi-card-list w-100" style={{ marginRight: 3 }}></i>
-                        <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>
-                            My Bets
-                        </span> 
-                    </a>
-                </Link>
-                <button className="btn btn-success btn-sm shadow-sm" style={{ marginLeft: 5 }} onClick={openDepositModal}>
-                    <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>
-                        Deposit
-                    </span>
-                </button>
+                      </a>                
+                                  
+                  </Link>
+                  <Link href="/history?his_tab=sbets&tab=all" prefetch={false}>
+                      <a
+                          itemProp="url"
+                          className="btn btn-success btn-sm shadow-sm"
+                          style={{ marginLeft: 5 }}
+                      >
+                          <i className="bi bi-card-list w-100" style={{ marginRight: 3 }}></i>
+                          <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>
+                              My Bets
+                          </span> 
+                      </a>
+                  </Link>
+                  <button className="btn btn-success btn-sm shadow-sm" style={{ marginLeft: 5 }} onClick={openDepositModal}>
+                      <span className="text-light" style={{ marginLeft: 5, letterSpacing: '1px' }}>
+                          Deposit
+                      </span>
+                  </button>
+               </StyleAuthenticatedMobile>
+                : ''}
+                 
             </StyleAuthenticated>            
         </>
-    )
+        )
+    }
 
     const MidNavLinkItems = (link, i) => {
         return (
@@ -365,14 +394,20 @@ const BottomNavBar = ({ login }) => {
 
     useClickOutside(linkBarRef, closeMenu)    
 
+
     return (
         <StyleBottomNavBar>  
-        <nav className="p-3" ref={linkBarRef}>
+        <nav className="p-1" ref={linkBarRef}>
             <Row>
-                <Col lg="6" md="6" sm="6" className="d-flex justify-content-end">
-                    {midnavLinks.map(MidNavLinkItems)}
+                <Col lg={6} md={6} sm={6}  className="d-flex justify-content-between align-items-center">
+                    <div className="time">
+                        <CurrentTime/>
+                    </div>
+                    <div>
+                        {midnavLinks.map(MidNavLinkItems)}
+                    </div>
                 </Col>
-                <Col lg="6" md="6" sm="6" className="d-flex justify-content-end">     
+                <Col lg={6} md={6} sm={6} className="d-flex justify-content-end align-items-center">     
                     {isAuthenticated ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   
                 </Col>
             </Row>
