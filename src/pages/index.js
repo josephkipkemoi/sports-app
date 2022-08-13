@@ -11,6 +11,7 @@ import CustomerInfo from '../components/CustomerInfo';
 import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
+import MobileNavComponent from '../components/MobileNavComponent';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -88,8 +89,6 @@ function App({ soccer_data }) {
     }  
 
   },[])
-
-
  
   return (
     <ThemedBody>
@@ -117,20 +116,22 @@ function App({ soccer_data }) {
                      </div>
                      
                    </StyleGameData>   
-                   </StyledMain>            
+                   </StyledMain>  
+                     
                   </Col>
-                 
+                  
                   <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>    
                    
                     <BetslipContainer />
-                  
-                    <CustomerInfo/>
+                    <CustomerInfo />
 
                   </Col>
 
               </Row>
             </main>
-                <Support/>  
+            
+            <Support/>  
+
     </ThemedBody>
   );
 }

@@ -20,6 +20,7 @@ import  Row  from "react-bootstrap/Row";
 import  Col  from "react-bootstrap/Col";
 import Tooltip from "./Tooltip";
 import axios from "../lib/axios";
+import MobileNavComponent from "./MobileNavComponent";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -189,14 +190,18 @@ const StyleBetslip = styled.div`
     margin: 6px;
     border-radius: 6px;
     margin-bottom: 16px;
-  }
- 
-  @media screen and (max-width: 990px) {
+}
+@media screen and (max-width: 990px) {
+    padding: 0;
+    margin: 0;
+    margin-left: 3px;
     .betcart-mb {
-       position: absolute;
-       bottom: 0;
-       width: 100%;
-       z-index: 2;
+      position: fixed;
+      bottom: 50px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      z-index: 2;
     }
    .empty-mobile {
     display: none;
@@ -212,7 +217,7 @@ export default function BetslipContainer() {
     const [, setClicked] = useState(false)
     const [userId, setUserId] = useState(null)
     const [modalOpen, setIsModalOpen] = useState(false)
-    const [mobileCartHeight, setMobileCartHeight] = useState('auto')
+    const [mobileCartHeight, setMobileCartHeight] = useState(0)
     const [code, setCode] = useState('')
 
     const postSharedCode = async (session_id, user_id, codes) => {
@@ -244,10 +249,11 @@ export default function BetslipContainer() {
     }
   
     const openMobileBetslip = (e) => {
+      const targetSlip = e.target.getAttribute('slip')
       const target = e.target.id
-      const isClicked = ( target === 'cart-header' || 
-                          target === 'cart-header-md' || 
-                          target === 'cart-header-single' )
+      const isClicked = ( targetSlip === 'active' ||                  
+                          target === 'mobile' ||
+                          target === 'mobile-txt' )
   
       if(isClicked && mobileCartHeight === 0) {
         setMobileCartHeight('auto')
@@ -263,29 +269,29 @@ export default function BetslipContainer() {
       return (
         <div 
         className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-        id="cart-header"
-        style={{ backgroundColor: '#ffffff', color: '#424242', borderTopRightRadius: '6px', borderTopLeftRadius: '6px'}} 
+        style={{ backgroundColor: '#ffffff', color: '#424242'}} 
         onClick={openMobileBetslip}
+        slip="active"
         >
          {length !== 0 &&
           <div 
           style={{ cursor: 'pointer' }}
           >
           {length > 1 ? 
-          <div className='d-flex align-items-center'>
+          <div className='d-flex align-items-center' slip="active">
             {mobileCartHeight === 0 ? 
-            <i className="bi bi-chevron-double-up mobile-down" id="cart-header-su" style={{ marginRight: 5 }}></i> :   
+            <i className="bi bi-chevron-double-up mobile-down" slip="active" id="cart-header-su" style={{ marginRight: 5 }}></i> :   
             <i className="bi bi-chevron-double-down mobile-down" id="cart-header-sd" style={{ marginRight: 5 }}></i>
             }
-            <p className='fw-bold' id="cart-header-multi"  style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({length})</p>
+            <p className='fw-bold' id="cart-header-multi" slip="active" style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({length})</p>
           </div>
           :
-          <div className='d-flex align-items-center'>      
+          <div className='d-flex align-items-center' slip="active">      
            {mobileCartHeight === 0 ? 
-            <i className="bi bi-chevron-double-up mobile-down" id="cart-header-mu" style={{ marginRight: 5 }}></i> :   
-            <i className="bi bi-chevron-double-down mobile-down" id="cart-header-md" style={{ marginRight: 5 }}></i>
+            <i className="bi bi-chevron-double-up mobile-down"  slip="active" id="cart-header-mu" style={{ marginRight: 5 }}></i> :   
+            <i className="bi bi-chevron-double-down mobile-down"  slip="active" id="cart-header-md" style={{ marginRight: 5 }}></i>
             }
-            <p className='fw-bold' id="cart-header-single" style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({length})</p> 
+            <p className='fw-bold' id="cart-header-single"  slip="active" style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({length})</p> 
           </div>
           } 
         
@@ -448,7 +454,12 @@ export default function BetslipContainer() {
            </div>       
         </>
         : <EmptyCart/>}
+ 
       </StyleBetCart>
+      <MobileNavComponent 
+      length={data?.length}
+      openSlip={openMobileBetslip}
+      />
       </StyleBetslip>
     )
   }
@@ -578,7 +589,35 @@ const BetCartFormElements = ({ betData, userId }) => {
                 {Number(possibleWin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
               </Small>
           </div>
-            <Row className='mb-3'>          
+            <div className="d-flex mb-2">
+              <button 
+                ref={linkBarRef}      
+                disabled={loading}
+                className='btn btn-light shadow m-1 text-dark w-100 '
+                style={{ letterSpacing: 1 }}
+                onClick={() => postBetslipCart()}
+                >
+                  {loading ? 
+                  <Spinner
+                  animation="grow"
+                  size="sm"
+                >
+                </Spinner>
+                          :
+                  ''}             
+                {loading ? 'Loading...' : 'Place Bet'}
+                </button>
+
+                <button 
+                  className='btn btn-danger shadow m-1 text-light w-100' 
+                  id="close-btn"
+                  onClick={() => removeBetslipCart()}
+                  style={{ letterSpacing: 1 }}
+                >                
+                  Remove All
+                </button>
+            </div>
+            {/* <Row className='mb-3'>          
               <Col lg={6} sm={12}>
                 <button 
                 ref={linkBarRef}      
@@ -608,7 +647,7 @@ const BetCartFormElements = ({ betData, userId }) => {
                   Remove All
                 </button>
               </Col>
-            </Row>
+            </Row> */}
           </>
           }
           <CongratulationModal isModalOpen={isCongratulationModalOpen} closeModal={closeCongratulationsMenu}/>
