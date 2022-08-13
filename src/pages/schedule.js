@@ -17,6 +17,7 @@ export default function Baseball() {
             <Col lg={9} md={12} sm={12}>
                 <TopNavBar/>
                 <CustomFilter heading="Schedule"/>
+                <ScheduleContainer/>
             </Col>
             <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>
                 <BetslipContainer/>
@@ -24,5 +25,50 @@ export default function Baseball() {
             </Col>
         </Row>
         </StyleSchedule>
+    )
+}
+
+const StyleScheduled = styled.div`
+    color: white;
+`
+const days = [
+    {
+        day: 'All'
+    },
+    {
+        day: 'Monday'
+    },
+    {
+        day: 'Tuesday'
+    },
+    {
+        day: 'Wednesday'
+    },
+    {
+        day: 'Thursday'
+    },
+    {
+        day: 'Friday'
+    },
+    {
+        day: 'Saturday'
+    },
+    {
+        day: 'Sunday'
+    },
+]
+const ScheduleContainer = () => {
+
+    const DayItems = (link, i) => {
+        return (
+                <span key={i}>{link.day}</span>
+        )
+    }
+    return (
+        <StyleScheduled>
+            <nav className="d-flex justify-content-between p-2">
+                {days.map(DayItems)}
+            </nav>
+        </StyleScheduled>
     )
 }

@@ -112,9 +112,7 @@ function App({ soccer_data }) {
                         caret_position="right"
                       /> 
 
-                      <Row  className="custom-grid p-2">   
-                        <GameComponent data={soccer_data}/>
-                      </Row>
+                      <GameComponent data={soccer_data}/>
 
                      </div>
                      

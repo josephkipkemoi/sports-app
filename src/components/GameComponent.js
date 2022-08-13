@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Small } from "./Html";
@@ -6,14 +6,14 @@ import { Small } from "./Html";
 export default function GameComponent({ data }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
-
+ 
      const sendBetslip = (e)  => {
   
       const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
       const awayTeam =  e.target.getAttribute('away_team') || localStorage.getItem('away_team');
       const odds = e.target.getAttribute('odds');
       const picked = e.target.getAttribute('picked');
-      const fixtureId = e.target.getAttribute('fixtureid') || localStorage.getItem('fixture_id');
+      const fixtureId = Number(e.target.getAttribute('fixtureid')) || Number(localStorage.getItem('fixture_id'));
       const session_id = sessionStorage.getItem('session_id')
       const market_id = e.target.getAttribute('market_id')
       
@@ -131,14 +131,19 @@ export default function GameComponent({ data }) {
 
       btn[i].classList.add('active')
     }
-     
+ 
     return (
-      <>  
+      <Row  className="custom-grid p-2">  
         {data.map((innerData,index) => {
           const oddsData = JSON.parse(innerData.odds)
           return (
             <React.Fragment key={index + innerData.fixture_date}>
-            <Col lg={8} sm={8} className="card custom-grid-box-main p-2" style={{ borderRight: '0px', border: 'none' }}>  
+            <Col 
+            lg={8} 
+            sm={8} 
+            className="card custom-grid-box-main p-2 text-white" 
+            style={{ borderRight: '0px', border: 'none', background: 'none' }}
+            >  
       
               <Row style={{ marginLeft: 2 }}>
               <h6 className='header text-mute' style={{ letterSpacing: '1px' }}> 
@@ -233,6 +238,6 @@ export default function GameComponent({ data }) {
           
         })}
 
-      </>
+      </Row>
     )
 }

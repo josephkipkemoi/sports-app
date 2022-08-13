@@ -19,6 +19,7 @@ import styled from "styled-components";
 import  Row  from "react-bootstrap/Row";
 import  Col  from "react-bootstrap/Col";
 import Tooltip from "./Tooltip";
+import axios from "../lib/axios";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -210,11 +211,37 @@ const StyleBetslip = styled.div`
 export default function BetslipContainer() {
     const [, setClicked] = useState(false)
     const [userId, setUserId] = useState(null)
-    // const { isAuthenticated } = useAuth({ middleware: 'guest' })
     const [modalOpen, setIsModalOpen] = useState(false)
     const [mobileCartHeight, setMobileCartHeight] = useState('auto')
-  
-    const toggleShareBtn = () => setIsModalOpen(prev => !prev)
+    const [code, setCode] = useState('')
+
+    const postSharedCode = async (session_id, user_id, codes) => {
+      const share_code = session_id.substring(session_id.length, 6);
+        const res = await axios.post('api/social-share/codes', {
+            codes,
+            user_id,
+            share_code,
+        })
+
+        if(res.status === 201) {
+          const { data: { share_code } } = res
+          setCode(share_code)
+          sessionStorage.setItem('session_id', Date.now())
+        }
+    }
+
+    const toggleShareBtn = (e) => {
+      const session_id = sessionStorage.getItem('session_id')
+      const user_id = localStorage.getItem('u_i')
+      const codes = sessionStorage.getItem('fixture_ids')
+     
+      if(e.target.getAttribute('share_code') === 'share_code') {
+        postSharedCode(session_id, user_id, codes)
+      }
+    
+      setIsModalOpen(prev => !prev)
+
+    }
   
     const openMobileBetslip = (e) => {
       const target = e.target.id
@@ -264,24 +291,41 @@ export default function BetslipContainer() {
         
         </div>
           }
-            <div className='btn btn-light btn-sm text-dark shadow-sm'  onClick={toggleShareBtn}>
-              <i className="bi bi-share" style={{ marginRight: '5px' }}></i>
-              <span className='text-dark fw-bold share-btn' >Share</span>
+            <div className='btn btn-light btn-sm text-dark shadow-sm' share_code="share_code"  onClick={toggleShareBtn}>
+              <i className="bi bi-share" style={{ marginRight: '5px' }} share_code="share_code" ></i>
+              <span className='text-dark fw-bold share-btn' share_code="share_code" >Share</span>
             </div>  
         </div>
       )
     }
     
   const EmptyCart = () => {
-      const [code, setCode] = useState('')
     
-      const handleBetCode = (e) => {
-        const betCode = e.target.value
-        setCode(betCode)
-      }
-      const loadBetCode = () => {
-        sessionStorage.setItem('share_code', code)
-        fetchUrlSessionSlip(code)
+      const LoadBetCodeComponent = () => {
+        const [code, setCode] = useState('')
+    
+        const handleBetCode = (e) => {
+          const betCode = e.target.value
+          setCode(betCode)
+        }
+        const loadBetCode = async () => {
+          // const res = await axios.get('api/social-share/codes/show?share_code=9650297')
+          // if(res.status === 200) {
+          //    const { data } = res
+          //    const ids = []
+          //    data.fixtures.map(d => d.map(e => {
+          //     ids.push(e.fixture_id)
+          //     sessionStorage.setItem('shared_ids', JSON.stringify(ids))
+          //     sessionStorage.setItem(e.fixture_id, JSON.stringify(e))
+          //   }))
+          // }
+        }
+        return (
+           <div className=' d-sm-flex'>
+              <input className="form-control shadow w-100 m-1" value={code} placeholder="Bet Code" onChange={handleBetCode}/>   
+              <button className='btn btn-secondary shadow w-100 m-1' onClick={loadBetCode} id="add_code">Add Code</button>        
+            </div>
+        )
       }
         return (
           <div className='card bg-success p-1 shadow empty-mobile'>
@@ -304,25 +348,14 @@ export default function BetslipContainer() {
               <hr/>
               <div className='text-center mb-2'>
                   <span className='d-block m-2' style={{ color: '#ffffff', letterSpacing: 1 }}>Or introduce your bet code:</span>
-                  <Row className='p-2'>
-                    <Col>
-                      <input className="form-control p-2 shadow w-100" value={code} placeholder="Bet Code" onChange={handleBetCode}/>   
-                    </Col>
-                    <Col>
-                      <button className='btn btn-secondary p-2 shadow w-100' onClick={loadBetCode}>Add Betslip Code</button>        
-                    </Col>
-                  </Row>
+                  <LoadBetCodeComponent/>
               </div>      
             </div>
-         
-          
           </div>
         )
     }
   
-  
   const CartElements = (link, i) => {
-    
       const fixId = String(link?.fixture_id).slice(0,6)  
        const removeSingleBetslipFixture = (fixture_id) => {
        
@@ -358,10 +391,10 @@ export default function BetslipContainer() {
   
   const fetchIds = () => {
     const ids = JSON.parse(sessionStorage.getItem('fixture_ids'))
-  
+ 
     const result = ids?.map(id => {
       const data = JSON.parse(sessionStorage.getItem(id))
-   
+     
       return data
     })
   
@@ -371,8 +404,12 @@ export default function BetslipContainer() {
   const listenToClickEvent = () => {
     window.addEventListener('click', (e) => {
    
-      if(e.target.id === 'fix-btn' || e.target.id === 'close-btn') {
+      if(
+        e.target.id === 'fix-btn' ||
+        e.target.id === 'close-btn' 
+       ) {
         setClicked(prev => !prev)
+ 
       }
     })
   }
@@ -384,7 +421,7 @@ export default function BetslipContainer() {
   }, [])
   
   const data = fetchIds()?.filter(v => !!v)
-  
+ 
   return (
     <StyleBetslip >
 
@@ -394,6 +431,7 @@ export default function BetslipContainer() {
         <ShareContainer 
         isModalOpen={modalOpen} 
         toggleShareBtn={toggleShareBtn}
+        share_code={code}
         />
         {data?.length > 0 ?
         <>
@@ -739,14 +777,14 @@ const CongratulationModal = ({ isModalOpen, closeModal }) => {
   }
 
 
-const ShareContainer = ({ isModalOpen, toggleShareBtn }) => {
+const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
     const [session, setSession] = useState('')
     const [isCopied, setIsCopied] = useState(false)
     const [copiedSmall, setCopiedSmall] = useState('none')
     const [copiedSmall2, setCopiedSmall2] = useState('none')
     const [isCodeCopied, setIsCodeCopied] = useState(false)
   
-    const fullUrl = `https://www.bet360.co.ke?sp_s=${session}`
+    const fullUrl = `https://www.bet360.co.ke?sp_s=${share_code}`
     const codeSession = session
   
     const [social, setSocial] = useState({
@@ -890,7 +928,7 @@ const ShareContainer = ({ isModalOpen, toggleShareBtn }) => {
           <span className='d-block'>Or copy the bet code: </span>
             <StlyeInputClipboard>
               <div className='d-flex'>
-                <input className='form-control' value={codeSession} readOnly={true}/>
+                <input className='form-control' value={share_code} readOnly={true}/>
                 <button className='btn btn-secondary' onClick={handleCodeClick}>
                 {isCodeCopied ? 
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-clipboard2-check" viewBox="0 0 16 16">

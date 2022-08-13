@@ -4,6 +4,8 @@ import  Row  from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import  Spinner  from "react-bootstrap/Spinner";
 import axios from "../lib/axios";
+import { Small } from "./Html";
+import GameComponent from './GameComponent';
 
 const StyleSearch = styled.div`
  background: none;
@@ -92,69 +94,9 @@ export default function CustomFilter({ heading }) {
 
 const SearchResults = ({ data }) => {
 
-    const SearchResultItems = (name, i) => {
-  
-      return (
-        <React.Fragment key={i + name.fixture_date}>
-          <hr/>
-        <Col lg={8} sm={8} className="custom-grid-box-main p-2">  
-  
-          <Row style={{ marginLeft: 2 }}>
-          <h5 className='header'> <img src={name.flag} className="img-fluid" style={{ width : 16 }}/> {name.country} | {name.league_name}</h5>
-          <small>{name.fixture_date}</small>
-            <Col lg={1} md={1} sm={1} className="d-flex flex-column justify-content-between">
-              
-                <i className="bi bi-star"></i>
-                
-                <Small onClick={() => displayMoreMarkets(i)}>
-                  {/* {name.unserialized_odds.bookmakers[0].bets.length} */}
-                  <i className="bi bi-arrow-right-short"></i>
-                </Small>
-                
-            </Col>
-            <Col>
-              <span className='d-block'>{name.home} - </span>
-              <span className='d-block'>{name.away}</span>
-            </Col>
-            <Col></Col>
-          </Row>
-                 
-        </Col>
-        <Col lg={4} sm={4} className="d-flex">
-          {/* {name.unserialized_odds.bookmakers[0].bets.map(odd => {             
-            return name.id === 1 && name.values.map((val, i) => {
-               return (
-                 <div key={i+val.name + val.odd} className='text-center mb-3 w-100'>
-                    <span className='header text-center'>{val.value}</span>  
-                   <button 
-                    odds={val.odd} 
-                    className='btn-custom'
-                    btn_id={i}
-                    home_team={data.home} 
-                    market={odd.name} 
-                    away_team={data.away} 
-                    picked={val.value}
-                    fixtureid={data.fixture_id}
-                    onClick={sendBetslip}  
-                    >{val.odd}</button>   
-                                    
-                 </div>
-               )
-             })
-          })} */}
-        </Col>
-        <div className='more-market' style={{ display: 'none' }}>
-          {/* {name.unserialized_odds.bookmakers[0].bets.map(MoreFixtureMarket)} */}
-        </div>
-    
-          <hr/>
-        
-      </React.Fragment>
-      )
-    }
     return (
       <>
-         {data.map(SearchResultItems)}   
+         <GameComponent data={data}/>
       </>
     )
   }
