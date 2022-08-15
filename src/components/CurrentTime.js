@@ -26,7 +26,7 @@ export default function CurrentTime() {
     }, [timer])
     return (
         <StyleTimer>
-           <span className="text-white">{`${hours}:${min}`}</span>
+           <span className="text-white">{`${hours}:${String(min).padStart(2, '0')}`}</span>
         </StyleTimer>
     )
 }

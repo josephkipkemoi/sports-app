@@ -78,8 +78,8 @@ overflow-x: hidden;
 
 `
 
-function App({ soccer_data }) {
-
+function App({ soccer_data, user }) {
+  console.log(user)
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -136,12 +136,12 @@ function App({ soccer_data }) {
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps() {
   const  data  = await axios.get('api/custom_fixture')
-   
+ 
    return {
     props: {
-      soccer_data: data.data.fixtures
+      soccer_data: data.data.fixtures,
     },  
   }
 }
