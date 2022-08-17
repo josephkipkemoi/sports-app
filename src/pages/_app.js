@@ -75,7 +75,7 @@ export default function MyApp({ Component, pageProps }) {
     
     const [queryClient] = useState(() => new QueryClient())
 
-    const { login } = useAuth({ middleware: 'guest' });
+    const { login, user } = useAuth({ middleware: 'guest' });
 
     const [loading, setLoading] = useState(false)
 
@@ -112,7 +112,7 @@ export default function MyApp({ Component, pageProps }) {
             <GlobalStyles/>
             <QueryClientProvider client={queryClient}>
                 <Hydrate state={pageProps.dehydratedState}>
-                    {loading ? <NavWrapper  login={login}>
+                    {loading ? <NavWrapper  login={login} user={user}>
                       <Provider store={store}>
                             <Component  {...pageProps}/>
                         </Provider>
@@ -128,12 +128,10 @@ export default function MyApp({ Component, pageProps }) {
                     </div>
             
                     }
-                    
-           
+
                 </Hydrate>
             </QueryClientProvider>       
             </ThemeProvider>
     )
 }
- 
  

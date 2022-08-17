@@ -74,7 +74,7 @@ const topNavLinks = [
     }
 ]
 
-export default function NavBar({ logout, login }) {
+export default function NavBar({ logout, login, user }) {
 
     const TopNavLinkElements = (link, i) => (        
         <div itemProp="name" key={i} className="nav-item">        
@@ -115,7 +115,7 @@ export default function NavBar({ logout, login }) {
                 </div>
         </nav>
         </StyledTopRightNav>
-        <BottomNavBar logout={logout} login={login}/>
+        <BottomNavBar logout={logout} login={login} user={user}/>
         </>
     )
 }
@@ -226,10 +226,10 @@ display: flex;
   }
 `
  
-const BottomNavBar = ({ login }) => {
+export const BottomNavBar = ({ login, user }) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isDepositModalOpen, setDepositModalOpen] = useState(false)
-    const { isAuthenticated } = useAuth()
+
     const [userDetails, setUserDetails] = useState({
         phone_number: '',
         password: '',
@@ -239,16 +239,17 @@ const BottomNavBar = ({ login }) => {
 
     const [errors, setErrors] = useState([]);
     const [isLoading, setIsLoading] = useState(null);
+    const [isAuth, setIsAuth] = useState(false)
 
     const handleUser = (e) => setUserDetails(prev => ({ ...prev, [e.target.name] : e.target.value }))
 
-    const loginUser = (e) => {
+    const loginUser = async (e) => {
         e.preventDefault()
 
-        login({setErrors, setIsLoading, phone_number, password})   
-      
+        login({setErrors, setIsLoading, setIsAuth, phone_number, password })   
+
     }
- 
+    
     const closeMenu = () => setModalOpen(false) 
  
     const openModal = (e) => {
@@ -270,6 +271,15 @@ const BottomNavBar = ({ login }) => {
         useEffect(() => {
             setScreenSize(window.screen.width)
         }, [])
+    
+    const isAuthenticated =  () => {
+        if(isAuth) {
+            setModalOpen(false)
+        }
+    }
+    useEffect(() => {
+        isAuthenticated()
+     }, [isAuth])
     return (
         <>
             <StyleAuthenticated className="d-flex align-items-center">
@@ -408,7 +418,7 @@ const BottomNavBar = ({ login }) => {
                     </div>
                 </Col>
                 <Col lg={6} md={6} sm={6} className="d-flex justify-content-end align-items-center">     
-                    {isAuthenticated ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   
+                    {!!user?.data ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   
                 </Col>
             </Row>
         </nav>

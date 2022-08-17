@@ -21,6 +21,7 @@ import  Col  from "react-bootstrap/Col";
 import Tooltip from "./Tooltip";
 import axios from "../lib/axios";
 import MobileNavComponent from "./MobileNavComponent";
+import useAuth from "../hooks/auth";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -215,7 +216,6 @@ const StyleBetslip = styled.div`
 
 export default function BetslipContainer() {
     const [, setClicked] = useState(false)
-    const [userId, setUserId] = useState(null)
     const [modalOpen, setIsModalOpen] = useState(false)
     const [mobileCartHeight, setMobileCartHeight] = useState(0)
     const [code, setCode] = useState('')
@@ -419,11 +419,9 @@ export default function BetslipContainer() {
       }
     })
   }
-  
+
   useEffect(() => {
     listenToClickEvent()
-    const userId = localStorage.getItem('u_i')
-    setUserId(userId)
   }, [])
   
   const data = fetchIds()?.filter(v => !!v)
@@ -449,7 +447,6 @@ export default function BetslipContainer() {
            
             <BetCartFormElements 
             betData={data}
-            userId={userId}
             />
            </div>       
         </>
@@ -465,7 +462,7 @@ export default function BetslipContainer() {
   }
 
 
-const BetCartFormElements = ({ betData, userId }) => {
+const BetCartFormElements = ({ betData }) => {
     const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false)
     const [loading, setLoading] = useState(null)
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false)
@@ -475,8 +472,10 @@ const BetCartFormElements = ({ betData, userId }) => {
   
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
     
-    const {data, refetch} = useGetBalanceByUserIdQuery(userId)
-  
+    const { user } = useAuth({ middleware: 'guest' })
+    
+    const {data, refetch} = useGetBalanceByUserIdQuery(user?.data?.id)
+
       const decrementBetAmount = () => {
         if(betAmount <= 50) {
           return
@@ -561,7 +560,7 @@ const BetCartFormElements = ({ betData, userId }) => {
            </div>
           }
          
-          <UserBalanceElement userId={userId}/>
+          <UserBalanceElement />
            {betData?.length !== 0 &&
            <>
            <div className='d-flex align-items-center justify-content-between'>
@@ -592,7 +591,7 @@ const BetCartFormElements = ({ betData, userId }) => {
             <div className="d-flex mb-2">
               <button 
                 ref={linkBarRef}      
-                disabled={loading}
+                disabled={loading || !user?.data.id}
                 className='btn btn-light shadow m-1 text-dark w-100 '
                 style={{ letterSpacing: 1 }}
                 onClick={() => postBetslipCart()}
@@ -617,37 +616,7 @@ const BetCartFormElements = ({ betData, userId }) => {
                   Remove All
                 </button>
             </div>
-            {/* <Row className='mb-3'>          
-              <Col lg={6} sm={12}>
-                <button 
-                ref={linkBarRef}      
-                disabled={loading}
-                className='btn btn-light shadow-sm mb-1 text-dark w-100'
-                style={{ letterSpacing: 1 }}
-                onClick={() => postBetslipCart()}
-                >
-                  {loading ? 
-                  <Spinner
-                  animation="grow"
-                  size="sm"
-                >
-                </Spinner>
-                          :
-                  ''}             
-                {loading ? 'Loading...' : 'Place Bet'}
-                </button>
-              </Col>
-              <Col lg={6} sm={12} className="align-items-center">
-                <button 
-                className='btn btn-danger shadow-sm mb-1 text-light w-100' 
-                id="close-btn"
-                onClick={() => removeBetslipCart()}
-                style={{ letterSpacing: 1 }}
-                >                
-                  Remove All
-                </button>
-              </Col>
-            </Row> */}
+            
           </>
           }
           <CongratulationModal isModalOpen={isCongratulationModalOpen} closeModal={closeCongratulationsMenu}/>
@@ -682,13 +651,13 @@ const BalanceModal = ({ isModalOpen, closeMenu }) => {
 }
 
 
-const UserBalanceElement = ({ userId }) => {
+const UserBalanceElement = () => {
+      const { user } = useAuth({ middleware: 'guest' })
 
-    if(userId) {
-      const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(userId)
+      const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(user?.data.id)
       
       if(error) {
-        return <span>Error...</span>
+        return ''
       }
       if(isLoading) {
         return ''
@@ -718,7 +687,7 @@ const UserBalanceElement = ({ userId }) => {
         }
         </>
       )
-    }
+    
      
   }
 

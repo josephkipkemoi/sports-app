@@ -32,7 +32,6 @@ const StyledHistory = styled.div`
 `
 
 export default function History(){
-
     return (
         <>
             <SportBetsHistoryProfile/>
@@ -773,3 +772,22 @@ const NoBetslipHistory = () => {
         </>
     )
 }
+
+export async function getServerSideProps() {
+    const { user } = await axios.get('api/user')
+  
+    if(!!user?.data.id) {
+       return {
+        redirect: {
+          destination: '/login',
+          permanent: false
+        }
+       }
+    } 
+  
+     return {
+      props: {
+       user: 'JSON.stringify(user?.data.id)',
+      },  
+    }
+  }

@@ -11,7 +11,7 @@ import CustomerInfo from '../components/CustomerInfo';
 import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
-import MobileNavComponent from '../components/MobileNavComponent';
+import { BottomNavBar } from '../components/NavBar';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -78,8 +78,8 @@ overflow-x: hidden;
 
 `
 
-function App({ soccer_data, user }) {
-  console.log(user)
+function App({ soccer_data }) {
+
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -97,7 +97,7 @@ function App({ soccer_data, user }) {
                   <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
                    <StyledMain>
                    <TopNavBar/>
-
+           
                    <CustomFilter heading="Highlights"/>
 
                    <StyleGameData>
@@ -138,7 +138,7 @@ function App({ soccer_data, user }) {
 
 export async function getServerSideProps() {
   const  data  = await axios.get('api/custom_fixture')
- 
+
    return {
     props: {
       soccer_data: data.data.fixtures,

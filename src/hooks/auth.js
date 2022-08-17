@@ -4,26 +4,18 @@ import { useRouter } from 'next/router'
 import useSWR from 'swr'
 
 const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
-    const router = useRouter();
-    const [userSession, setUserSession] = useState(null)
+    // const router = useRouter();
 
     const [isAuthenticated, setIsAuthenticated] = useState(false)
+
     const { data, error, mutate } = useSWR(`api/user`, async () => {
-        // if(!!userSession) {
-        //     const response = await axios.get(`api/user?us_s=${userSession}`)
-        //     if(response.data.status === 200) {
-        //         setIsAuthenticated(true)
-        //     }
-        //     return response.data.user[0]
-        // }
-      
-        // .then(res => res.data)
-        // .catch(e => {
-        //     if(e.response.status !== 409) throw error
+        const user = axios.get('api/user');
+   
+        if(user.data) {
+            setIsAuthenticated(true)
+        }
 
-        //     router.push('/verify-email')
-        // })
-
+        return user
     }
     )
 
@@ -53,27 +45,19 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     }
 
 
-    const login = async ({ setErrors, setIsLoading,...props }) => {
+    const login = async ({ setErrors, setIsLoading, setIsAuth, ...props }) => {
         await csrf()
          
         setErrors([])
         setIsLoading(true)
              axios
             .post('api/login', props)
-            .then((d) => {
-                mutate()
-                if(d.status === 200)
-                {
-                localStorage.removeItem('u_s')
-                localStorage.removeItem('u_i')
-                localStorage.setItem('u_s',d.data.session_cookie)
-                localStorage.setItem('u_i', d.data.session_uid)
-                window.location.pathname = '/'
-                setIsLoading(false)
-                return true
-                }
-
-            })
+            .then((r) =>{
+                 mutate()
+                 if(r.status === 200) {
+                    setIsAuth(true)
+                 }
+                })
             .catch(e => {
                 if(e.response.status !== 422) throw error
 
@@ -81,7 +65,6 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                
                 setIsLoading(false)
             }) 
- 
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
@@ -147,7 +130,6 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         // if( user === null) localStorage.removeItem('u_s')
         if (middleware === 'guest' && redirectIfAuthenticated && data?.user) router.push(redirectIfAuthenticated)
         if(middleware === 'auth' && error) logout()
-        setUserSession(localStorage.getItem('u_s'))
       
         checkIfAuthenticated()
 
