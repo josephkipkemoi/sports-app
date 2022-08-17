@@ -72,10 +72,6 @@ height: 100vh;
 
 const StyledMain = styled.div`
 background: #424242;
-max-height: 100vh;
-overflow-y: scroll;
-overflow-x: hidden;
-
 `
 
 function App({ soccer_data }) {

@@ -491,8 +491,8 @@ const BetCartFormElements = ({ betData }) => {
       }
   
       const postBalanceAfterPlacing = async () => {
-        const res = await axios.post(`api/users/${userId}/balance/decrement`, {
-          'user_id': userId,
+        const res = await axios.post(`api/users/${user?.data?.id}/balance/decrement`, {
+          'user_id': user?.data?.id,
           'amount': betAmount
         } ,
         {
@@ -522,10 +522,9 @@ const BetCartFormElements = ({ betData }) => {
           return
         }   
         const sessionId = Number(sessionStorage.getItem('session_id'))
-        const userId = Number(localStorage.getItem('u_i'))
-  
+ 
         const res = await axios.post('api/users/fixtures/cart', {
-          user_id: userId,
+          user_id: user?.data?.id,
           cart_id: sessionId,
           bet_amount: betAmount,
           possible_payout: possibleWin,
@@ -843,18 +842,6 @@ const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
        console.error(e)
       })
     }
-  
-  // useEffect(() => {
-  //   const sessionId = sessionStorage.getItem('session_id')
-  //   const userId = localStorage.getItem('u_i');
-  //   setUserId(userId)
-  //   fetchSocialLinks(sessionId)
-  //   setSession(sessionId)
-  
-  //  window.addEventListener('click', () => {
-  //     console.log('clicked')
-  //   })
-  // }, [])
   
   return (
       <Modal show={isModalOpen} className="mt-5">

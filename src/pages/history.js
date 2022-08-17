@@ -38,17 +38,14 @@ export default function History(){
         </>
     )
 }
+
 const SportBetsHistoryProfile = () => {
     
-    const [userId, setUserId] = useState(null)
     const router = useRouter()
     const { tab , his_tab} = router.query
+    const { user } = useAuth({ middleware: 'guest' })
 
-    useEffect(() => {
-        const userId = localStorage.getItem('u_i')
-        setUserId(userId)
-    },[ tab])
-
+    const fetchHist = () => console.log('click')
     return (
         <StyledHistory>
             <Row>
@@ -56,12 +53,12 @@ const SportBetsHistoryProfile = () => {
                     <UserProfile />
                 </Col>
                 <Col lg="9" md="9" sm="8">
-                    <HistoryFilter/> 
+                    <HistoryFilter onRefresh={fetchHist}/> 
                     <hr/>    
-                    {tab === 'all' && <AllTabHistory user_id={userId}/>}
-                    {tab === 'settled' && <SettledHistory user_id={userId}/>}
-                    {tab === 'unsettled' && <UnsettledHistory user_id={userId}/>}
-                    {tab === 'search' && <SearchFilterResults user_id={userId}/>}
+                    {tab === 'all' && <AllTabHistory user_id={user?.data.id}/>}
+                    {tab === 'settled' && <SettledHistory user_id={user?.data.id}/>}
+                    {tab === 'unsettled' && <UnsettledHistory user_id={user?.data.id}/>}
+                    {tab === 'search' && <SearchFilterResults user_id={user?.data.id}/>}
                     {his_tab === 'jbets' && <JackpotHistory/>} 
                 </Col>
             </Row>    
@@ -106,7 +103,7 @@ const Pagination = (data) => {
 
 const AllTabHistory = ({ user_id }) => {
 
-    const { data, error, isLoading } = useGetAllUserHistoryBetslipV1Query(user_id)
+    const { data, error, isLoading, refetch } = useGetAllUserHistoryBetslipV1Query(user_id)
  
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
@@ -132,10 +129,16 @@ const AllTabHistory = ({ user_id }) => {
         const historyData = JSON.parse(name.cart)
    
         return (
-            <React.Fragment key={i} >         
+            <React.Fragment key={i}>         
                     <div 
-                    className="card p-3 mt-1 cursor-pointer" 
-                    style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none' }}
+                    className="p-3 m-1 shadow rounded" 
+                    style={{ 
+                        borderBottomRightRadius: 0, 
+                        borderBottomLeftRadius: 0,
+                        borderBottom: 'none', 
+                        cursor: 'pointer',
+                        borderTop: '1px solid lightgray'
+                    }}
                     onClick={() => openMoreMarkets(i)}
                     >
                     <div className='d-flex justify-content-between'>
@@ -205,13 +208,26 @@ const AllTabHistory = ({ user_id }) => {
     }
  
     return (
-        <>
+        <div className='bg-light rounded p-2'>
+        <div className='d-flex justify-content-center m-2'>
+            <button 
+                className='btn btn-outline-success border-0 shadow d-flex align-items-center'
+                onClick={refetch}
+            >
+                Refresh
+                <FontAwesomeIcon
+                    icon={faRefresh}
+                    style={{ marginLeft: 5 }}
+                />
+            </button>
+        </div>
+         
          {data?.data.length > 0 ?
          data.data.map(BetHistoryElements) : 
           <NoBetslipHistory/>}  
 
           {data?.data.length >= 5 && <Pagination data={data}/>} 
-        </>
+        </div>
     )
 }
 
@@ -378,7 +394,7 @@ const SearchFilterResults = ({ user_id }) => {
 }
 
 const UnsettledHistory = ({ user_id }) => {
-    const { data, error, isLoading } = useGetUnsettledHistoryBetslipQuery(user_id)
+    const { data, error, isLoading, refetch } = useGetUnsettledHistoryBetslipQuery(user_id)
 
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
@@ -476,13 +492,25 @@ const UnsettledHistory = ({ user_id }) => {
         )
     }
     return (
-        <>
+        <div className='bg-light rounded p-2'>
+         <div className='d-flex justify-content-center m-2'>
+            <button 
+                className='btn btn-outline-success border-0 shadow d-flex align-items-center'
+                onClick={refetch}
+            >
+                Refresh
+                <FontAwesomeIcon
+                    icon={faRefresh}
+                    style={{ marginLeft: 5 }}
+                />
+            </button>
+        </div>
             {data.data.length > 0 ? 
             data.data.map(UnsettledItems) :
             <NoBetslipHistory/>}
             
           {data?.data.length >= 5 && <Pagination data={data}/>} 
-        </>
+        </div>
     )
 }
 
@@ -510,9 +538,10 @@ const userProfileLinks = [
     }
 ]
 export const UserProfile = () => {
-    const [userId, setUserId] = useState(null);
-      
-    const UserProfileLinkElements = (link, i) => {
+
+    const { user } = useAuth({ middleware: 'guest' })
+
+const UserProfileLinkElements = (link, i) => {
         return (
             <Link key={i} href={link.path}>
                 <a
@@ -525,11 +554,11 @@ export const UserProfile = () => {
                 </a>
             </Link>
         )
-    }
+}
 
-    const BalanceElement = () => {
-        if(userId) {
-            const {data, error, isLoading} = useGetBalanceByUserIdQuery(userId)
+const BalanceElement = () => {
+
+            const {data, error, isLoading} = useGetBalanceByUserIdQuery(user?.data.id)
 
             if(error) {
                 return <span className="d-block fw-bold text-danger mt-1">Error</span>
@@ -540,6 +569,7 @@ export const UserProfile = () => {
             }
     
             const { amount } = data
+
             return (
                 <Span className='d-block fw-bold text-light'  style={{ letterSpacing: '1px' }}>
                     <FontAwesomeIcon 
@@ -552,31 +582,15 @@ export const UserProfile = () => {
                     KES {amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </Span>
             )
-        }
+    
         }
 
     const UserProfileElement = () => {
-        const { data, error, isLoading } = useGetAuthUserQuery(userId)
-
-        if(error) {
-            return <span>Error</span>
-        }
-
-        if(isLoading) {
-            return ''
-        }
-
-        const { user } = data;
-
         return (
-            <Span className='fw-bold' style={{ marginLeft: 10, letterSpacing: '1px' }} >+254{user?.phone_number}</Span>
+            <Span className='fw-bold' style={{ marginLeft: 10, letterSpacing: '1px' }} >+254{user?.data.phone_number}</Span>
         )
     }
        
-    useEffect(() => {
-        const userId = localStorage.getItem('u_i');
-        setUserId(userId)
-    })
     return (
         <StyleUserProfile className='card m-2 p-2 bg-success'>
             <Card className=' shadow text-light p-2 m-2' style={{ background: '#505050' }}>
@@ -629,7 +643,7 @@ const StyleHeaderNav = styled.div`
         margin-left: 12px;
     }
 `
-const HistoryFilter = () => {
+const HistoryFilter = ({ onRefresh }) => {
     const router = useRouter()
     const [dates, setDates] = useState({
         from_date: '',
@@ -679,34 +693,37 @@ const HistoryFilter = () => {
                 </StyleHeaderNav>          
             </div>
             <Row className='d-flex p-2 '>
-            <Col sm="12" md="9" lg="9" className="d-flex mb-2">
-                <StyleFilterBtn >
+            <Col sm="12" md="3" lg="3" className='mb-2'>
+                <StyleFilterBtn className="d-sm-flex justify-content-between align-items-center">
                     <Link href="history?his_tab=sbets&tab=all">
-                        <a itemProp="url">
- 
-                            <button className={`btn btn-outline-light ${tab === 'all' && 'active'}`}>
-                                All
-                            </button>
+                        <a 
+                        itemProp="url" 
+                        className={`btn btn-outline-warning shadow ${tab === 'all' && 'active'}`}
+                        >
+                            All
                         </a>
                     </Link>
                     <Link href="history?his_tab=sbets&tab=settled">
-                        <a itemProp='url'>
-                            <button className={`btn btn-outline-light ${tab === 'settled' && 'active'}`}>
-                                Settled
-                            </button>
+                        <a 
+                        itemProp='url' 
+                        className={`btn btn-outline-warning shadow ${tab === 'settled' && 'active'}`}
+                        style={{ marginLeft: 5 }}
+                        >
+                            Settled
                         </a>
                     </Link>
                     <Link href="history?his_tab=sbets&tab=unsettled">
-                        <a itemProp='url'>
-                            <button className={`btn btn-outline-light ${tab === 'unsettled' && 'active'}`}>
-                                Unsettled
-                            </button>
+                        <a 
+                        itemProp='url' 
+                        className={`btn btn-outline-warning shadow ${tab === 'unsettled' && 'active'}`}
+                        style={{ marginLeft: 5 }}
+                        >
+                            Unsettled
                         </a>
-                    </Link>                   
-                    
+                    </Link>                  
                 </StyleFilterBtn>               
             </Col>
-            <Col sm="12" md="3" lg="3" className='d-flex'>
+            <Col sm="12" md="9" lg="9" className='d-flex justify-content-end'>
                 <StyleSearch >
                     <button 
                     type="search" 
@@ -773,21 +790,4 @@ const NoBetslipHistory = () => {
     )
 }
 
-export async function getServerSideProps() {
-    const { user } = await axios.get('api/user')
-  
-    if(!!user?.data.id) {
-       return {
-        redirect: {
-          destination: '/login',
-          permanent: false
-        }
-       }
-    } 
-  
-     return {
-      props: {
-       user: 'JSON.stringify(user?.data.id)',
-      },  
-    }
-  }
+
