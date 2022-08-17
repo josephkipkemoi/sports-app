@@ -24,19 +24,22 @@ const StyleProfile = styled.div`
     padding-bottom: 24px;
 `
 
-export default function Profile() {
+export default function Profile(d) {
+
     const router = useRouter()
     const { pathname } = router
 
     const { logout } = useAuth({ middleware: 'guest' })
-    
+   
     const logoutUser = (e) => {
         e.preventDefault()
         logout()
     }
 
-    useEffect(() => {
 
+
+    useEffect(() => {
+     
     },[pathname])
     return (
         <StyleProfile>
@@ -71,37 +74,18 @@ export default function Profile() {
 }
 
 const AuthUserProfile = () => {
-    const [userId, setUserId] = useState(null);
 
     const AuthProfileElement = () => {
-
-        if(userId) {
-            const {data, error, isLoading} = useGetAuthUserQuery(userId);
-
-            if(error){
-                return <span className="d-block fw-bold text-danger mt-1">Error</span>
-            }
-        
-            if(isLoading) {
-                return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
-            }
-            const { user } = data 
-
-            sessionStorage.setItem('u_phone_no', user?.phone_number)
-   
+            const { user } = useAuth({ middleware: 'guest' })
             return (
                  <Span className="d-block fw-bold mt-3">
-                  (254) {user?.phone_number}    
+                  (254) {user?.data?.phone_number}    
                 </Span>
             )
-        }
         
+    
     }   
 
-    useEffect(() => {
-        const userId = localStorage.getItem('u_i')
-        setUserId(userId)
-    }, [])
     return (
         <div className="pt-4 text-center">
             <button className="btn btn-secondary rounded-circle p-3 ">
@@ -120,12 +104,12 @@ const AuthUserProfile = () => {
         </div>
     )
 }
- const BalanceComponent = () => {
-    const [userId, setUserId] = useState(null);
+
+const BalanceComponent = () => {
 
     const BalanceElement = () => {
-        if(userId) {
-            const { data, error, isLoading } = useGetBalanceByUserIdQuery(userId)
+            const { user } = useAuth({ middleware: 'guest' })
+            const { data, error, isLoading } = useGetBalanceByUserIdQuery(user?.data.id)
             if(error) {
                 return <span className="d-block fw-bold text-danger mt-1">Error</span>
             }
@@ -136,14 +120,10 @@ const AuthUserProfile = () => {
             return (
                 <Span className="d-block fw-bold" style={{ width: 124 }}>Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
             )
-        }
+    
     
     }
     
-    useEffect(() => {
-        const userId = localStorage.getItem('u_i')
-        setUserId(userId)
-    }, [])
     return (
         <div className="d-sm-flex justify-content-between shadow-sm p-4 mb-4">
             <div >
