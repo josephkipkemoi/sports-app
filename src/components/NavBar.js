@@ -13,6 +13,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { SearchComponent } from "./CustomFilter";
 import CurrentTime from "./CurrentTime";
+import { PersonSvgIcon } from "./Svg";
 
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
@@ -277,16 +278,24 @@ export const BottomNavBar = ({ login, user }) => {
             setModalOpen(false)
         }
     }
+
     useEffect(() => {
         isAuthenticated()
-     }, [isAuth])
+    }, [isAuth])
+
     return (
         <>
+        {/* <div className="d-flex align-items-center">
+            <span className="text-light" style={{ marginRight: 5 }}>Profile</span>
+            <div className="p-2 bg-secondary rounded-circle">               
+                <PersonSvgIcon width="24" height="24" className="text-light"/>          
+            </div>
+        </div> */}
+     
             <StyleAuthenticated className="d-flex align-items-center">
                 <Link href="/notifications">
-                    <a className="btn btn-light btn-sm text-dark shadow-sm border-0">
-                        <i className="bi bi-bell"></i>
-                        <small></small> 
+                    <a className="btn btn-sm text-dark shadow-sm border-0">
+                        <i className="bi bi-bell-fill text-white"></i>
                     </a>
                 </Link>
                 <SearchComponent customClass="custom-search"/>

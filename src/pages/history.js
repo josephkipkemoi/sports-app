@@ -22,6 +22,7 @@ import {    useGetAllUserHistoryBetslipV1Query,
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
+import withSession from '../lib/session';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -31,7 +32,19 @@ const StyledHistory = styled.div`
     }
 `
 
-export default function History(){
+export default function History(props){
+    const router = useRouter()
+    console.log(props)
+    // const fetchUser = async () => {
+    //     const user = await axios.get('api/user')
+ 
+    //     if(Boolean(user.data.id) === false) {
+    //         router.push('/')
+    //     }
+    // }
+    useEffect(() => {
+        // fetchUser()
+    }, [])
     return (
         <>
             <SportBetsHistoryProfile/>
@@ -790,4 +803,4 @@ const NoBetslipHistory = () => {
     )
 }
 
-
+ 
