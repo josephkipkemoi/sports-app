@@ -214,7 +214,7 @@ const StyleBetslip = styled.div`
   }
 `
 
-export default function BetslipContainer() {
+export default function BetslipContainer({ jackpotId }) {
     const [, setClicked] = useState(false)
     const [modalOpen, setIsModalOpen] = useState(false)
     const [mobileCartHeight, setMobileCartHeight] = useState(0)
@@ -264,7 +264,6 @@ export default function BetslipContainer() {
   
     }
     
-  
   const BetslipCartHeader = ({ length }) => {
       return (
         <div 
@@ -426,6 +425,10 @@ export default function BetslipContainer() {
   
   const data = fetchIds()?.filter(v => !!v)
  
+  const jackpotIds = [...new Set(jackpotId)]
+
+  sessionStorage.setItem('jackpot_ids', JSON.stringify(jackpotIds))
+
   return (
     <StyleBetslip >
 
@@ -437,22 +440,25 @@ export default function BetslipContainer() {
         toggleShareBtn={toggleShareBtn}
         share_code={code}
         />
-        {data?.length > 0 ?
-        <>
-           <BetslipCartHeader length={data?.length}/>
-           <div style={{ height: `${mobileCartHeight}` }}>
-            <div  className="mobile-form">
-              {data?.map(CartElements)}
-            </div>
-           
-            <BetCartFormElements 
-            betData={data}
-            />
-           </div>       
-        </>
-        : <EmptyCart/>}
- 
+        {jackpotIds.length > 0 ? <JackpotBetCart /> : 
+         data?.length > 0 ?
+          <>
+             <BetslipCartHeader length={data?.length}/>
+             <div style={{ height: `${mobileCartHeight}` }}>
+              <div  className="mobile-form">
+                {data?.map(CartElements)}
+              </div>
+             
+              <BetCartFormElements 
+              betData={data}
+              />
+             </div>       
+          </>
+          : <EmptyCart/>
+        }
+
       </StyleBetCart>
+ 
       <MobileNavComponent 
       length={data?.length}
       openSlip={openMobileBetslip}
@@ -460,6 +466,100 @@ export default function BetslipContainer() {
       </StyleBetslip>
     )
   }
+
+const StyleJackpotCart = styled.div`
+
+`
+const StyleSubmitButton = styled.button`
+  width: 100%;
+  border-radius: 6px;
+  border: none;
+  // :hover {
+  //   cursor: not-allowed;
+  // }
+  // :hover::before {
+  //   content: 'Log in to place bet';
+  //   position: absolute;
+  //   left: 0;
+  //   margin-left: 10px;
+  //   margin-top: -40px;
+  //   padding: 5px;
+  //   background: white;
+  //   border-radius: 4px;
+  //   letter-spacing: 1px;
+  // }
+`
+
+
+const JackpotBetCart = () => {
+  const { user } = useAuth({ middleware: 'guest' })
+  const [jackpotGames, setJackpotGames] = useState([])
+
+  const fetchJackpotGames = () => {
+    const jackpotIds = JSON.parse(sessionStorage.getItem('jackpot_ids'))
+    
+    const jackpot_games = jackpotIds.map(id => {
+        const games = sessionStorage.getItem(id) 
+        return games
+    })
+
+    setJackpotGames(jackpot_games)
+  }
+
+  const submitJackpot = async () => {
+    const res = await axios.post(`api/jackpot/${user.data.id}/cart`, {
+      user_id: user.data.id,
+      jp_picked: JSON.stringify(jackpotGames)
+    })
+     
+  }
+ 
+  useEffect(() => { 
+    window.addEventListener('click', (e) => {
+       if(e.target.getAttribute('j_click') === 'jp') {
+          fetchJackpotGames()
+       }
+    })
+  }, [])
+
+  const Button = ({ disabled=!user.data } ) => <StyleSubmitButton onClick={submitJackpot} disabled={disabled}>Submit</StyleSubmitButton>
+
+  return (
+    <StyleJackpotCart className="bg-success p-2 mt-1 rounded shadow">
+      <div className="d-flex align-items-center justify-content-between bg-light p-2">
+        <span className="text-dark">Jackpot</span>
+        <i className="bi bi-share text-dark" style={{ marginRight: 5 }}></i>
+      </div>
+      <hr/>
+      <div>
+        {jackpotGames.map((d,i) => {
+            const jData = JSON.parse(d)
+          return (
+            <>
+              <span>{jData.home} - {jData.away}</span>
+              <span>Picked: {jData.picked}</span>
+              <hr/>
+            </>
+          )
+        })}
+      </div>
+  
+      <div className="d-flex justify-content-between">
+        <Button >
+          {/* <button 
+          className=" w-100" 
+          onClick={submitJackpot}
+          disabled={!user.data}
+          > */}
+            
+          {/* </button> */}
+        </Button>
+     
+        <button className="btn btn-danger w-100 shadow">Remove All</button>
+      </div>
+    </StyleJackpotCart>
+  )
+}
 
 
 const BetCartFormElements = ({ betData }) => {
@@ -477,7 +577,7 @@ const BetCartFormElements = ({ betData }) => {
     const {data, refetch} = useGetBalanceByUserIdQuery(user?.data?.id)
 
       const decrementBetAmount = () => {
-        if(betAmount <= 50) {
+        if(betAmount <= 50) { 
           return
         }
         setBetAmount(prev => prev -= configData.INCREMENT_DECREMENT_AMOUNT)

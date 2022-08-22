@@ -33,6 +33,10 @@ const adminLinks = [
     {
         name: 'Customer Feedback',
         path: 'admin?tab=feedback'
+    },
+    {
+        name: 'Jackpot',
+        path: 'admin?tab=jackpot'
     }
 ]
  
@@ -117,7 +121,65 @@ export default function Admin() {
              }
             {tab === 'users' && <UsersProfileComponent/>}
             {tab === 'feedback' && <CustomerFeedback/>}
+            {tab === 'jackpot' && <JackpotComponent/>}
         </StyledAdmin>
+    )
+}
+
+const jackpot_options = [
+    {
+        value: 'Mega Jackpot',
+        label: 'Mega Jackpot'
+    },
+    {
+        value: 'Five Jackpot',
+        label: 'Five Jackpot'
+    }
+];
+
+const JackpotComponent = () => {
+    const [fields, setFields] = useState({
+        jp_home: '',
+        jp_away: '',
+        jp_home_odds: '',
+        jp_draw_odds: '',
+        jp_away_odds: '',
+        jp_time: '',
+        jp_market: ''
+    });
+
+    const handleField = (e) => setFields(prev => ({...prev, [e.target.name]: e.target.value}))
+    const handleMarketField = (e) => setFields(prev => ({...prev, jp_market: e.value}))
+
+    const submitGame = async () => {
+         await axios.post('api/admin/jackpot', fields)
+    }
+
+    return (
+        <Card className="mt-5">
+            <Card.Header>
+                <h4>Jackpot</h4>
+            </Card.Header>
+            <Card.Body>
+                <div>
+                    <Select options={jackpot_options} onChange={handleMarketField} name="jp_market"/>
+                </div>
+                <div className="d-sm-flex">
+                    <input type="text" onChange={handleField} name="jp_home" placeholder="Home Team" className="form-control"/>
+                    <input type="text" onChange={handleField} name="jp_away" placeholder="Away Team" className="form-control"/>
+                    <InputNumber onChange={handleField} name="jp_home_odds"  placeholder="Home Odds" className="form-control"/>
+                    <InputNumber onChange={handleField} name="jp_draw_odds" placeholder="Draw Odds" className="form-control"/>
+                    <InputNumber onChange={handleField} name="jp_away_odds" placeholder="Away Odds" className="form-control"/>
+                    <input onChange={handleField} name="jp_time" type="datetime-local" className="form-control"/>      
+                </div> 
+                <button className="btn btn-primary" onClick={submitGame}>Add Game</button>
+                <div className="mt-3 d-flex">
+                    <Select/>
+                    <button className="btn btn-danger">Remove Game</button>
+                </div>
+                <button className="btn btn-danger mt-4">Remove All</button>
+            </Card.Body>           
+        </Card>
     )
 }
 

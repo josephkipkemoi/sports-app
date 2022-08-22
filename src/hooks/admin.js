@@ -19,6 +19,9 @@ export const AdminApi = createApi({
         }),
         getAllCustomerMessages: builder.query({
             query: () => 'api/support/messages'
+        }),
+        getJackpotFixtures: builder.query({
+            query: (market) => `api/jackpot?jp_market=${market}`
         })
     })
 })
@@ -28,5 +31,6 @@ export const {
      useGetAdminUserBalanceByIdQuery,
      useGetAllFixturesIdsQuery,
      useGetAllCustomerMessagesQuery,
+     useGetJackpotFixturesQuery,
 } = AdminApi
 
