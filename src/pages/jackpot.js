@@ -11,6 +11,7 @@ import { faSoccerBall } from '@fortawesome/free-solid-svg-icons'
 import axios from "../lib/axios";
 import { useGetJackpotFixturesQuery } from "../hooks/admin";
 import GameComponent from '../components/GameComponent';
+import { setRequestMeta } from "next/dist/server/request-meta";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -28,8 +29,16 @@ const StyledJackpot = styled.div`
         margin: 15vh auto;
     }
 `
+const StyleJackpotContainer = styled.div`
+    max-height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+`
 export default function Jackpot() {
-    const [jackpotId, setJackpotId] = useState([])
+    const [megaJackpotId, setMegaJackpotId] = useState([])
+    const [fiveJackpotId, setFiveJackpotId] = useState([])
+
+    const [market, setMarket] = useState('')
 
     const megaJackpotData = useGetJackpotFixturesQuery('Mega Jackpot')
     const fiveJackpotData = useGetJackpotFixturesQuery('Five Jackpot')
@@ -47,27 +56,34 @@ export default function Jackpot() {
             <Row className="px-2">
                 <Col lg="9" md="9" sm="12" style={{ padding: 0 }}> 
                     <TopNavBar/>
+                    <StyleJackpotContainer>
+                        <JackpotContainer 
+                            data={megaJackpotData.data}
+                            setMegaJackpotId={setMegaJackpotId}
+                            setMarket={setMarket}
+                            jackpot="Mega Jackpot"
+                            jackpot_prize="10,134,344.00"
+                            games_count="10"
+                        />
 
-                 
-                    <JackpotContainer 
-                        data={megaJackpotData.data}
-                        setJackpotId={setJackpotId}
-                        jackpot="Mega Jackpot"
-                        jackpot_prize="10,134,344.00"
-                        games_count="10"
-                    />
-
-                    <JackpotContainer 
-                        data={fiveJackpotData.data} 
-                        setJackpotId={setJackpotId}
-                        jackpot="Five Jackpot"
-                        jackpot_prize="5,654,152.00"
-                        games_count="5"
-                    /> 
-                   
+                        <JackpotContainer 
+                            data={fiveJackpotData.data} 
+                            setFiveJackpotId={setFiveJackpotId}
+                            setMarket={setMarket}
+                            jackpot="Five Jackpot"
+                            jackpot_prize="5,654,152.00"
+                            games_count="5"
+                        /> 
+                    </StyleJackpotContainer>                   
                 </Col>
                 <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0 }}>
-                    <BetslipContainer jackpotId={jackpotId}/>
+                    <BetslipContainer 
+                        megaJackpotId={megaJackpotId} 
+                        fiveJackpotId={fiveJackpotId}
+                        setMegaJackpotId={setMegaJackpotId}
+                        setFiveJackpotId={setFiveJackpotId}
+                        market={market}
+                    />
                     <CustomerInfo/>
                 </Col>
             </Row>       
@@ -83,26 +99,47 @@ const NoJackpotAvailable = () => {
     )
 }
 
-const JackpotContainer = ({ data, setJackpotId, jackpot, games_count, jackpot_prize }) => {
+const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, games_count, jackpot_prize, setMarket }) => {
  
     const JackpotItems = (n, i) => {
 
-        const handleData = (e) => {
+        const handleData = (e, btnIndex) => {
             const id = e.target.getAttribute('id')
             const home = e.target.getAttribute('home')
             const away = e.target.getAttribute('away')
             const picked = e.target.getAttribute('picked')
-            
+            const market = e.target.getAttribute('market')
+            const divs = document.getElementsByClassName('mjp_btn_div')[i]
+            const btn = divs.getElementsByClassName('jp_btn')
+ 
+            for(let i = 0; i < btn.length; i++) {
+                btn[i].classList.remove('active')
+            }
+    
+            btn[btnIndex].classList.add('active')
+
             const jData = {
                 home,
                 away,
-                picked
+                picked,
+                market
+            }
+      
+            sessionStorage.setItem(id+market, JSON.stringify(jData))
+
+            if(market === 'Mega Jackpot') {
+                setMegaJackpotId(prev => prev.concat(id))
+                setMarket(market)
+
             }
 
-            sessionStorage.setItem(id, JSON.stringify(jData))
-            setJackpotId(prev => prev.concat(id))
+            if(market === 'Five Jackpot') {
+                setFiveJackpotId(prev => prev.concat(id))
+                setMarket(market)
+            }
+        
         }
-   
+     
         return (
             <div key={i} className="d-flex justify-content-between shadow-sm mb-3">
                 <div className="col-lg-9 col-md-9 col-sm-9 d-flex align-items-center">
@@ -113,42 +150,47 @@ const JackpotContainer = ({ data, setJackpotId, jackpot, games_count, jackpot_pr
                         <span className="text-white">{n.jp_away}</span>
                     </div>
                 </div>
-                <div className="col-lg-3 col-md-3 col-sm-3 d-flex">
+                <div 
+                className={`col-lg-3 col-md-3 col-sm-3 d-flex mjp_btn_div`}
+                >
                     <button 
-                    className="btn btn-success m-1 w-100" 
+                    className={`btn btn-success m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `}
                     style={{ width: '80px' }}
                     home={n.jp_home}
                     away={n.jp_away}
                     id={i}
+                    market={n.jp_market}
                     j_click="jp"
                     picked="Home"
-                    onClick={handleData}
+                    onClick={(e) => handleData(e,0)}
                     disabled={!n.jp_active}
                     >
                         {n.jp_home_odds}
                     </button>
                     <button 
-                    className="btn btn-success m-1 w-100" 
+                    className="btn btn-success m-1 w-100 jp_btn" 
                     style={{ width: '80px' }}
                     home={n.jp_home}
                     j_click="jp"
                     away={n.jp_away}
                     id={i}
+                    market={n.jp_market}
                     picked="Draw"
-                    onClick={handleData}
+                    onClick={(e) => handleData(e,1)}
                     disabled={!n.jp_active}
                     >
                         {n.jp_draw_odds}
                     </button>
                     <button 
-                    className="btn btn-success m-1 w-100" 
+                    className="btn btn-success m-1 w-100 jp_btn" 
                     style={{ width: '80px' }}
                     j_click="jp"
                     home={n.jp_home}
                     away={n.jp_away}
                     id={i}
+                    market={n.jp_market}
                     picked="Away"
-                    onClick={handleData}
+                    onClick={(e) => handleData(e,2)}
                     disabled={!n.jp_active}
                     >
                         {n.jp_away_odds}
@@ -158,33 +200,33 @@ const JackpotContainer = ({ data, setJackpotId, jackpot, games_count, jackpot_pr
         )
     }
     return (
-        <Row className="p-3" style={{ padding: 0, margin: 0 }}>
-            <div 
-            className="d-flex align-items-center justify-content-between text-white p-3 bg-dark rounded shadow-sm mb-3"
-            >
-                <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
-                    <FontAwesomeIcon icon={faSoccerBall} className="text-white"/>
-                </button>
-                <div className="d-flex align-items-center">
-                    <span className="fw-bold" >{jackpot}</span>
-                    <span className="text-warning" style={{ marginRight: 10, marginLeft: 10 }}>
-                        KSH {jackpot_prize}
-                    </span>
-                    <span>{games_count} Games</span>
+            <Row className="p-3" style={{ padding: 0, margin: 0 }}>
+                <div 
+                className="d-flex align-items-center justify-content-between text-white p-3 bg-dark rounded shadow-sm mb-3"
+                >
+                    <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
+                        <FontAwesomeIcon icon={faSoccerBall} className="text-white"/>
+                    </button>
+                    <div className="d-flex align-items-center">
+                        <span className="fw-bold" >{jackpot}</span>
+                        <span className="text-warning" style={{ marginRight: 10, marginLeft: 10 }}>
+                            KSH {jackpot_prize}
+                        </span>
+                        <span>{games_count} Games</span>
+                    </div>
+                    <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
+                        <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>                
+                    </button>
                 </div>
-                <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
-                    <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>                
-                </button>
-            </div>
-            <div className="col-lg-9 col-md-9 col-sm-9"></div>
-            <div className="col-lg-3 col-md-3 col-sm-3">
-                <div className="d-flex justify-content-between text-light text-center">
-                    <span className=" w-100" style={{ width: '80px' }}>Home</span>
-                    <span className=" w-100" style={{ width: '80px' }}>Draw</span>
-                    <span className=" w-100" style={{ width: '80px' }}>Away</span>
+                <div className="col-lg-9 col-md-9 col-sm-9"></div>
+                <div className="col-lg-3 col-md-3 col-sm-3">
+                    <div className="d-flex justify-content-between text-light text-center">
+                        <span className=" w-100" style={{ width: '80px' }}>Home</span>
+                        <span className=" w-100" style={{ width: '80px' }}>Draw</span>
+                        <span className=" w-100" style={{ width: '80px' }}>Away</span>
+                    </div>
                 </div>
-            </div>
-            {data.map(JackpotItems)}
-        </Row>
+                {data.map(JackpotItems)}
+            </Row>
     )
 }

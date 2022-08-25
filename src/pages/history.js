@@ -14,6 +14,7 @@ import { useRouter } from 'next/router';
 import { useGetAllBetHistoryQuery } from '../hooks/betslip';
 import { useGetAuthUserQuery } from '../hooks/customAuth';
 import {    useGetAllUserHistoryBetslipV1Query, 
+            useGetMegaJackpotHistoryQuery, 
             useGetPaginatedHistoryQuery, 
             useGetSettledHistoryBetslipQuery, 
             useGetUnsettledHistoryBetslipQuery, 
@@ -32,9 +33,9 @@ const StyledHistory = styled.div`
     }
 `
 
-export default function History(props){
+export default function History(){
     const router = useRouter()
-    console.log(props)
+    
     // const fetchUser = async () => {
     //     const user = await axios.get('api/user')
  
@@ -58,7 +59,6 @@ const SportBetsHistoryProfile = () => {
     const { tab , his_tab} = router.query
     const { user } = useAuth({ middleware: 'guest' })
 
-    const fetchHist = () => console.log('click')
     return (
         <StyledHistory>
             <Row>
@@ -66,7 +66,7 @@ const SportBetsHistoryProfile = () => {
                     <UserProfile />
                 </Col>
                 <Col lg="9" md="9" sm="8">
-                    <HistoryFilter onRefresh={fetchHist}/> 
+                    <HistoryFilter /> 
                     <hr/>    
                     {tab === 'all' && <AllTabHistory user_id={user?.data.id}/>}
                     {tab === 'settled' && <SettledHistory user_id={user?.data.id}/>}
@@ -80,7 +80,49 @@ const SportBetsHistoryProfile = () => {
     )
 }
 
-const JackpotHistory = () => <NoBetslipHistory/>
+const JackpotHistory = () => {
+    const { user } = useAuth({ middleware: 'guest' })
+    const { data, isLoading, error } = useGetMegaJackpotHistoryQuery(user.data.id)
+    
+    if(isLoading) {
+        return <Spinner animation='grow' />
+    }
+
+    if(error) {
+        return <span>Error</span>
+    }
+ 
+    const JackpotElements = (n, i) => {
+        const jData = JSON.parse(n.jp_picked)
+       
+        return (
+            <Card key={i} className="mb-3">
+                <Card.Header>Mega Jackpot</Card.Header>
+                {jData.map((d,i) => {
+                    const el =JSON.parse(d)
+          
+                    return (
+                        <>
+                            <Card.Body>
+                                <span className='d-block'>Teams: {el.home} - {el.away}</span>
+                                <div className='d-flex justify-content-between'>
+                                    <span>Picked: {el.picked}</span>
+                                    <span>Outcome: pending</span>
+                                </div>
+                            </Card.Body>
+                            <hr/>
+                        </>
+                    )
+                })}
+            </Card>
+        )
+    }
+    return (
+        <>
+          {data.map(JackpotElements)}
+        </>
+        )
+}
 
 
 const Pagination = (data) => {
@@ -656,7 +698,7 @@ const StyleHeaderNav = styled.div`
         margin-left: 12px;
     }
 `
-const HistoryFilter = ({ onRefresh }) => {
+const HistoryFilter = () => {
     const router = useRouter()
     const [dates, setDates] = useState({
         from_date: '',
