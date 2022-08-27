@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import  Row from "react-bootstrap/Row";
 import  Col  from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
@@ -8,10 +8,7 @@ import CustomerInfo from '../components/CustomerInfo';
 import TopNavBar from "../components/TopNavBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSoccerBall } from '@fortawesome/free-solid-svg-icons'
-import axios from "../lib/axios";
 import { useGetJackpotFixturesQuery } from "../hooks/admin";
-import GameComponent from '../components/GameComponent';
-import { setRequestMeta } from "next/dist/server/request-meta";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -43,6 +40,24 @@ export default function Jackpot() {
     const megaJackpotData = useGetJackpotFixturesQuery('Mega Jackpot')
     const fiveJackpotData = useGetJackpotFixturesQuery('Five Jackpot')
  
+    const fetchJackpotGames = () => {
+        const megaJackpotIds = JSON.parse(sessionStorage.getItem('Mega Jackpot'))
+        const fiveJackpotIds = JSON.parse(sessionStorage.getItem('Five Jackpot'))
+
+        if(megaJackpotIds) {
+            setMegaJackpotId(megaJackpotIds)
+        }   
+        if(fiveJackpotIds) {
+            setFiveJackpotId(fiveJackpotIds)
+        }
+    }
+
+    useEffect(() => {
+
+        fetchJackpotGames()
+
+    }, [])
+
     if(megaJackpotData.isLoading || fiveJackpotData.isLoading) {
        return <Spinner animation="grow"/>
     }
@@ -50,11 +65,11 @@ export default function Jackpot() {
     if(megaJackpotData.error || fiveJackpotData.error) {
        return <span>Try again later!</span>
     }
-   
+
     return (
         <StyledJackpot>
             <Row className="px-2">
-                <Col lg="9" md="9" sm="12" style={{ padding: 0 }}> 
+                <Col lg="9" md="9" sm="12" style={{ padding: 0, height: 'auto' }}> 
                     <TopNavBar/>
                     <StyleJackpotContainer>
                         <JackpotContainer 
@@ -76,7 +91,7 @@ export default function Jackpot() {
                         /> 
                     </StyleJackpotContainer>                   
                 </Col>
-                <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0 }}>
+                <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0, height: '100vh', overflowY: 'scroll', overflowX: 'hidden' }}>
                     <BetslipContainer 
                         megaJackpotId={megaJackpotId} 
                         fiveJackpotId={fiveJackpotId}
@@ -122,9 +137,11 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                 home,
                 away,
                 picked,
-                market
+                market,
+                id: i+1,
+                sessionId: i
             }
-      
+ 
             sessionStorage.setItem(id+market, JSON.stringify(jData))
 
             if(market === 'Mega Jackpot') {
@@ -139,7 +156,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
             }
         
         }
-     
+ 
         return (
             <div key={i} className="d-flex justify-content-between shadow-sm mb-3">
                 <div className="col-lg-9 col-md-9 col-sm-9 d-flex align-items-center">
@@ -161,7 +178,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                     id={i}
                     market={n.jp_market}
                     j_click="jp"
-                    picked="Home"
+                    picked={n.jp_home}
                     onClick={(e) => handleData(e,0)}
                     disabled={!n.jp_active}
                     >
@@ -189,7 +206,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                     away={n.jp_away}
                     id={i}
                     market={n.jp_market}
-                    picked="Away"
+                    picked={n.jp_away}
                     onClick={(e) => handleData(e,2)}
                     disabled={!n.jp_active}
                     >

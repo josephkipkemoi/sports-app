@@ -42,6 +42,11 @@ const topNavLinks = [
       icon:  faStar
     }, 
     {
+      name: 'Jackpots',
+      path: '/jackpot',
+      icon: faStar
+    },
+    {
       name: 'Soccer',
       path: '/soccer',
       icon: faSoccerBall

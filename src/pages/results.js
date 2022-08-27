@@ -1,7 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import  Card  from "react-bootstrap/Card";
-import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Support from "../components/Support";
+import CustomerInfo from "../components/CustomerInfo";
+import TopNavBar from "../components/TopNavBar";
 
 const StyleResults = styled.div`
     height: 100vh;
@@ -16,18 +19,18 @@ const StyleResults = styled.div`
 export default function Results() {
     return (
         <StyleResults>
-          <Container className="pt-3">
-                <Card className="bg-light" style={{ border: 'none' }}>
-                    <Card.Header className="bg-success text-center text-light">
-                        <h5>Results</h5>
-                    </Card.Header>
-                    <Card.Body className="text-center">
-                        <div className="card-bb">
-                            <span>Check again later!</span>
-                        </div>
-                    </Card.Body>
-                </Card>
-            </Container>
+            <Row className="px-2">
+                <Col lg="9" md="9" sm="12" style={{ padding: 0 }}>
+                    <TopNavBar/>
+                    <div className="text-center mt-3">
+                        <span className="text-white">Please refresh or check again later!</span>
+                    </div>
+                </Col>
+                <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0 }}>
+                    <CustomerInfo   />
+                </Col>
+            </Row>
+            <Support/>
         </StyleResults>
     )
 }

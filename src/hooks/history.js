@@ -27,7 +27,7 @@ export const HistoryApi = createApi({
             query: ({ userId, pid }) => `${userId}/sessions/${pid}/history`
         }),
         getMegaJackpotHistory: builder.query({
-            query: (user_id) => `jackpot/${user_id}/history`
+            query: ({ user, market }) => `jackpot/${user}/history?jp=${market}`
         })
     })
 })

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Small } from "./Html";
@@ -7,7 +7,7 @@ export default function GameComponent({ data }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
  
-     const sendBetslip = (e)  => {
+    const sendBetslip = (e)  => {
   
       const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
       const awayTeam =  e.target.getAttribute('away_team') || localStorage.getItem('away_team');
@@ -39,9 +39,21 @@ export default function GameComponent({ data }) {
       setId(prev => prev.concat(fixtureId))
 
     }
-
-    sessionStorage.setItem('fixture_ids', JSON.stringify(fixIds))
     
+    const updateFixtureIds = () => {   
+      const fixtureIds = JSON.parse(sessionStorage.getItem('fixture_ids'))
+      if(fixtureIds?.length > 0) {   
+        setId(prev => prev.concat(fixtureIds))
+      } else {
+        sessionStorage.setItem('fixture_ids', JSON.stringify(fixIds))
+      }
+  
+    }
+    
+    if(fixIds?.length > 0) {
+      sessionStorage.setItem('fixture_ids', JSON.stringify(fixIds))
+    }
+
     const displayMoreMarkets = (index, home, away, fixture_id) => {
 
       localStorage.setItem('home_team', home)
@@ -131,6 +143,10 @@ export default function GameComponent({ data }) {
 
       btn[i].classList.add('active')
     }
+
+    useEffect(() => {
+      updateFixtureIds()
+    }, [])
  
     return (
       <Row  className="custom-grid p-2">  

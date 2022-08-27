@@ -11,6 +11,7 @@ import {
     H5, InputNumber, Small, Span, 
  } from '../components/Html';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import  { faShare }  from "@fortawesome/free-solid-svg-icons";
 import Link from 'next/link';
 import configData from '../../config.json';
 import  Modal  from 'react-bootstrap/Modal';
@@ -163,7 +164,6 @@ const StyleBetCart = styled.div`
  
 }
 `
-
 const StyleBetslip = styled.div`
   background-color: #383838;
   padding: 1rem;
@@ -213,13 +213,12 @@ const StyleBetslip = styled.div`
    }
   }
 `
-
 export default function BetslipContainer({ megaJackpotId, market, fiveJackpotId, setMegaJackpotId, setFiveJackpotId }) {
-    const [, setClicked] = useState(false)
+    const [clicked, setClicked] = useState(false)
     const [modalOpen, setIsModalOpen] = useState(false)
     const [mobileCartHeight, setMobileCartHeight] = useState(0)
     const [code, setCode] = useState('')
-
+ 
     const postSharedCode = async (session_id, user_id, codes) => {
       const share_code = session_id.substring(session_id.length, 6);
         const res = await axios.post('api/social-share/codes', {
@@ -268,7 +267,7 @@ const BetslipCartHeader = ({ length }) => {
       return (
         <div 
         className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-        style={{ backgroundColor: '#ffffff', color: '#424242'}} 
+        style={{ backgroundColor: '#ffffff', color: '#424242', borderTopLeftRadius: '6px', borderTopRightRadius: '6px'}} 
         onClick={openMobileBetslip}
         slip="active"
         >
@@ -297,8 +296,8 @@ const BetslipCartHeader = ({ length }) => {
         </div>
           }
             <div className='btn btn-light btn-sm text-dark shadow-sm' share_code="share_code"  onClick={toggleShareBtn}>
-              <i className="bi bi-share" style={{ marginRight: '5px' }} share_code="share_code" ></i>
-              <span className='text-dark fw-bold share-btn' share_code="share_code" >Share</span>
+              <FontAwesomeIcon icon={faShare} style={{ marginRight: '5px' }} share_code="share_code"/>
+              <Small className='text-dark fw-bold share-btn' share_code="share_code" >Share</Small>
             </div>  
         </div>
       )
@@ -360,7 +359,7 @@ const EmptyCart = () => {
         )
 }
   
-  const CartElements = (link, i) => {
+const CartElements = (link, i) => {
       const fixId = String(link?.fixture_id).slice(0,6)  
        const removeSingleBetslipFixture = (fixture_id) => {
        
@@ -392,7 +391,7 @@ const EmptyCart = () => {
             </div>    
           </React.Fragment>
         )
-    }
+}
   
   const fetchIds = () => {
     const ids = JSON.parse(sessionStorage.getItem('fixture_ids'))
@@ -408,26 +407,21 @@ const EmptyCart = () => {
   
   const listenToClickEvent = () => {
     window.addEventListener('click', (e) => {
-   
       if(
         e.target.id === 'fix-btn' ||
-        e.target.id === 'close-btn' 
+        e.target.id === 'close-btn' ||
+        e.target.getAttribute('removebtn') === 'remove-btn'
        ) {
         setClicked(prev => !prev)
- 
       }
     })
   }
 
-  useEffect(() => {
-    listenToClickEvent()
-  }, [])
-  
   const data = fetchIds()?.filter(v => !!v)
  
   const megaJackpotIds = [...new Set(megaJackpotId)]
   const jackpotFiveIds = [...new Set(fiveJackpotId)]
-
+ 
   if(market === 'Mega Jackpot') {
     sessionStorage.setItem(market, JSON.stringify(megaJackpotIds))
   }
@@ -435,10 +429,77 @@ const EmptyCart = () => {
   if(market === 'Five Jackpot') {
     sessionStorage.setItem(market, JSON.stringify(jackpotFiveIds))
   }
+
+  // Fetch jackpot games from loacalstorage
+  const [megaJackpotGames, setMegaJackpotGames] = useState([])
+  const [fiveJackpotGames, setFiveJackpotGames] = useState([])
+
+  const [megaJackpotLength, setMegaJackpotLength] = useState(0)
+  const [jackpotFiveLength, setJackpotFiveLength] = useState(0)
+
+  const jackpotGames = (mjIds, fjIds) => {
+
+      const mega_jackpot_games = mjIds?.map(id => {
+        const games = sessionStorage.getItem(id+"Mega Jackpot") 
+        return games
+      })
+
+      const five_jackpot_games = fjIds?.map(id => {
+        const games = sessionStorage.getItem(id+"Five Jackpot") 
+        return games
+      })
+
+      return {
+        mega: mega_jackpot_games,
+        five: five_jackpot_games,
+      }
+  }
+
+ 
+  const fetchJackpotGames = () => {
+    const megaJackpotIds = JSON.parse(sessionStorage.getItem("Mega Jackpot"))
+    const fiveJackpotIds = JSON.parse(sessionStorage.getItem("Five Jackpot"))
+
+    const {mega, five} = jackpotGames(megaJackpotIds, fiveJackpotIds)
+
+    if(megaJackpotIds) {
+      setMegaJackpotLength(mega?.length)
+      setMegaJackpotGames(mega)
+    }
+
+    if(fiveJackpotIds) {
+      setJackpotFiveLength(five?.length)
+      setFiveJackpotGames(five)
+    }
+
+  }
+
+  useEffect(() => {
+    listenToClickEvent()
+    fetchJackpotGames()
+
+    window.addEventListener('click', ({ target}) => {
+      if(
+        target.getAttribute('j_click') === 'jp' || 
+        target.getAttribute('removebtn') === 'remove-btn'
+      ) {
+        fetchJackpotGames()
+     }
+    })
+  
+  }, [megaJackpotId, fiveJackpotId])
  
   return (
     <StyleBetslip>
-
+      <JackpotBetCart 
+        market={market} 
+        setMegaJackpotId={setMegaJackpotId}
+        setFiveJackpotId={setFiveJackpotId}
+        mj_length={megaJackpotLength}
+        fj_length={jackpotFiveLength}
+        megaJackpotGames={megaJackpotGames}
+        fiveJackpotGames={fiveJackpotGames}
+      /> 
     <StyleBetCart 
     className='betcart-mb card bg-success shadow' 
     >
@@ -447,14 +508,7 @@ const EmptyCart = () => {
         toggleShareBtn={toggleShareBtn}
         share_code={code}
         />
-        <JackpotBetCart 
-          market={market} 
-          setMegaJackpotId={setMegaJackpotId}
-          setFiveJackpotId={setFiveJackpotId}
-          mj_length={megaJackpotIds.length}
-          fj_length={jackpotFiveIds.length}
-        /> 
-
+      
         {
          data?.length > 0 ?
           <>
@@ -465,7 +519,7 @@ const EmptyCart = () => {
               </div>
              
               <BetCartFormElements 
-              betData={data}
+                betData={data}
               />
              </div>       
           </>
@@ -475,22 +529,71 @@ const EmptyCart = () => {
       </StyleBetCart>
  
       <MobileNavComponent 
-      length={data?.length}
-      openSlip={openMobileBetslip}
+        length={data?.length}
+        openSlip={openMobileBetslip}
       />
       </StyleBetslip>
     )
   }
 
 const StyleJackpotCart = styled.div`
-  max-height: 80vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
+border-top-right-radius: 6px;
+border-top-left-radius: 6px;
+.mg-header {
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+.mg-header-len {
+  margin-left: 6px;
+}
+  hr {
+    margin-top: .25rem;
+    margin-bottom: .25rem;
+    padding: 0;
+    color: lightgray;
+  }
 `
+
+const JackpotBetCart = ({ 
+  setMegaJackpotId, 
+  mj_length, 
+  fj_length, 
+  setFiveJackpotId, 
+  megaJackpotGames, 
+  fiveJackpotGames,
+ }) => {
+
+ 
+  return (
+    <>
+    {mj_length > 0 &&  <JackpotCart
+        market={"Mega Jackpot"}   
+        jackpotGames={megaJackpotGames} 
+        // user={user}
+        // data={data}
+        length={mj_length}
+        setMegaJackpotId={setMegaJackpotId} 
+      />}
+
+      { fj_length > 0 &&  <JackpotCart
+        market={"Five Jackpot"}   
+        jackpotGames={fiveJackpotGames} 
+        // user={user}
+        // data={data}
+        length={fj_length}
+        setFiveJackpotId={setFiveJackpotId}
+      />}
+
+    </>
+  )
+}
+
+
 const StyleSubmitButton = styled.button`
   width: 100%;
   border-radius: 6px;
   border: none;
+  margin: .25rem;
   // :hover {
   //   cursor: not-allowed;
   // }
@@ -507,122 +610,14 @@ const StyleSubmitButton = styled.button`
   // }
 `
 
+const JackpotCart = ({ market, jackpotGames, length, setMegaJackpotId, setFiveJackpotId }) => {
 
-const JackpotBetCart = ({ market, setMegaJackpotId, mj_length, fj_length, setFiveJackpotId }) => {
+  const [betAmount, ] = useState(100)
  
-  const { user } = useAuth({ middleware: 'guest' })
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const closeModal = () => setIsModalOpen(false)
  
-  const [megaJackpotGames, setMegaJackpotGames] = useState([])
-  const [fiveJackpotGames, setFiveJackpotGames] = useState([])
-
-  const [megaJackpotLength, setMegaJackpotLength] = useState(0)
-  const [jackpotFiveLength, setJackpotFiveLength] = useState(0)
-
-  const { data , isLoading, error} = useGetBalanceByUserIdQuery(user?.data?.id)
- 
-  const fetchJackpotGames = () => {
-    const jackpotIds = JSON.parse(sessionStorage.getItem(market))
-    
-    if(market === 'Mega Jackpot') {
-      if(jackpotIds && jackpotIds.length > 0 ) {
-        setMegaJackpotLength(jackpotIds.length)
-  
-        const mega_jackpot_games = jackpotIds.map(id => {
-            const games = sessionStorage.getItem(id+market) 
-     
-            return games
-        })
-
-        setMegaJackpotGames(mega_jackpot_games)
-      }
-    
-    } 
-
-    if(market === 'Five Jackpot') {
-      if(jackpotIds && jackpotIds.length > 0) {
-          setJackpotFiveLength(jackpotIds.length)
-
-          const jackpot_five_games = jackpotIds.map(id => {
-            const games = sessionStorage.getItem(id+market) 
-     
-            return games
-          })
-
-          setFiveJackpotGames(jackpot_five_games)
-      }
-    }
-
-  }
-
-
-
-  useEffect(() => { 
-    window.addEventListener('click', (e) => {
-       if(e.target.getAttribute('j_click') === 'jp') {
-          fetchJackpotGames()
-       }
-    })
-  }, [mj_length, fj_length])
-
-  if(isLoading) {
-    return <Spinner animation="grow"/>
-  }
-
-  if(error) {
-    return <span>Error</span>
-  }
-  return (
-    <>
-    {mj_length > 0 &&  <JackpotCart
-        market={"Mega Jackpot"}   
-        jackpotGames={megaJackpotGames} 
-        user={user}
-        data={data}
-        length={megaJackpotLength}
-        setMegaJackpotId={setMegaJackpotId} 
-      />}
-
-      { fj_length > 0 &&  <JackpotCart
-        market={"Five Jackpot"}   
-        jackpotGames={fiveJackpotGames} 
-        user={user}
-        data={data}
-        length={jackpotFiveLength}
-        setFiveJackpotId={setFiveJackpotId}
-      />}
-
-    </>
-  )
-}
-
-const JackpotCart = ({ market, jackpotGames, user, data, length, setMegaJackpotId, setFiveJackpotId }) => {
-  const [betAmount, setBetAmount] = useState(0)
-
-  const submitJackpot = async () => {
-    // if(data.amount < betAmount) {
-    //   alert('Insufficient Balance, Top up to continue')
-    // }
-
-    // if( betAmount > 100) {
-    //   alert('Kshs 100 is accepted per bet')
-    // }
-
-    // const res = await axios.post(`api/jackpot/${user.data.id}/cart`, {
-    //   user_id: user.data.id,
-    //   jp_picked: JSON.stringify(jackpotGames)
-    // })
-    console.log( (market === 'Mega Jackpot' && Number(length) !== 10))
-  }
- 
-  const changeAmount = (e) => setBetAmount(e.target.value)
-
-  const Button = ({ 
-                    disabled=!user.data || 
-                    data.amount < 100 || 
-                    (market === 'Mega Jackpot' && Number(length) !== 10) || 
-                    (market === 'Five Jackpot' && Number(length) !== 5)
-                  }) => <StyleSubmitButton onClick={submitJackpot} disabled={disabled}>Submit</StyleSubmitButton>
-
   const removeJackpotCart = () => {
     if(market === 'Mega Jackpot') {
       setMegaJackpotId([])
@@ -635,49 +630,163 @@ const JackpotCart = ({ market, jackpotGames, user, data, length, setMegaJackpotI
     }
 
   }
+
+  const removeSingleBetslip = (i, market) => {
+    const sessionIds = JSON.parse(sessionStorage.getItem(market))
+    sessionIds.splice(sessionIds.indexOf(String(i)), 1)
+  
+    if(market === 'Mega Jackpot') {
+      setMegaJackpotId(sessionIds)
+      sessionStorage.removeItem(i+market)
+    }
+
+    if(market === 'Five Jackpot') {
+      setFiveJackpotId(sessionIds)
+      sessionStorage.removeItem(i+market)
+    }
+
+  }
  
   return (
-    <StyleJackpotCart className={`bg-${market === 'Mega Jackpot' ? 'success' : 'secondary'} p-2 mt-1 rounded shadow mb-2`}>
-    <div className="d-flex align-items-center justify-content-between bg-light p-2">
-      <span className="text-dark">{market} ({length})</span>
-      <i className="bi bi-share text-dark" style={{ marginRight: 5 }}></i>
-    </div>
-    <hr/>
-    <div>
-      {jackpotGames.map((d,i) => {
+    <StyleJackpotCart className={`bg-${market === 'Mega Jackpot' ? 'dark' : 'dark'} mt-1 rounded shadow mb-2`}>
+      <div className="d-flex justify-content-between align-items-center mb-3 bg-secondary p-1 mg-header" style={{ margin: 0, padding: 0 }}>
+          <span className="text-white fw-bold mg-header-len">{market} ({length})</span>
+          <div className="d-flex align-items-center btn btn-outline-secondary btn-sm">
+            <FontAwesomeIcon className="text-light" icon={faShare}  share_code="share_code"/>
+            <Small className='text-light fw-bold share-btn' style={{ marginLeft: 5 }} share_code="share_code" >Share</Small>
+          </div>
+      </div>
+
+      <div className="mt-3" style={{ paddingLeft: '.55rem', paddingRight: '.55rem' }}>
+        {jackpotGames?.map((d,i) => {
           const jData = JSON.parse(d)
-        return (
-          <React.Fragment key={i}>
-            <span>{jData.home} - {jData.away}</span>
-            <span>Picked: {jData.picked}</span>
-            <hr/>
-          </React.Fragment>
-        )
-      })}
-    </div>
-    <UserBalanceElement />
-    <div className="row mb-3">
-      <Col>
-        <label htmlFor="jp_amount">Bet Amount</label>
-      </Col>
-      <Col>
-        <input id="jp_amount" className="form-control" placeholder="100" onChange={changeAmount}/>
-      </Col>
-    
-    </div>
-    <div className="d-flex justify-content-between">
-      <Button></Button>
-      <button 
-        className="btn btn-danger w-100 shadow"
-        onClick={removeJackpotCart}
-        j_click="jp"
-      >
-        Remove All      
-      </button>
-    </div>
+          return (
+            <React.Fragment key={i}>
+              <div className="d-flex align-items-start justify-content-between">
+                <div>
+                  <span className="d-flex align-items-center">
+                    <Small style={{ marginRight: 9 }}>{jData.id}.</Small>
+                    <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: 6 }}/>
+                    {jData.home} - {jData.away}
+                  </span>
+                  <Small>Your Pick: {jData.picked}</Small>
+                </div>
+                <button 
+                  className="btn btn-sm" 
+                  onClick={() => removeSingleBetslip(jData.sessionId, market)}
+                  removebtn="remove-btn"
+                >
+                  <i removebtn="remove-btn" className="bi bi-x-circle-fill text-light"></i>
+                </button>
+              </div>            
+              <hr/>
+            </React.Fragment>
+          )
+        })}
+      </div>
+
+      <div style={{ paddingLeft: '.55rem', paddingRight: '.55rem' }}>
+        <UserBalanceElement />
+      </div>
+
+      <div className="row mb-3" style={{ paddingLeft: '.55rem', paddingRight: '.55rem' }}>
+        <Col>
+          <Small>Bet Amount</Small>
+        </Col>
+        <Col className="text-end">
+          <Small>KES {betAmount}.00</Small>
+        </Col>      
+      </div>
+      <div className="d-flex justify-content-between" style={{ paddingLeft: '.55rem', paddingRight: '.55rem', paddingBottom: '.75rem' }}>     
+       
+        <button 
+          className="btn btn-secondary w-100 shadow m-1"
+          onClick={removeJackpotCart}
+          j_click="jp"
+        >
+          REMOVE ALL   
+        </button>
+        <SubmitJackpotButton 
+          betAmount={betAmount}
+          setIsModalOpen={setIsModalOpen}
+          market={market}
+          length={length}
+          jackpotGames={jackpotGames}
+        />
+      </div>
+      <CongratulationModal 
+        isModalOpen={isModalOpen} 
+        closeModal={closeModal}
+        historyRoute="history?his_tab=jbets&tab=j_all"
+        market="Jackpot"
+      />
   </StyleJackpotCart>
   )
 }
+
+const SubmitJackpotButton = ({ betAmount, setIsModalOpen, market, length, jackpotGames }) => {
+ 
+  const [loading, setLoading] = useState(false)
+  const { user } = useAuth({ middleware: 'guest' })
+  const { data, refetch } = useGetBalanceByUserIdQuery(user?.data.id)
+
+  const postBalanceAfterPlacing = async () => {
+    const res = await axios.post(`api/users/${user?.data?.id}/balance/decrement`, {
+      'user_id': user?.data?.id,
+      'amount': betAmount
+    } ,
+    {
+      headers: {
+        'x-sportsapp-key': configData.SPORTS_APP_KEY
+      }
+    })
+
+    if(res.status === 200) {
+      refetch()
+    }
+  }
+
+  const submitJackpot = async () => {
+    setLoading(true)
+    if(data.amount < betAmount) {
+      alert('Insufficient Balance, Top up to continue')
+    }
+
+    if( betAmount > 100) {
+      alert('Kshs 100 is accepted per bet')
+    }
+
+    const { status } = await axios.post(`api/jackpot/${user.data.id}/cart`, {
+      user_id: user.data.id,
+      jp_picked: JSON.stringify(jackpotGames),
+      jp_market: market
+    })
+ 
+    if(status === 201) {
+      postBalanceAfterPlacing()
+      setLoading(false)
+      setIsModalOpen(true)
+    }
+    
+  }
+ 
+  const Button = ({ 
+    disabled=!user?.data.id ||
+    betAmount < 100 || 
+    (market === 'Mega Jackpot' && Number(length) !== 10) || 
+    (market === 'Five Jackpot' && Number(length) !== 5)
+  }) => <StyleSubmitButton onClick={submitJackpot} disabled={disabled}>
+          {loading ? <Spinner animation="grow"/> : 'PLACE BET'}
+        </StyleSubmitButton>
+
+  return (
+    <>
+       <Button></Button>
+    </>
+  )
+}
+
+
 
 
 const BetCartFormElements = ({ betData }) => {
@@ -836,13 +945,16 @@ const BetCartFormElements = ({ betData }) => {
             
           </>
           }
-          <CongratulationModal isModalOpen={isCongratulationModalOpen} closeModal={closeCongratulationsMenu}/>
+          <CongratulationModal 
+            isModalOpen={isCongratulationModalOpen} 
+            closeModal={closeCongratulationsMenu}
+            historyRoute="history?his_tab=sbets&tab=all"
+            market="Bet"
+          />
           <BalanceModal isModalOpen={isBalanceModalOpen} closeMenu={closeMenu}/>
           </div>
       )
-  }
-
-
+}
 
 const BalanceModal = ({ isModalOpen, closeMenu }) => {
     return (
@@ -867,7 +979,6 @@ const BalanceModal = ({ isModalOpen, closeMenu }) => {
     )
 }
 
-
 const UserBalanceElement = () => {
       const { user } = useAuth({ middleware: 'guest' })
 
@@ -884,7 +995,7 @@ const UserBalanceElement = () => {
     
       return (
         <>
-         { true ? 
+         { !!user.data.id ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
             <Small>Balance:</Small>
             <Small className='fw-bold'>
@@ -906,10 +1017,9 @@ const UserBalanceElement = () => {
       )
     
      
-  }
+}
 
-  
-const CongratulationModal = ({ isModalOpen, closeModal }) => {
+const CongratulationModal = ({ isModalOpen, closeModal, historyRoute, market }) => {
 
     const Stars = () => {
       return (
@@ -972,7 +1082,9 @@ const CongratulationModal = ({ isModalOpen, closeModal }) => {
             </div>
           <StyleCongratulationsModalMidMenu className='text-center mt-3 mb-3'>
             <h1 modalId="modal-ref" className='fw-bold text-light'>Congratulations!</h1>
-            <h3 className='mt-2 mb-4 text-light'>You have placed your bet successfully!</h3>
+            <h3 className='mt-2 mb-4 text-light'>
+              {market} placed successfully!
+            </h3>
             <div className='d-flex'>
               <Link href='#'>
                 <a
@@ -983,7 +1095,7 @@ const CongratulationModal = ({ isModalOpen, closeModal }) => {
                   <small className='small-position'>Share</small>
                 </a>
                 </Link>
-                <Link href='/history?his_tab=sbets&tab=all'>
+                <Link href={historyRoute}>
                 <a
                   itemProp='url'
                   className='btn btn-warning w-100 mt-2 m-1 shadow-lg d-flex justify-content-center'
@@ -999,8 +1111,7 @@ const CongratulationModal = ({ isModalOpen, closeModal }) => {
         </Modal.Body>                            
      </Modal>
       )
-  }
-
+}
 
 const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
     const [session, setSession] = useState('')
@@ -1169,6 +1280,6 @@ const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
         
       </Modal>
     )
-  }
+}
   
   

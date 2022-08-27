@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
 import Modal from 'react-bootstrap/Modal';
 import styled from 'styled-components';
-import { Span } from '../components/Html';
+import { Small, Span } from '../components/Html';
 import useAuth from '../hooks/auth';
 import axios from '../lib/axios';
 import Card from 'react-bootstrap/Card';
@@ -23,7 +23,8 @@ import {    useGetAllUserHistoryBetslipV1Query,
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
-import withSession from '../lib/session';
+import JackpotComponent from '../components/JackpotComponent';
+import Pagination from '../components/Pagination';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -34,18 +35,7 @@ const StyledHistory = styled.div`
 `
 
 export default function History(){
-    const router = useRouter()
-    
-    // const fetchUser = async () => {
-    //     const user = await axios.get('api/user')
- 
-    //     if(Boolean(user.data.id) === false) {
-    //         router.push('/')
-    //     }
-    // }
-    useEffect(() => {
-        // fetchUser()
-    }, [])
+  
     return (
         <>
             <SportBetsHistoryProfile/>
@@ -72,7 +62,9 @@ const SportBetsHistoryProfile = () => {
                     {tab === 'settled' && <SettledHistory user_id={user?.data.id}/>}
                     {tab === 'unsettled' && <UnsettledHistory user_id={user?.data.id}/>}
                     {tab === 'search' && <SearchFilterResults user_id={user?.data.id}/>}
-                    {his_tab === 'jbets' && <JackpotHistory/>} 
+                    {(his_tab === 'jbets' && tab === 'j_all') && <AllJackpotHistory user_id={user?.data.id}/>} 
+                    {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={user?.data.id}/>} 
+                    {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={user?.data.id}/>} 
                 </Col>
             </Row>    
             <Support/>       
@@ -80,10 +72,74 @@ const SportBetsHistoryProfile = () => {
     )
 }
 
-const JackpotHistory = () => {
-    const { user } = useAuth({ middleware: 'guest' })
-    const { data, isLoading, error } = useGetMegaJackpotHistoryQuery(user.data.id)
-    
+const AllJackpotHistory = ({ user_id }) => {
+    const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'All'})
+ 
+    if(isLoading) {
+        return <Spinner animation='grow' />
+    }
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+    return (
+        <>
+           <button 
+               className='btn btn-light border-0 shadow-sm d-flex align-items-center mx-auto mb-3'
+               onClick={refetch}
+           >
+               Refresh
+               <FontAwesomeIcon
+                   icon={faRefresh}
+                   style={{ marginLeft: 5 }}
+               />
+           </button>
+        
+        {data.data.length > 0 ? 
+            <div className='bg-dark p-2 rounded'>
+           <JackpotComponent data={data}/>
+           </div> 
+       : <NoBetslipHistory/>}
+       </>
+    )
+}
+
+const MegaJackpotHistory = ({ user_id }) => {
+    const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Mega Jackpot'})
+ 
+    if(isLoading) {
+        return <Spinner animation='grow' />
+    }
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+    return (
+        <>
+           <button 
+               className='btn btn-light border-0 shadow-sm d-flex align-items-center mx-auto mb-3'
+               onClick={refetch}
+           >
+               Refresh
+               <FontAwesomeIcon
+                   icon={faRefresh}
+                   style={{ marginLeft: 5 }}
+               />
+           </button>
+        {data.data.length > 0 ? 
+           <div className='bg-dark p-2 rounded'>
+           <JackpotComponent data={data}/>
+       </div> 
+       : <NoBetslipHistory/>}
+       </> 
+    )
+}
+
+const FiveJackpotHistory = ({ user_id }) => {
+    const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Five Jackpot'})
+ 
     if(isLoading) {
         return <Spinner animation='grow' />
     }
@@ -92,67 +148,25 @@ const JackpotHistory = () => {
         return <span>Error</span>
     }
  
-    const JackpotElements = (n, i) => {
-        const jData = JSON.parse(n.jp_picked)
-       
-        return (
-            <Card key={i} className="mb-3">
-                <Card.Header>Mega Jackpot</Card.Header>
-                {jData.map((d,i) => {
-                    const el =JSON.parse(d)
-          
-                    return (
-                        <>
-                            <Card.Body>
-                                <span className='d-block'>Teams: {el.home} - {el.away}</span>
-                                <div className='d-flex justify-content-between'>
-                                    <span>Picked: {el.picked}</span>
-                                    <span>Outcome: pending</span>
-                                </div>
-                            </Card.Body>
-                            <hr/>
-                        </>
-                    )
-                })}
-            </Card>
-        )
-    }
     return (
         <>
-          {data.map(JackpotElements)}
+          <button 
+                className='btn btn-light border-0 shadow-sm d-flex align-items-center mx-auto mb-3'
+                onClick={refetch}
+            >
+                Refresh
+                <FontAwesomeIcon
+                    icon={faRefresh}
+                    style={{ marginLeft: 5 }}
+                />
+            </button>
+         {data.data.length > 0 ? 
+            <div className='bg-dark p-2 rounded'>
+          
+            <JackpotComponent data={data}/>
+        </div> 
+        : <NoBetslipHistory/>}
         </>
-        )
-}
-
-
-const Pagination = (data) => {
-
-    const PaginationItems = (name, i) => {
-        return (
-           <React.Fragment key={i}>
-               {name.label === 'pagination.previous' 
-                && <li className={`page-item ${name.active && 'active'} ${(name.label === 'pagination.previous' && name.url === null) && 'disabled'}`}>
-                <a className="page-link" href="#" tabIndex="-1">Previous</a>
-                </li>}
-                {(name.label  !== 'pagination.next' && name.label !== 'pagination.previous') && 
-                <li className={`page-item ${name.active && 'active'}`}><a className="page-link" href="#">{name.label}</a></li>
-                }
-                {name.label === 'pagination.next' 
-                && <li className={`page-item ${name.active && 'active'} ${(name.label === 'pagination.next' && name.url === null) && 'disabled'}`}>
-                <a className="page-link" href="#" tabIndex="-1">Next</a>
-                </li>}
-              
-           </React.Fragment>
-        )
-    }
-    return (
-          <>
-           <nav aria-label="History page navigation" >
-            <ul className="pagination d-flex justify-content-center" >
-                {data.data.links.map(PaginationItems)}
-                </ul>
-           </nav>            
-          </>
     )
 }
 
@@ -242,7 +256,7 @@ const AllTabHistory = ({ user_id }) => {
                     >
                     {historyData.map((d,i) => {       
                         return (
-                            <div className='card p-3 mb-2 shadow '>
+                            <div className='card p-3 mb-2 shadow' key={i}>
                                 <div>
                                     <small>Game ID: {d.fixture_id}</small>
                                     <span className='d-block text-center bg-success rounded text-light p-1 m-1'>{d.betslip_teams}</span>
@@ -263,10 +277,10 @@ const AllTabHistory = ({ user_id }) => {
     }
  
     return (
-        <div className='bg-light rounded p-2'>
-        <div className='d-flex justify-content-center m-2'>
+        <>
+            <div className='d-flex justify-content-center '>
             <button 
-                className='btn btn-outline-success border-0 shadow d-flex align-items-center'
+                className='btn btn-light border-0 shadow-sm d-flex align-items-center '
                 onClick={refetch}
             >
                 Refresh
@@ -276,13 +290,18 @@ const AllTabHistory = ({ user_id }) => {
                 />
             </button>
         </div>
-         
-         {data?.data.length > 0 ?
-         data.data.map(BetHistoryElements) : 
+          {data?.data.length > 0 ?
+          <>]
+           <div className='bg-light rounded p-2'>
+            {data.data.map(BetHistoryElements) }
+            {data?.data.length >= 5 && <Pagination data={data}/>} 
+            </div>
+          
+          </>
+        : 
           <NoBetslipHistory/>}  
-
-          {data?.data.length >= 5 && <Pagination data={data}/>} 
-        </div>
+        </>
+       
     )
 }
 
@@ -299,7 +318,7 @@ const SettledHistory = ({ user_id }) => {
     </div>
     }
 
-    const SettledItems = (name , i) => {
+const SettledItems = (name , i) => {
         const historyData = JSON.parse(name.cart)
                 return (
                     <React.Fragment key={i}>
@@ -547,10 +566,10 @@ const UnsettledHistory = ({ user_id }) => {
         )
     }
     return (
-        <div className='bg-light rounded p-2'>
-         <div className='d-flex justify-content-center m-2'>
+        <>
+         <div className='d-flex justify-content-center mb-2'>
             <button 
-                className='btn btn-outline-success border-0 shadow d-flex align-items-center'
+                className='btn btn-outline-success border-0 shadow-sm d-flex align-items-center'
                 onClick={refetch}
             >
                 Refresh
@@ -560,12 +579,16 @@ const UnsettledHistory = ({ user_id }) => {
                 />
             </button>
         </div>
+
             {data.data.length > 0 ? 
-            data.data.map(UnsettledItems) :
-            <NoBetslipHistory/>}
-            
-          {data?.data.length >= 5 && <Pagination data={data}/>} 
-        </div>
+                <div className='bg-light rounded p-2'>
+            {data.data.map(UnsettledItems)}
+             
+            {data?.data.length >= 5 && <Pagination data={data}/>} 
+        </div> : <NoBetslipHistory/>}
+           
+        </>
+     
     )
 }
 
@@ -612,32 +635,32 @@ const UserProfileLinkElements = (link, i) => {
 }
 
 const BalanceElement = () => {
+    if(user) {
+        const {data, error, isLoading} = useGetBalanceByUserIdQuery(user?.data.id)
 
-            const {data, error, isLoading} = useGetBalanceByUserIdQuery(user?.data.id)
+        if(error) {
+            return <span className="d-block fw-bold text-danger mt-1">Error</span>
+        }
 
-            if(error) {
-                return <span className="d-block fw-bold text-danger mt-1">Error</span>
-            }
-    
-            if(isLoading) {
-                return ''
-            }
-    
-            const { amount } = data
+        if(isLoading) {
+            return ''
+        }
 
-            return (
-                <Span className='d-block fw-bold text-light'  style={{ letterSpacing: '1px' }}>
-                    <FontAwesomeIcon 
-                    icon={faRefresh} 
-                    style={{ 
-                        cursor: 'pointer',
-                        paddingRight: 4, 
-                    }}
-                    />
-                    KES {amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                </Span>
-            )
-    
+        const { amount } = data
+
+        return (
+            <Span className='d-block fw-bold text-light'  style={{ letterSpacing: '1px' }}>
+                <FontAwesomeIcon 
+                icon={faRefresh} 
+                style={{ 
+                    cursor: 'pointer',
+                    paddingRight: 4, 
+                }}
+                />
+                KES {amount?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </Span>
+        )
+    }
         }
 
     const UserProfileElement = () => {
@@ -717,6 +740,45 @@ const HistoryFilter = () => {
     const filterDate = (e) => {
         setDates(prev => ({...prev, [e.target.name]: e.target.value}))
     }
+
+    const SportBetsLinks = () => {
+        return (
+            <StyleFilterBtn className="d-sm-flex justify-content-between align-items-center">
+                <Link 
+                    href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=all' : 'history?his_tab=jbets&tab=j_all'}`}
+                >
+                    <a 
+                    itemProp="url" 
+                    className={`btn btn-outline-warning shadow ${tab === 'all' || tab === 'j_all' && 'active'}`}
+                    >
+                        All
+                    </a>
+                </Link>
+                <Link 
+                    href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=settled' : 'history?his_tab=jbets&tab=mega_jackpot'} `}
+                >
+                    <a 
+                    itemProp='url' 
+                    className={`btn btn-outline-warning shadow ${tab === 'settled' || tab === 'mega_jackpot' && 'active'}`}
+                    style={{ marginLeft: 5 }}
+                    >
+                        {his_tab === 'sbets' ? "Settled" : "Mega Jackpot"}
+                    </a>
+                </Link>
+                <Link 
+                    href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=unsettled' : 'history?his_tab=jbets&tab=five_jackpot' }`}
+                >
+                    <a 
+                    itemProp='url' 
+                    className={`btn btn-outline-warning shadow ${tab === 'unsettled' || tab === 'five_jackpot' && 'active'}`}
+                    style={{ marginLeft: 5 }}
+                    >
+                        {his_tab === 'sbets' ? "Unsettled" : "Five Jackpot"}
+                    </a>
+                </Link>                  
+            </StyleFilterBtn>  
+        )
+    }
     return (
         <div className='history-header mb-3 card m-2 p-2 bg-success'>
             <div>
@@ -749,34 +811,7 @@ const HistoryFilter = () => {
             </div>
             <Row className='d-flex p-2 '>
             <Col sm="12" md="3" lg="3" className='mb-2'>
-                <StyleFilterBtn className="d-sm-flex justify-content-between align-items-center">
-                    <Link href="history?his_tab=sbets&tab=all">
-                        <a 
-                        itemProp="url" 
-                        className={`btn btn-outline-warning shadow ${tab === 'all' && 'active'}`}
-                        >
-                            All
-                        </a>
-                    </Link>
-                    <Link href="history?his_tab=sbets&tab=settled">
-                        <a 
-                        itemProp='url' 
-                        className={`btn btn-outline-warning shadow ${tab === 'settled' && 'active'}`}
-                        style={{ marginLeft: 5 }}
-                        >
-                            Settled
-                        </a>
-                    </Link>
-                    <Link href="history?his_tab=sbets&tab=unsettled">
-                        <a 
-                        itemProp='url' 
-                        className={`btn btn-outline-warning shadow ${tab === 'unsettled' && 'active'}`}
-                        style={{ marginLeft: 5 }}
-                        >
-                            Unsettled
-                        </a>
-                    </Link>                  
-                </StyleFilterBtn>               
+                <SportBetsLinks />          
             </Col>
             <Col sm="12" md="9" lg="9" className='d-flex justify-content-end'>
                 <StyleSearch >
