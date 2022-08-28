@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import  { 
     faStar, 
+    faMoneyBills,
     faSoccerBall,
     faTableTennis, 
     faGlobeAmericas,
@@ -44,7 +45,7 @@ const topNavLinks = [
     {
       name: 'Jackpots',
       path: '/jackpot',
-      icon: faStar
+      icon: faMoneyBills
     },
     {
       name: 'Soccer',

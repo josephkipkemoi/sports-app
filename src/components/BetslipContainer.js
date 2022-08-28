@@ -619,6 +619,7 @@ const JackpotCart = ({ market, jackpotGames, length, setMegaJackpotId, setFiveJa
   const closeModal = () => setIsModalOpen(false)
  
   const removeJackpotCart = () => {
+
     if(market === 'Mega Jackpot') {
       setMegaJackpotId([])
       sessionStorage.removeItem(market)

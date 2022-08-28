@@ -10,8 +10,8 @@ import  Button from "react-bootstrap/Button";
 import  Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import Select from "react-select";
-import { InputNumber } from "../components/Html";
-import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery, useGetAllFixturesIdsQuery, useGetAllCustomerMessagesQuery } from "../hooks/admin";
+import { InputNumber, Small } from "../components/Html";
+import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery, useGetAllFixturesIdsQuery, useGetAllCustomerMessagesQuery, useGetJackpotFixturesQuery } from "../hooks/admin";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 import Collapse from "react-bootstrap/Collapse";
 import { PhoneSvgIcon } from "../components/Svg";
@@ -137,7 +137,9 @@ const jackpot_options = [
     }
 ];
 
+
 const JackpotComponent = () => {
+
     const [fields, setFields] = useState({
         jp_home: '',
         jp_away: '',
@@ -145,14 +147,57 @@ const JackpotComponent = () => {
         jp_draw_odds: '',
         jp_away_odds: '',
         jp_time: '',
-        jp_market: ''
+        jp_market: '',
+        jp_active: true
     });
+
+    const [jackpotId, setJackpotId] = useState('');
+
+    const megaJackpotData = useGetJackpotFixturesQuery('Mega Jackpot')
+    const fiveJackpotData = useGetJackpotFixturesQuery('Five Jackpot')
+
+    if(megaJackpotData.isLoading || fiveJackpotData.isLoading) {
+        return <Spinner animation="grow"/>
+     }
+ 
+    if(megaJackpotData.error || fiveJackpotData.error) {
+        return <span>Try again later!</span>
+    }
+
+    const mega_jackpot_id_options = megaJackpotData.data.map(d => ({label: d.id,value: d.id}) )
+    const five_jackpot_id_options = fiveJackpotData.data.map(d => ({label: d.id,value: d.id}))
 
     const handleField = (e) => setFields(prev => ({...prev, [e.target.name]: e.target.value}))
     const handleMarketField = (e) => setFields(prev => ({...prev, jp_market: e.value}))
 
     const submitGame = async () => {
-         await axios.post('api/admin/jackpot', fields)
+        const res = await axios.post('api/admin/jackpot', fields)
+  
+        if(res.status === 201 && fields.jp_market === "Mega Jackpot") {
+            megaJackpotData.refetch()
+        }
+        if(res.status === 201 && fields.jp_market === "Five Jackpot") {
+            fiveJackpotData.refetch()
+        }
+    }
+
+    const updateGame = async () => {
+       await axios.patch(`api/admin/jackpot/${jackpotId}/patch`, fields)
+         
+    }
+
+    const updateJackpotId = ({ value }) => setJackpotId(value)
+
+    const deactivateJackpotMarket = async () => {
+        await axios.patch(`api/admin/jackpot/${fields.jp_market}/status`, {
+            jp_active: false
+        })
+    }
+
+    const activateJackpotMarket = async () => {
+        await axios.patch(`api/admin/jackpot/${fields.jp_market}/status`, {
+            jp_active: true
+        })
     }
 
     return (
@@ -160,24 +205,151 @@ const JackpotComponent = () => {
             <Card.Header>
                 <h4>Jackpot</h4>
             </Card.Header>
-            <Card.Body>
-                <div>
-                    <Select options={jackpot_options} onChange={handleMarketField} name="jp_market"/>
+            <Card.Body className="px-4">
+                <Row className="gx-2">
+                    <h5 className="text-center fw-bold bg-primary p-2 text-white">Add/Update Games to  {fields.jp_market}</h5>
+                    <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
+                        <div >
+                            <Small className="text-dark">Jackpot Market</Small>
+                            <Select 
+                                className="mb-2" 
+                                options={jackpot_options} 
+                                onChange={handleMarketField} 
+                                name="jp_market" 
+                            />                      
+                            <hr className="text-white"/>
+                            <Small className="text-dark">Select ID to Update</Small>
+                            <Select 
+                                options={ fields.jp_market === 'Mega Jackpot' ? mega_jackpot_id_options : five_jackpot_id_options}
+                                onChange={updateJackpotId}
+                            />
+                        </div>
+                    </Col>
+                    <Col className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
+                        <div >
+                            <Small className="text-dark">
+                                Games Added: 
+                                {fields.jp_market === "Mega Jackpot" ? megaJackpotData.data.length : fiveJackpotData.data.length}
+                            </Small>
+                            <div className="d-flex">
+                                <input 
+                                    type="text" 
+                                    onChange={handleField} 
+                                    name="jp_home" 
+                                    placeholder="Home Team" 
+                                    className="form-control m-1"
+                                />
+                                <input 
+                                    type="text" 
+                                    onChange={handleField}
+                                    name="jp_away" 
+                                    placeholder="Away Team" 
+                                    className="form-control m-1"
+                                />
+                            </div>
+                            <div className="d-flex">
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="jp_home_odds"  
+                                    placeholder="Home Odds" 
+                                    className="form-control m-1"
+                                />
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="jp_draw_odds" 
+                                    placeholder="Draw Odds" 
+                                    className="form-control m-1"
+                                />
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="jp_away_odds" 
+                                    placeholder="Away Odds" 
+                                    className="form-control m-1"
+                                />
+                                <input 
+                                    onChange={handleField} 
+                                    name="jp_time" 
+                                    type="datetime-local" 
+                                    className="form-control m-1"
+                                />      
+                            </div>
+                            <div>
+                                <button 
+                                    className="btn btn-primary m-1" 
+                                    onClick={submitGame}
+                                    disabled={
+                                        (fields.jp_market === 'Mega Jackpot' && megaJackpotData.data.length === 10 ) ||
+                                        (fields.jp_market === 'Five Jackpot' && fiveJackpotData.data.length === 5 ) 
+                                    }
+                                >
+                                    Add Game
+                                </button>
+                                <button
+                                className="btn btn-warning m-1" 
+                                onClick={updateGame}
+                                disabled={
+                                    (fields.jp_market === 'Mega Jackpot' && megaJackpotData.data.length < 10 ) ||
+                                    (fields.jp_market === 'Five Jackpot' && fiveJackpotData.data.length < 5 ) 
+                                }
+                                >
+                                    Update Game
+                                </button>
+                                <button 
+                                className="btn btn-danger m-1"
+                                onClick={activateJackpotMarket}
+                                >
+                                    Activate Jackpot
+                                </button>
+                                <button 
+                                className="btn btn-danger m-1"
+                                onClick={deactivateJackpotMarket}
+                                >
+                                    Deactivate Jackpot
+                                </button>
+                            </div>
+                            <div>
+
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+              
+                <hr/>
+                
+                <div className="mt-3 row gx-4">
+                <Col lg="12">
+                    <h5 className="text-center fw-bold bg-primary p-2 text-white">REMOVE/DELETE SINGLE GAME</h5>
+                    <div className="d-flex align-items-center justify-content-between">
+                        <div className="w-100">
+                            <Small className="text-dark m-1">Select Market</Small>
+                            <Select options={jackpot_options}/>
+                        </div>
+                        <div className="w-100">
+                            <Small className="text-dark m-1">Select ID</Small>
+                            <Select className="m-1"/>
+                        </div>
+                        <div className="d-flex flex-column w-100">
+                            <Small className="text-dark m-1">Caution</Small>
+                            <button className="btn btn-danger m-1">Remove Game</button>
+                        </div>
+                    </div>
+                </Col>
+                <hr/>
+                <Col>
+                    <h5 className="text-center fw-bold bg-primary p-2 text-white">REMOVE/DELETE ALL GAMES</h5>
+                    <div className="d-flex">
+                        <div className="w-100" >
+                            <Small className="text-dark m-1">Select Market</Small>
+                            <Select className="m-1" options={jackpot_options}/>
+                        </div>
+                        <div className="w-100">
+                            <Small className="text-dark m-1">Caution</Small>
+                            <button className="btn btn-danger w-100 m-1">Remove All</button>
+                        </div>
+                    </div>
+                </Col>
                 </div>
-                <div className="d-sm-flex">
-                    <input type="text" onChange={handleField} name="jp_home" placeholder="Home Team" className="form-control"/>
-                    <input type="text" onChange={handleField} name="jp_away" placeholder="Away Team" className="form-control"/>
-                    <InputNumber onChange={handleField} name="jp_home_odds"  placeholder="Home Odds" className="form-control"/>
-                    <InputNumber onChange={handleField} name="jp_draw_odds" placeholder="Draw Odds" className="form-control"/>
-                    <InputNumber onChange={handleField} name="jp_away_odds" placeholder="Away Odds" className="form-control"/>
-                    <input onChange={handleField} name="jp_time" type="datetime-local" className="form-control"/>      
-                </div> 
-                <button className="btn btn-primary" onClick={submitGame}>Add Game</button>
-                <div className="mt-3 d-flex">
-                    <Select/>
-                    <button className="btn btn-danger">Remove Game</button>
-                </div>
-                <button className="btn btn-danger mt-4">Remove All</button>
+               
             </Card.Body>           
         </Card>
     )

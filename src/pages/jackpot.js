@@ -171,44 +171,44 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                 className={`col-lg-3 col-md-3 col-sm-3 d-flex mjp_btn_div`}
                 >
                     <button 
-                    className={`btn btn-success m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `}
-                    style={{ width: '80px' }}
-                    home={n.jp_home}
-                    away={n.jp_away}
-                    id={i}
-                    market={n.jp_market}
-                    j_click="jp"
-                    picked={n.jp_home}
-                    onClick={(e) => handleData(e,0)}
-                    disabled={!n.jp_active}
+                        className={`btn btn-success m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `}
+                        style={{ width: '80px' }}
+                        home={n.jp_home}
+                        away={n.jp_away}
+                        id={i}
+                        market={n.jp_market}
+                        j_click="jp"
+                        picked={n.jp_home}
+                        onClick={(e) => handleData(e,0)}
+                        disabled={!n.jp_active}
                     >
                         {n.jp_home_odds}
                     </button>
                     <button 
-                    className="btn btn-success m-1 w-100 jp_btn" 
-                    style={{ width: '80px' }}
-                    home={n.jp_home}
-                    j_click="jp"
-                    away={n.jp_away}
-                    id={i}
-                    market={n.jp_market}
-                    picked="Draw"
-                    onClick={(e) => handleData(e,1)}
-                    disabled={!n.jp_active}
+                        className="btn btn-success m-1 w-100 jp_btn" 
+                        style={{ width: '80px' }}
+                        home={n.jp_home}
+                        j_click="jp"
+                        away={n.jp_away}
+                        id={i}
+                        market={n.jp_market}
+                        picked="Draw"
+                        onClick={(e) => handleData(e,1)}
+                        disabled={!n.jp_active}
                     >
                         {n.jp_draw_odds}
                     </button>
                     <button 
-                    className="btn btn-success m-1 w-100 jp_btn" 
-                    style={{ width: '80px' }}
-                    j_click="jp"
-                    home={n.jp_home}
-                    away={n.jp_away}
-                    id={i}
-                    market={n.jp_market}
-                    picked={n.jp_away}
-                    onClick={(e) => handleData(e,2)}
-                    disabled={!n.jp_active}
+                        className="btn btn-success m-1 w-100 jp_btn" 
+                        style={{ width: '80px' }}
+                        j_click="jp"
+                        home={n.jp_home}
+                        away={n.jp_away}
+                        id={i}
+                        market={n.jp_market}
+                        picked={n.jp_away}
+                        onClick={(e) => handleData(e,2)}
+                        disabled={!n.jp_active}
                     >
                         {n.jp_away_odds}
                     </button>
