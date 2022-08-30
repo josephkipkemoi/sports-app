@@ -5,7 +5,7 @@ const baseConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx'],
     images: {
       disableStaticImages: true,
-      domains: ['images.ctfassets.net'],
+      domains: ['media.api-sports.io'],
     },
     webpack(config) {
         config.resolve.modules = [...config.resolve.modules, path.resolve('./')]

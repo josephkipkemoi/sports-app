@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { SearchComponent } from "./CustomFilter";
 import CurrentTime from "./CurrentTime";
 import { PersonSvgIcon } from "./Svg";
+import styled from "styled-components";
 
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
@@ -129,7 +130,7 @@ const midnavLinks = [
     },
     {
         name: 'Live Games',
-        path: '/live',
+        path: '/live?fixture=all',
         class: 'live-games'
     },
 ]
@@ -230,7 +231,7 @@ display: flex;
 export const BottomNavBar = ({ login, user }) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isDepositModalOpen, setDepositModalOpen] = useState(false)
-
+    const [profileOpen, setProfileOpen] = useState(0)
     const [userDetails, setUserDetails] = useState({
         phone_number: '',
         password: '',
@@ -285,20 +286,14 @@ export const BottomNavBar = ({ login, user }) => {
 
     return (
         <>
-        {/* <div className="d-flex align-items-center">
-            <span className="text-light" style={{ marginRight: 5 }}>Profile</span>
-            <div className="p-2 bg-secondary rounded-circle">               
-                <PersonSvgIcon width="24" height="24" className="text-light"/>          
-            </div>
-        </div> */}
-     
             <StyleAuthenticated className="d-flex align-items-center">
+            <SearchComponent customClass="custom-search"/>
                 <Link href="/notifications">
                     <a className="btn btn-sm text-dark shadow-sm border-0">
                         <i className="bi bi-bell-fill text-white"></i>
                     </a>
                 </Link>
-                <SearchComponent customClass="custom-search"/>
+              
                 {pathname === '/' && screenSize >= 990 ?
                  <StyleAuthenticatedMobile >
                  <Link href="/profile" prefetch={false}>
@@ -334,7 +329,8 @@ export const BottomNavBar = ({ login, user }) => {
                </StyleAuthenticatedMobile>
                 : ''}
                  
-            </StyleAuthenticated>            
+            </StyleAuthenticated>   
+                
         </>
         )
     }
@@ -427,7 +423,9 @@ export const BottomNavBar = ({ login, user }) => {
                     </div>
                 </Col>
                 <Col lg={6} md={6} sm={6} className="d-flex justify-content-end align-items-center">     
-                    {!!user?.data ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   
+                    {/* {!!user?.data ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   */}
+                    <Profile setProfileOpen={setProfileOpen} profileOpen={profileOpen}/>
+                    <ProfileComponent profileOpen={profileOpen}/>
                 </Col>
             </Row>
         </nav>
@@ -493,5 +491,49 @@ export const BottomNavBar = ({ login, user }) => {
 
                 <DepositModal/>
         </StyleBottomNavBar>
+    )
+}
+
+const StyleProfile = styled.div`
+.profile {
+    cursor: pointer;
+}
+`
+
+const Profile = ({ setProfileOpen, profileOpen }) => {
+    const openProfile = () => {
+        if(profileOpen === 0) {
+            setProfileOpen('auto')
+        } else {
+            setProfileOpen(0)
+        }
+    }
+    return (
+        <StyleProfile className="d-flex align-items-center p-2">
+            <div className="p-1 bg-light rounded-circle profile" onClick={openProfile}>               
+                <PersonSvgIcon width="18" height="18" className="text-dark"/>          
+            </div>
+        </StyleProfile>    
+    )
+}
+
+const StyleProfileComponent = styled.div`
+ position: absolute;
+ height: 320px;
+ width: 240px;
+ top: 95px;
+ right: 20px;
+ background: #fff;
+ z-index: 2;
+ overflow: hidden;
+`
+
+const ProfileComponent = ({ profileOpen }) => {
+    return (
+        <StyleProfileComponent className="rounded shadow" style={{ height: profileOpen }}>
+            <div className="p-2">
+                <h1>Profile</h1>
+            </div>
+        </StyleProfileComponent>
     )
 }
