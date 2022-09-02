@@ -9,6 +9,7 @@ import TopNavBar from "../components/TopNavBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSoccerBall } from '@fortawesome/free-solid-svg-icons'
 import { useGetJackpotFixturesQuery } from "../hooks/admin";
+import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -39,7 +40,9 @@ export default function Jackpot() {
 
     const megaJackpotData = useGetJackpotFixturesQuery('Mega Jackpot')
     const fiveJackpotData = useGetJackpotFixturesQuery('Five Jackpot')
- 
+    const jackpotPrize = useGetJackpotPrizeWinsQuery()
+
+    console.log(jackpotPrize.data)
     const fetchJackpotGames = () => {
         const megaJackpotIds = JSON.parse(sessionStorage.getItem('Mega Jackpot'))
         const fiveJackpotIds = JSON.parse(sessionStorage.getItem('Five Jackpot'))
@@ -58,14 +61,24 @@ export default function Jackpot() {
 
     }, [])
 
-    if(megaJackpotData.isLoading || fiveJackpotData.isLoading) {
+    if (
+        megaJackpotData.isLoading || 
+        fiveJackpotData.isLoading || 
+        jackpotPrize.isLoading
+        ) {
        return <Spinner animation="grow"/>
     }
 
-    if(megaJackpotData.error || fiveJackpotData.error) {
+    if  (
+        megaJackpotData.error || 
+        fiveJackpotData.error || 
+        jackpotPrize.error
+        ) {
        return <span>Try again later!</span>
     }
 
+    const { data, MegaCount, FiveCount } = jackpotPrize.data
+    const [ megaMarket, fiveMarket ] = data
     return (
         <StyledJackpot>
             <Row className="px-2">
@@ -76,18 +89,18 @@ export default function Jackpot() {
                             data={megaJackpotData.data}
                             setMegaJackpotId={setMegaJackpotId}
                             setMarket={setMarket}
-                            jackpot="Mega Jackpot"
-                            jackpot_prize="10,134,344.00"
-                            games_count="10"
+                            jackpot={megaMarket.market}
+                            jackpot_prize={megaMarket.jackpot_prize}
+                            games_count={MegaCount}
                         />
 
                         <JackpotContainer 
                             data={fiveJackpotData.data} 
                             setFiveJackpotId={setFiveJackpotId}
                             setMarket={setMarket}
-                            jackpot="Five Jackpot"
-                            jackpot_prize="5,654,152.00"
-                            games_count="5"
+                            jackpot={fiveMarket.market}
+                            jackpot_prize={fiveMarket.jackpot_prize}
+                            games_count={FiveCount}
                         /> 
                     </StyleJackpotContainer>                   
                 </Col>
@@ -168,7 +181,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                     </div>
                 </div>
                 <div 
-                className={`col-lg-3 col-md-3 col-sm-3 d-flex mjp_btn_div`}
+                    className={`col-lg-3 col-md-3 col-sm-3 d-flex mjp_btn_div`}
                 >
                     <button 
                         className={`btn btn-success m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `}
@@ -182,7 +195,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                         onClick={(e) => handleData(e,0)}
                         disabled={!n.jp_active}
                     >
-                        {n.jp_home_odds}
+                        {!n.jp_active ?  <i className="bi bi-exclamation-circle"></i> : n.jp_home_odds}                       
                     </button>
                     <button 
                         className="btn btn-success m-1 w-100 jp_btn" 
@@ -196,7 +209,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                         onClick={(e) => handleData(e,1)}
                         disabled={!n.jp_active}
                     >
-                        {n.jp_draw_odds}
+                        {!n.jp_active ?  <i className="bi bi-exclamation-circle"></i> : n.jp_draw_odds}
                     </button>
                     <button 
                         className="btn btn-success m-1 w-100 jp_btn" 
@@ -210,7 +223,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                         onClick={(e) => handleData(e,2)}
                         disabled={!n.jp_active}
                     >
-                        {n.jp_away_odds}
+                        {!n.jp_active ?  <i className="bi bi-exclamation-circle"></i> : n.jp_away_odds}
                     </button>
                 </div>
             </div>
@@ -227,7 +240,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                     <div className="d-flex align-items-center">
                         <span className="fw-bold" >{jackpot}</span>
                         <span className="text-warning" style={{ marginRight: 10, marginLeft: 10 }}>
-                            KSH {jackpot_prize}
+                            KSH {(Number(jackpot_prize)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </span>
                         <span>{games_count} Games</span>
                     </div>

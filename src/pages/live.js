@@ -127,8 +127,6 @@ const LiveFixturesComponent = () => {
         return <span>Error</span>
     }
 
-    const { live_fixtures } = data
-
     const LiveGamesElements = (d,i) => {
         const { league, 
                 goals, 
@@ -214,7 +212,7 @@ const LiveFixturesComponent = () => {
     }
     return (
     <StyleLiveFixturesComponent>
-        {live_fixtures?.length > 0 ? live_fixtures.map(LiveGamesElements) : <NoLiveGamesComponent/>}
+        {data?.live_fixtures?.length > 0 ? data?.live_fixtures.map(LiveGamesElements) : <NoLiveGamesComponent/>}
     </StyleLiveFixturesComponent>
   
     )

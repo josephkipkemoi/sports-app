@@ -15,6 +15,8 @@ import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery, useGetAllFixtures
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 import Collapse from "react-bootstrap/Collapse";
 import { PhoneSvgIcon } from "../components/Svg";
+import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
+import { Modal } from "react-bootstrap";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -37,6 +39,10 @@ const adminLinks = [
     {
         name: 'Jackpot',
         path: 'admin?tab=jackpot'
+    },
+    {
+        name: 'Live Games',
+        path: 'admin?tab=live'
     }
 ]
  
@@ -122,7 +128,29 @@ export default function Admin() {
             {tab === 'users' && <UsersProfileComponent/>}
             {tab === 'feedback' && <CustomerFeedback/>}
             {tab === 'jackpot' && <JackpotComponent/>}
+            {tab === 'live' && <LiveGamesComponent/>}
         </StyledAdmin>
+    )
+}
+
+const LiveGamesComponent = () => {
+    const updateLiveGames = async () => {
+       await axios.post('api/fixtures/live')
+    }
+    return (
+        <>
+           <Card className="mt-3">
+            <Card.Header>Update Live Games</Card.Header>
+            <Card.Body>
+                <button 
+                    className="btn btn-primary"
+                    onClick={updateLiveGames}
+                >
+                    Update
+                </button>
+            </Card.Body>
+        </Card>
+        </>
     )
 }
 
@@ -207,6 +235,11 @@ const JackpotComponent = () => {
             </Card.Header>
             <Card.Body className="px-4">
                 <Row className="gx-2">
+                    <div className="mb-3">
+                        <UpdateJackpotPrize/>
+                    </div>
+                   
+                   
                     <h5 className="text-center fw-bold bg-primary p-2 text-white">Add/Update Games to  {fields.jp_market}</h5>
                     <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
                         <div >
@@ -352,6 +385,98 @@ const JackpotComponent = () => {
                
             </Card.Body>           
         </Card>
+    )
+}
+
+const UpdateJackpotPrize = () => {
+    const { data, isLoading, error } = useGetJackpotPrizeWinsQuery()
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const [balance, setBalance] = useState(0)
+    const [market, setMarket] = useState('')
+    const [jackpotPrize, setJackpotPrize] = useState(0)
+
+    if(isLoading) {
+        return <Spinner animation="grow"/>
+    }
+
+    if(error) {
+        return <span>Error</span>
+    }
+    const [megaMarket, fiveMarket] = data.data
+
+    const handleJpMarket = ({ value }) => {
+       setMarket(value)
+       if(value === megaMarket.market) {
+            setBalance(megaMarket.jackpot_prize)
+       }
+       if(value === fiveMarket.market) {
+        setBalance(fiveMarket.jackpot_prize)
+        }
+    }
+
+    const handleJpPrize = e => setJackpotPrize(e.target.value)
+
+    const cancelJp = () => setIsModalOpen(false)
+
+    const handleUpdate = async () => {
+        await axios.post('api/admin/jackpot/prize', {
+            market: market,
+            jackpot_prize: jackpotPrize
+        })
+        cancelJp()
+    }
+
+    return (
+        <React.Fragment>
+         <h5 className="text-center fw-bold bg-primary p-2 text-white">Update {market} Jackpot Prize</h5>
+         <h6 className="fw-bold">Current Jackpot Prize: {balance}</h6>
+            <Col className="d-sm-flex">
+                <Select
+                    options={jackpot_options}
+                    onChange={handleJpMarket}
+                    className="w-50 m-1"
+                />
+                <InputNumber 
+                    className="form-control m-1" 
+                    placeholder="Enter Amount"
+                    onChange={handleJpPrize}
+                />
+                <button 
+                    className="btn btn-primary m-1"
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    Submit
+                </button>
+            </Col>
+            <Modal show={isModalOpen}>
+                <Modal.Body>
+                    <h2 className="alert alert-danger">
+                        <i className="bi bi-exclamation-circle"></i>
+                        Are you sure you want to update {market} prize?
+                    </h2>
+                    <h3>
+                        New {market} prize 
+                    </h3>
+                    <h4>
+                        KES  {(Number(jackpotPrize)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    </h4>
+
+                    <button 
+                        className="btn btn-danger w-50"
+                        onClick={cancelJp}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        className="btn btn-primary w-50"
+                        onClick={handleUpdate}
+                    >
+                        Update
+                    </button>
+                </Modal.Body>
+            </Modal>
+        </React.Fragment>
     )
 }
 

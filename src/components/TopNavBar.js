@@ -14,7 +14,6 @@ import  {
     faHorse,
     faGolfBall,
     faTableTennisPaddleBall,
-    faSignal,
     faCalendar,
 }  from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
@@ -93,13 +92,8 @@ const topNavLinks = [
       icon: faTableTennisPaddleBall
     },
     {
-      name: 'Streaming',
-      path: '/streaming',
-      icon: faSignal
-    },
-    {
       name: 'Schedule',
-      path: '/schedule',
+      path: '/live?fixture=scheduled',
       icon: faCalendar
     }
 ]

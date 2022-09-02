@@ -8,6 +8,7 @@ import { UserApi } from "../hooks/customAuth";
 import { FavoritesApi } from "../hooks/favorites";
 import { CustomFixtureApi } from "../hooks/fixture";
 import { HistoryApi } from "../hooks/history";
+import { JackpotApi } from "../hooks/jackpot";
 import { LiveFixturesApi } from "../hooks/liveFixtures";
  
 export const store = configureStore({
@@ -20,6 +21,7 @@ export const store = configureStore({
         [FavoritesApi.reducerPath]: FavoritesApi.reducer,
         [AdminApi.reducerPath]: AdminApi.reducer,
         [LiveFixturesApi.reducerPath]: LiveFixturesApi.reducer,
+        [JackpotApi.reducerPath]: JackpotApi.reducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         immutableCheck: false,
@@ -33,6 +35,7 @@ export const store = configureStore({
         FavoritesApi.middleware,
         AdminApi.middleware,
         LiveFixturesApi.middleware,
+        JackpotApi.middleware,
     )
 })
 

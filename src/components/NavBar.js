@@ -54,11 +54,11 @@ const topNavLinks = [
     },
     {
         name: 'Livescore',
-        path: '/live'
+        path: '/live?fixture=live'
     },
     {
         name: 'Results',
-        path: '/results'
+        path: '/live?fixture=finished'
     },
     {
         name: '',
