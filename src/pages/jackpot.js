@@ -89,8 +89,8 @@ export default function Jackpot() {
                             data={megaJackpotData.data}
                             setMegaJackpotId={setMegaJackpotId}
                             setMarket={setMarket}
-                            jackpot={megaMarket.market}
-                            jackpot_prize={megaMarket.jackpot_prize}
+                            jackpot={megaMarket?.market}
+                            jackpot_prize={megaMarket?.jackpot_prize}
                             games_count={MegaCount}
                         />
 
@@ -98,8 +98,8 @@ export default function Jackpot() {
                             data={fiveJackpotData.data} 
                             setFiveJackpotId={setFiveJackpotId}
                             setMarket={setMarket}
-                            jackpot={fiveMarket.market}
-                            jackpot_prize={fiveMarket.jackpot_prize}
+                            jackpot={fiveMarket?.market}
+                            jackpot_prize={fiveMarket?.jackpot_prize}
                             games_count={FiveCount}
                         /> 
                     </StyleJackpotContainer>                   

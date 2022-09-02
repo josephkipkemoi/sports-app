@@ -2,11 +2,28 @@ import React, { useEffect, useState } from "react";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Small } from "./Html";
+import axios from '../lib/axios';
+import useAuth from "../hooks/auth";
+import styled from "styled-components";
 
-export default function GameComponent({ data }) {
+const StyleFavorites = styled.i`
+  i {
+    opacity: .8;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    transition: .3s;
+  }
+  i:hover {
+    cursor: pointer;
+    opacity: 1;
+  }
+`
+
+export default function GameComponent({ data, refetch }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
- 
+    const { user } = useAuth({ middleware: 'guest' })
+
     const sendBetslip = (e)  => {
   
       const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
@@ -121,13 +138,33 @@ export default function GameComponent({ data }) {
       )
     }
 
-    const updateFavorite = async (fixture_id) => {
-      const user_id = Number(localStorage.getItem('u_i'))
 
-       await axios.post('api/favorites', {
-        user_id,
+    const removeSingleFavorite = async (fixture_id) => {
+      const { status } = await axios.delete(`api/users/${user.data.id}/favorites/${fixture_id}/remove`)
+      
+      if(status === 200) {
+          refetch()
+      }
+    }
+
+
+    const updateFavorite = async (fixture_id, favorite_active) => {
+      if(Boolean(user.data) === false) {
+        alert("Log in to add favorites")
+      }
+      
+      if(favorite_active) {
+       return removeSingleFavorite(fixture_id)
+      }
+
+      const { status } = await axios.post('api/favorites', {
+        user_id: user.data.id,
         fixture_id
       });
+     
+      if(status === 201) {
+         refetch()
+      }
 
     }  
 
@@ -152,6 +189,7 @@ export default function GameComponent({ data }) {
       <Row  className="custom-grid p-2">  
         {data.map((innerData,index) => {
           const oddsData = JSON.parse(innerData.odds)
+ 
           return (
             <React.Fragment key={index + innerData.fixture_date}>
             <Col 
@@ -182,7 +220,13 @@ export default function GameComponent({ data }) {
 
                   <Row>
                     <Col className='d-inline-flex'>
-                      <i className="bi bi-star-fill" onClick={() => updateFavorite(innerData.fixture_id)}></i>
+                      <StyleFavorites>
+                        <i 
+                          className={`bi bi-star-fill ${innerData.favorite_active ? 'text-warning' : 'text-white'}`}
+                          onClick={() => updateFavorite(innerData.fixture_id, innerData.favorite_active)}                      
+                        ></i>
+                      </StyleFavorites>
+                    
                       <div style={{ marginTop: 2.5, marginLeft: 10 }}>
                         <span style={{ letterSpacing : '1px', color: '#ffffff', fontWeight: 500  }}>{innerData.home}</span>
                         <i className="bi bi-dash"></i>

@@ -12,6 +12,8 @@ import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
 import { BottomNavBar } from '../components/NavBar';
+import { useGetV1CustomFixtureQuery } from '../hooks/fixture';
+import { Spinner } from 'react-bootstrap';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -74,7 +76,9 @@ const StyledMain = styled.div`
 background: #424242;
 `
 
-function App({ soccer_data }) {
+function App() {
+
+  const { data, isLoading, error, refetch } = useGetV1CustomFixtureQuery()
 
   useEffect(() => {
 
@@ -85,6 +89,15 @@ function App({ soccer_data }) {
     }  
 
   },[])
+ 
+    
+  if(isLoading) {
+    return <Spinner animation='grow' />
+  }
+
+  if(error) {
+    return <span>Try again later!</span>
+  }
  
   return (
     <ThemedBody>
@@ -106,8 +119,12 @@ function App({ soccer_data }) {
                         right={50}
                         caret_position="right"
                       /> 
+                      <div className='d-flex justify-content-center'>
+                        { isLoading && <Spinner animation='grow'/> }
+                        { error && <span className='text-white'>Try again Later</span> }
+                      </div>
 
-                      <GameComponent data={soccer_data}/>
+                      <GameComponent data={data.fixtures} refetch={refetch}/>
 
                      </div>
                      
@@ -130,16 +147,6 @@ function App({ soccer_data }) {
 
     </ThemedBody>
   );
-}
-
-export async function getServerSideProps() {
-  const  data  = await axios.get('api/custom_fixture')
-
-   return {
-    props: {
-      soccer_data: data.data.fixtures,
-    },  
-  }
 }
 
 export default App;
