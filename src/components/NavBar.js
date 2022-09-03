@@ -423,7 +423,7 @@ export const BottomNavBar = ({ login, user }) => {
                     </div>
                 </Col>
                 <Col lg={6} md={6} sm={6} className="d-flex justify-content-end align-items-center">     
-                    {Boolean(user) ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}  
+                    {Boolean(user.uu_id) ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}  
                     {/* <Profile setProfileOpen={setProfileOpen} profileOpen={profileOpen}/>
                     <ProfileComponent profileOpen={profileOpen}/> */}
                 </Col>
