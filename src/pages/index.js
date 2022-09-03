@@ -79,7 +79,7 @@ background: #424242;
 function App() {
 
   const { data, isLoading, error, refetch } = useGetV1CustomFixtureQuery()
-
+ 
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')

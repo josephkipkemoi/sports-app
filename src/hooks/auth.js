@@ -55,7 +55,8 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
             .then((r) =>{
                  mutate()
                  if(r.status === 200) {
-                    setIsAuth(true)
+                   localStorage.setItem('uu_id', JSON.stringify(r.data))
+                   setIsLoading(false)
                  }
                 })
             .catch(e => {
