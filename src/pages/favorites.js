@@ -5,11 +5,10 @@ import { useGetFavoritesByIdQuery } from "../hooks/favorites";
 import TopNavBar from "../components/TopNavBar";
 import CustomerInfo from "../components/CustomerInfo";
 import CustomFilter from "../components/CustomFilter";
-import useAuth from '../hooks/auth';
 import GameComponent from "../components/GameComponent";
 import BetslipContainer from "../components/BetslipContainer";
 import axios from "../lib/axios";
-import { useRouter } from "next/router";
+import AuthUser from "../hooks/AuthUser";
 
 const StyledFavorites = styled.div`
  height: 100vh;
@@ -20,11 +19,10 @@ const StyledFavorites = styled.div`
 
 `
 export default function Favorites() {
-    const router = useRouter()
 
-    const { user } = useAuth({ middleware: 'guest' })
+    const { uu_id } = AuthUser()
 
-    const { data, error, isLoading, refetch } = useGetFavoritesByIdQuery(user?.data?.id)
+    const { data, error, isLoading, refetch } = useGetFavoritesByIdQuery(uu_id.id)
     
     if(error) {
         return <span>Error</span>
@@ -35,7 +33,7 @@ export default function Favorites() {
     }
     
     const removeFavorites = async () => {
-        const { status } = await axios.delete(`api/users/${user.data.id}/favorites/remove`)
+        const { status } = await axios.delete(`api/users/${uu_id.id}/favorites/remove`)
         
         if(status === 200) {
             refetch()

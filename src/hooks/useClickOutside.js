@@ -16,7 +16,7 @@ export default function useClickOutside(elRef, callback) {
         }
 
         // if element doesnt contain our click target, stop
-        if(elRef.current.contains(e.target) || e.target.getAttribute('modalId') === 'modal-ref') {
+        if(elRef.current.contains(e.target) || e.target.getAttribute('modalid') === 'modal-ref') {
             return
         }
 

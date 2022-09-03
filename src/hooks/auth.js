@@ -27,13 +27,8 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         axios
             .post('api/register', props)
             .then((d) => {
-                console.log(d)
-                localStorage.removeItem('u_s')
-                localStorage.removeItem('u_i')
-                localStorage.setItem('u_i',d.data.user_id)
-
-               localStorage.setItem('u_s',d.data.session_payload)
-               window.location.pathname = '/'
+               localStorage.setItem('uu_id', JSON.stringify(d.data))
+                window.location.pathname = '/'
                 mutate()
             })
             .catch(e => {
@@ -115,8 +110,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
                         mutate()
                         })
         }
-        localStorage.removeItem('u_i')
-        localStorage.removeItem('u_s')
+        localStorage.removeItem('uu_id')
         localStorage.removeItem('share_code')
         window.location.pathname = '/'
     }

@@ -15,16 +15,16 @@ import {
     Small 
 } from "../components/Html";
 import axios from "../lib/axios"
-import { useGetAuthUserQuery } from "../hooks/customAuth"
 import { useRouter } from 'next/router';
 import Support from '../components/Support';
+import AuthUser from '../hooks/AuthUser';
 
 const StyleProfile = styled.div`
     background-color: #ebeded;
     padding-bottom: 24px;
 `
 
-export default function Profile(d) {
+export default function Profile() {
 
     const router = useRouter()
     const { pathname } = router
@@ -76,10 +76,11 @@ export default function Profile(d) {
 const AuthUserProfile = () => {
 
     const AuthProfileElement = () => {
-            const { user } = useAuth({ middleware: 'guest' })
+            const { uu_id } = AuthUser()
+ 
             return (
                  <Span className="d-block fw-bold mt-3">
-                  (254) {user?.data?.phone_number}    
+                  (254) {uu_id.phone_number}    
                 </Span>
             )
         
@@ -108,8 +109,8 @@ const AuthUserProfile = () => {
 const BalanceComponent = () => {
 
     const BalanceElement = () => {
-            const { user } = useAuth({ middleware: 'guest' })
-            const { data, error, isLoading } = useGetBalanceByUserIdQuery(user?.data.id)
+            const { uu_id } = AuthUser()
+            const { data, error, isLoading } = useGetBalanceByUserIdQuery(uu_id.id)
             if(error) {
                 return <span className="d-block fw-bold text-danger mt-1">Error</span>
             }
@@ -158,7 +159,7 @@ const BalanceComponent = () => {
 }
 
 const DepositComponent = () => {
-    const { user } = useAuth({ middleware: 'guest' })
+    const { uu_id } = AuthUser()
  
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
 
@@ -194,9 +195,9 @@ const DepositComponent = () => {
         const short_code = config.BUSINESS_SHORT_CODE;
         const passkey = config.BUSINESS_PASSKEY;
         const timestamp = generateTimestamp().toString();
-        const phone_number = Number('254' + user.data.phone_number)
+        const phone_number = Number('254' + uu_id.phone_number)
         const password = generateBase64Encoding(short_code, passkey, timestamp);
-  
+        console.log(phone_number)
         axios.post('api/mpesa/push', {
             phone_number,
             timestamp,

@@ -23,6 +23,7 @@ import Tooltip from "./Tooltip";
 import axios from "../lib/axios";
 import MobileNavComponent from "./MobileNavComponent";
 import useAuth from "../hooks/auth";
+import AuthUser from "../hooks/AuthUser";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -569,8 +570,6 @@ const JackpotBetCart = ({
     {mj_length > 0 &&  <JackpotCart
         market={"Mega Jackpot"}   
         jackpotGames={megaJackpotGames} 
-        // user={user}
-        // data={data}
         length={mj_length}
         setMegaJackpotId={setMegaJackpotId} 
       />}
@@ -578,8 +577,6 @@ const JackpotBetCart = ({
       { fj_length > 0 &&  <JackpotCart
         market={"Five Jackpot"}   
         jackpotGames={fiveJackpotGames} 
-        // user={user}
-        // data={data}
         length={fj_length}
         setFiveJackpotId={setFiveJackpotId}
       />}
@@ -728,12 +725,12 @@ const JackpotCart = ({ market, jackpotGames, length, setMegaJackpotId, setFiveJa
 const SubmitJackpotButton = ({ betAmount, setIsModalOpen, market, length, jackpotGames }) => {
  
   const [loading, setLoading] = useState(false)
-  const { user } = useAuth({ middleware: 'guest' })
-  const { data, refetch } = useGetBalanceByUserIdQuery(user?.data.id)
+  const { uu_id } = AuthUser()
+  const { data, refetch } = useGetBalanceByUserIdQuery(uu_id.id)
 
   const postBalanceAfterPlacing = async () => {
-    const res = await axios.post(`api/users/${user?.data?.id}/balance/decrement`, {
-      'user_id': user?.data?.id,
+    const res = await axios.post(`api/users/${uu_id.id}/balance/decrement`, {
+      'user_id': uu_id.id,
       'amount': betAmount
     } ,
     {
@@ -757,8 +754,8 @@ const SubmitJackpotButton = ({ betAmount, setIsModalOpen, market, length, jackpo
       alert('Kshs 100 is accepted per bet')
     }
 
-    const { status } = await axios.post(`api/jackpot/${user.data.id}/cart`, {
-      user_id: user.data.id,
+    const { status } = await axios.post(`api/jackpot/${uu_id.id}/cart`, {
+      user_id: uu_id.id,
       jp_picked: JSON.stringify(jackpotGames),
       jp_market: market
     })
@@ -772,7 +769,7 @@ const SubmitJackpotButton = ({ betAmount, setIsModalOpen, market, length, jackpo
   }
  
   const Button = ({ 
-    disabled=!user?.data.id ||
+    disabled=!uu_id.id ||
     betAmount < 100 || 
     (market === 'Mega Jackpot' && Number(length) !== 10) || 
     (market === 'Five Jackpot' && Number(length) !== 5)
@@ -800,9 +797,9 @@ const BetCartFormElements = ({ betData }) => {
   
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
     
-    const { user } = useAuth({ middleware: 'guest' })
-    
-    const {data, refetch} = useGetBalanceByUserIdQuery(user?.data?.id)
+    const { uu_id } = AuthUser()
+
+    const {data, refetch} = useGetBalanceByUserIdQuery(uu_id.id)
 
       const decrementBetAmount = () => {
         if(betAmount <= 50) { 
@@ -819,8 +816,8 @@ const BetCartFormElements = ({ betData }) => {
       }
   
       const postBalanceAfterPlacing = async () => {
-        const res = await axios.post(`api/users/${user?.data?.id}/balance/decrement`, {
-          'user_id': user?.data?.id,
+        const res = await axios.post(`api/users/${uu_id.id}/balance/decrement`, {
+          'user_id': uu_id.id,
           'amount': betAmount
         } ,
         {
@@ -852,7 +849,7 @@ const BetCartFormElements = ({ betData }) => {
         const sessionId = Number(sessionStorage.getItem('session_id'))
  
         const res = await axios.post('api/users/fixtures/cart', {
-          user_id: user?.data?.id,
+          user_id: uu_id.id,
           cart_id: sessionId,
           bet_amount: betAmount,
           possible_payout: possibleWin,
@@ -918,7 +915,7 @@ const BetCartFormElements = ({ betData }) => {
             <div className="d-flex mb-2">
               <button 
                 ref={linkBarRef}      
-                disabled={loading || !user?.data.id}
+                disabled={loading || !uu_id.id}
                 className='btn btn-light shadow m-1 text-dark w-100 '
                 style={{ letterSpacing: 1 }}
                 onClick={() => postBetslipCart()}
@@ -981,9 +978,9 @@ const BalanceModal = ({ isModalOpen, closeMenu }) => {
 }
 
 const UserBalanceElement = () => {
-      const { user } = useAuth({ middleware: 'guest' })
+      const { uu_id } = AuthUser()   
 
-      const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(user?.data.id)
+      const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(uu_id.id)
       
       if(error) {
         return ''
@@ -996,7 +993,7 @@ const UserBalanceElement = () => {
     
       return (
         <>
-         { !!user.data.id ? 
+         { !!uu_id.id ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
             <Small>Balance:</Small>
             <Small className='fw-bold'>

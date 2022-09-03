@@ -6,7 +6,6 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import useClickOutside from "../hooks/useClickOutside";
-import useAuth from "../hooks/auth";
 import  Col  from "react-bootstrap/Col";
 import  Row  from "react-bootstrap/Row";
 import Image from "next/image";
@@ -15,6 +14,7 @@ import { SearchComponent } from "./CustomFilter";
 import CurrentTime from "./CurrentTime";
 import { PersonSvgIcon } from "./Svg";
 import styled from "styled-components";
+import AuthUser from "../hooks/AuthUser";
 
 const StyledTopRightNav = styledComponents.div`
 .right-nav-link {
@@ -76,7 +76,8 @@ const topNavLinks = [
     }
 ]
 
-export default function NavBar({ logout, login, user }) {
+export default function NavBar({ logout, login }) {
+    const user = AuthUser()
 
     const TopNavLinkElements = (link, i) => (        
         <div itemProp="name" key={i} className="nav-item">        
@@ -275,14 +276,14 @@ export const BottomNavBar = ({ login, user }) => {
         }, [])
     
     const isAuthenticated =  () => {
-        if(isAuth) {
+        if(user) {
             setModalOpen(false)
         }
     }
 
     useEffect(() => {
         isAuthenticated()
-    }, [isAuth])
+    }, [user])
 
     return (
         <>
@@ -409,7 +410,6 @@ export const BottomNavBar = ({ login, user }) => {
 
     useClickOutside(linkBarRef, closeMenu)    
 
-
     return (
         <StyleBottomNavBar>  
         <nav className="p-1" ref={linkBarRef}>
@@ -423,19 +423,19 @@ export const BottomNavBar = ({ login, user }) => {
                     </div>
                 </Col>
                 <Col lg={6} md={6} sm={6} className="d-flex justify-content-end align-items-center">     
-                    {!!user?.data ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}  
+                    {Boolean(user) ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}  
                     {/* <Profile setProfileOpen={setProfileOpen} profileOpen={profileOpen}/>
                     <ProfileComponent profileOpen={profileOpen}/> */}
                 </Col>
             </Row>
         </nav>
     
-             <Modal show={isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
-                 <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
-                        <Form modalId="modal-ref">
-                            <Form.Group modalId="modal-ref" className="mb-3">
+             <Modal show={isModalOpen} className="mt-5 pt-5" modalid="modal-ref">
+                 <Modal.Body modalid="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+                        <Form modalid="modal-ref">
+                            <Form.Group modalid="modal-ref" className="mb-3">
                                 <Form.Control 
-                                modalId="modal-ref" 
+                                modalid="modal-ref" 
                                 name="phone_number"
                                 type="number" 
                                 className="shadow-sm p-3" 
@@ -444,9 +444,9 @@ export const BottomNavBar = ({ login, user }) => {
                                 >
                                 </Form.Control>
                             </Form.Group>
-                            <Form.Group modalId="modal-ref" className="mb-3">
+                            <Form.Group modalid="modal-ref" className="mb-3">
                                 <Form.Control 
-                                modalId="modal-ref" 
+                                modalid="modal-ref" 
                                 name="password"
                                 type="password" 
                                 className="shadow-sm p-3" 
@@ -456,7 +456,7 @@ export const BottomNavBar = ({ login, user }) => {
                                 </Form.Control>
                             </Form.Group>                         
                             <Button 
-                            modalId="modal-ref" 
+                            modalid="modal-ref" 
                             style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 
                             className="w-100 p-3 mb-3 fw-bold shadow-sm" 
                             type="submit"                 

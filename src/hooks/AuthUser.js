@@ -1,15 +1,5 @@
-import React, { useState } from "react";
-import axios from "../lib/axios";
+import React from "react";
 
 export default function AuthUser() {
-
-    const getUser = async () => {
-        const user = await axios.get('api/user')
-   
-        return user
-    }
-    // console.log(getUser())
-    return {
-         getUser
-    }
+    return JSON.parse(localStorage.getItem('uu_id'))
 }

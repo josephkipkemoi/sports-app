@@ -3,8 +3,8 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { Small } from "./Html";
 import axios from '../lib/axios';
-import useAuth from "../hooks/auth";
 import styled from "styled-components";
+import AuthUser from "../hooks/AuthUser";
 
 const StyleFavorites = styled.i`
   i {
@@ -22,7 +22,7 @@ const StyleFavorites = styled.i`
 export default function GameComponent({ data, refetch }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
-    const { user } = useAuth({ middleware: 'guest' })
+    const { uu_id } = AuthUser()
 
     const sendBetslip = (e)  => {
   
@@ -140,7 +140,7 @@ export default function GameComponent({ data, refetch }) {
 
 
     const removeSingleFavorite = async (fixture_id) => {
-      const { status } = await axios.delete(`api/users/${user.data.id}/favorites/${fixture_id}/remove`)
+      const { status } = await axios.delete(`api/users/${uu_id.id}/favorites/${fixture_id}/remove`)
       
       if(status === 200) {
           refetch()
@@ -149,7 +149,7 @@ export default function GameComponent({ data, refetch }) {
 
 
     const updateFavorite = async (fixture_id, favorite_active) => {
-      if(Boolean(user.data) === false) {
+      if(Boolean(uu_id) === false) {
         alert("Log in to add favorites")
       }
       
@@ -158,7 +158,7 @@ export default function GameComponent({ data, refetch }) {
       }
 
       const { status } = await axios.post('api/favorites', {
-        user_id: user.data.id,
+        user_id: uu_id.id,
         fixture_id
       });
      

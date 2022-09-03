@@ -25,6 +25,7 @@ import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
 import JackpotComponent from '../components/JackpotComponent';
 import Pagination from '../components/Pagination';
+import AuthUser from '../hooks/AuthUser';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -47,7 +48,7 @@ const SportBetsHistoryProfile = () => {
     
     const router = useRouter()
     const { tab , his_tab} = router.query
-    const { user } = useAuth({ middleware: 'guest' })
+    const { uu_id } = AuthUser()
 
     return (
         <StyledHistory>
@@ -58,13 +59,13 @@ const SportBetsHistoryProfile = () => {
                 <Col lg="9" md="9" sm="8">
                     <HistoryFilter /> 
                     <hr/>    
-                    {tab === 'all' && <AllTabHistory user_id={user?.data.id}/>}
-                    {tab === 'settled' && <SettledHistory user_id={user?.data.id}/>}
-                    {tab === 'unsettled' && <UnsettledHistory user_id={user?.data.id}/>}
-                    {tab === 'search' && <SearchFilterResults user_id={user?.data.id}/>}
-                    {(his_tab === 'jbets' && tab === 'j_all') && <AllJackpotHistory user_id={user?.data.id}/>} 
-                    {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={user?.data.id}/>} 
-                    {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={user?.data.id}/>} 
+                    {tab === 'all' && <AllTabHistory user_id={uu_id.id}/>}
+                    {tab === 'settled' && <SettledHistory user_id={uu_id.id}/>}
+                    {tab === 'unsettled' && <UnsettledHistory user_id={uu_id.id}/>}
+                    {tab === 'search' && <SearchFilterResults user_id={uu_id.id}/>}
+                    {(his_tab === 'jbets' && tab === 'j_all') && <AllJackpotHistory user_id={uu_id.id}/>} 
+                    {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={uu_id.id}/>} 
+                    {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={uu_id.id}/>} 
                 </Col>
             </Row>    
             <Support/>       
@@ -617,8 +618,7 @@ const userProfileLinks = [
 ]
 export const UserProfile = () => {
 
-    const { user } = useAuth({ middleware: 'guest' })
-
+    const { uu_id } = AuthUser()
 const UserProfileLinkElements = (link, i) => {
         return (
             <Link key={i} href={link.path}>
@@ -635,8 +635,8 @@ const UserProfileLinkElements = (link, i) => {
 }
 
 const BalanceElement = () => {
-    if(user) {
-        const {data, error, isLoading} = useGetBalanceByUserIdQuery(user?.data.id)
+    if(uu_id) {
+        const {data, error, isLoading} = useGetBalanceByUserIdQuery(uu_id.id)
 
         if(error) {
             return <span className="d-block fw-bold text-danger mt-1">Error</span>
@@ -665,7 +665,7 @@ const BalanceElement = () => {
 
     const UserProfileElement = () => {
         return (
-            <Span className='fw-bold' style={{ marginLeft: 10, letterSpacing: '1px' }} >+254{user?.data.phone_number}</Span>
+            <Span className='fw-bold' style={{ marginLeft: 10, letterSpacing: '1px' }} >+254{uu_id.phone_number}</Span>
         )
     }
        

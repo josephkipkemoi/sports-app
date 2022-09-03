@@ -17,10 +17,10 @@ font-weight: 200;
 border-bottom: 1px solid gray;
 `
 
-export default function NavWrapper({ children, logout, login, user }) {
+export default function NavWrapper({ children, logout, login }) {
     return (
         <PageStyles>
-            <NavBar logout={logout} login={login} user={user}/>   
+            <NavBar logout={logout} login={login} />   
             <ContentStyled>{children}</ContentStyled>
             <Footer/>
         </PageStyles>
