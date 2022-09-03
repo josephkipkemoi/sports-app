@@ -216,7 +216,7 @@ const StyleBetslip = styled.div`
 export default function BetslipContainer({ megaJackpotId, market, fiveJackpotId, setMegaJackpotId, setFiveJackpotId }) {
     const [clicked, setClicked] = useState(false)
     const [modalOpen, setIsModalOpen] = useState(false)
-    const [mobileCartHeight, setMobileCartHeight] = useState(0)
+    const [mobileCartHeight, setMobileCartHeight] = useState('auto')
     const [code, setCode] = useState('')
  
     const postSharedCode = async (session_id, user_id, codes) => {

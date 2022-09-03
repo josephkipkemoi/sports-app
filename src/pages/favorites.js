@@ -41,13 +41,7 @@ export default function Favorites() {
             refetch()
         }
     }
-
-    const fetchFavorites = () => refetch()
-
-    useEffect(() => {
-        fetchFavorites()
-    },[router.pathname])
-
+  
     return (
         <StyledFavorites >
             <Row className="px-2">

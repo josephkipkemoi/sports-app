@@ -42,7 +42,6 @@ export default function Jackpot() {
     const fiveJackpotData = useGetJackpotFixturesQuery('Five Jackpot')
     const jackpotPrize = useGetJackpotPrizeWinsQuery()
 
-    console.log(jackpotPrize.data)
     const fetchJackpotGames = () => {
         const megaJackpotIds = JSON.parse(sessionStorage.getItem('Mega Jackpot'))
         const fiveJackpotIds = JSON.parse(sessionStorage.getItem('Five Jackpot'))

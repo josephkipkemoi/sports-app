@@ -158,8 +158,8 @@ const BalanceComponent = () => {
 }
 
 const DepositComponent = () => {
-    const [userId, setUserId] = useState(null);
-
+    const { user } = useAuth({ middleware: 'guest' })
+ 
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
 
     const [depositAmount, setDepositAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
@@ -188,46 +188,28 @@ const DepositComponent = () => {
         if(incrementAmt === 5000) {
           setDepositAmount(depositAmount + configData.INCREMENT_DEPOSIT_5000)
         }
-      }
-
-    //   const depositAmountToDb = () => {
-    //     if(userId) {
-    //         axios.post(`api/users/${userId}/balance`, {
-    //             'user_id': userId,
-    //             'amount': depositAmount
-    //            } ,{
-    //                 headers: {
-    //                     'x-sportsapp-key': configData.SPORTS_APP_KEY
-    //                 }        
-    //         })
-    //     }
-    // }
+    }
 
     const deposit = async () => {
         const short_code = config.BUSINESS_SHORT_CODE;
         const passkey = config.BUSINESS_PASSKEY;
         const timestamp = generateTimestamp().toString();
-        const phone_number = Number('254' + sessionStorage.getItem('u_phone_no'))
+        const phone_number = Number('254' + user.data.phone_number)
         const password = generateBase64Encoding(short_code, passkey, timestamp);
- 
+  
         axios.post('api/mpesa/push', {
             phone_number,
             timestamp,
             amount: depositAmount         
         })
-           
-     
+
     }
 
     const fetchMpesa = async () => {
         // const res = await axios.get('api/mpesa/transaction')
         // console.log(res)
     }
-    useEffect(() => {
-        const userId = localStorage.getItem('u_i')
-        // fetchMpesa()
-        setUserId(userId)
-    }, [])
+  
     return (
         <div className="shadow-sm p-4 mb-4">
             <h5>Deposit</h5>
