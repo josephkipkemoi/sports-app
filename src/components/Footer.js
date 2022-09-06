@@ -7,7 +7,7 @@ import styledComponents from "styled-components";
 import styled from "styled-components";
  
 const StyledFooter = styledComponents.div`
-    background-color: #444;
+    background-color: #191970;
     color: #fff;
     width: 100%;
 `

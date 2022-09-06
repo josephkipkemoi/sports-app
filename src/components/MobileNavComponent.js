@@ -10,6 +10,7 @@ const StyleMobileNavComponent = styled.div`
     z-index: 2;
     margin: 0;
     padding: 0;
+    background-color: #001041;
     span {
         line-height: 12px;
     }
@@ -31,7 +32,7 @@ export default function MobileNavComponent ({ length, openSlip }) {
     return (
         <StyleMobileNavComponent className="w-100">
             <div 
-            className="bg-success w-100 text-white d-flex justify-content-between align-items-center mobile-display"
+            className="w-100 text-white d-flex justify-content-between align-items-center mobile-display"
             >
                 <Link href="/">
                     <a
@@ -54,7 +55,7 @@ export default function MobileNavComponent ({ length, openSlip }) {
                 <div className="bg-white p-2 rounded-circle ">
                     {length === undefined || length === 0? 
                         <BetslipSvgIcon width="16" height="16" /> :
-                        <span onClick={openSlip}  id="mobile" className="text-dark p-2 fw-bold" id="mobile-txt">{length}</span>
+                        <span onClick={openSlip}  id="mobile" className="text-dark p-2 fw-bold" >{length}</span>
                     }
                 </div>
                 <Link href="/profile">

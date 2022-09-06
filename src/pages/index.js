@@ -25,15 +25,21 @@ const ThemedBody = styled('div')`
 
 const StyleGameData = styled('div')`
 height: 100vh;
+overflow-y: scroll;
+overflow-x: hidden;
+background-color: #ebeded;
+ 
 .custom-grid-box-main, .custom-grid-hide {
-  background: #424242;
-  color: #c3c3c3; 
+  background: #ebeded;
+  color: #191970; 
 }
+ 
 .header {
-  background: #424242;
-  color: #ffffff;
+  background: #fff;
+  color: #191970;
   letter-spacing: 1px;
-  font-weight: 600;
+  font-weight: 700;
+  width: 90%;
  }
 .custom-grid-box {
   background: #424242;
@@ -61,9 +67,7 @@ height: 100vh;
     flex-wrap: wrap;
     padding: 12px;
   }
-  .custom-grid h5 {
-    font-size: 12px;
-  }
+ 
   .custom-grid-hide {
     display: none;
   }
@@ -130,7 +134,7 @@ function App() {
                      
                    </StyleGameData>   
                    </StyledMain>  
-                     
+                                                                                                                                      
                   </Col>
                   
                   <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>    

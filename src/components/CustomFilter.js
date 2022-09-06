@@ -6,6 +6,10 @@ import  Spinner  from "react-bootstrap/Spinner";
 import axios from "../lib/axios";
 import { Small } from "./Html";
 import GameComponent from './GameComponent';
+import  { 
+  faSoccerBall,
+}  from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const StyleSearch = styled.div`
 input {
@@ -43,10 +47,36 @@ button:hover {
 `
 
 const StyleCustomFilter = styled.div`
-@media screen and (max-width: 990px) {
-  display: grid;
-  grid-template-columns: 1fr 1fr ;
+display: flex;
+align-items: center;
+padding: 10px 15px;
+background-color: #fff;
+.header-one {
+  width: 40%;
 }
+.header-two {
+  width: 40%;
+}
+.header-three {
+  width: 20%;
+}
+@media screen and (max-width: 992px) {
+  .header-one {
+    width: 100%;
+  }
+  .header-two {
+     display: none;
+  }
+  .header-three {
+    display: none;
+  }
+}
+ h5 {
+  margin: 0;
+  padding: 0;
+  color: #001041;
+  text-transform: uppercase;
+ }
 
 `
 export default function CustomFilter({ heading, refetch }) {
@@ -69,7 +99,33 @@ export default function CustomFilter({ heading, refetch }) {
     }
     return (
       <>
-       <Row className="d-flex flex-row align-items-center p-2 card shadow-sm mb-2" style={{ backgroundColor: '#424242' }}>
+      <div>
+        <StyleCustomFilter >
+          <div className="header-one d-flex align-items-center">
+            <FontAwesomeIcon className="fa-lg" icon={faSoccerBall} />
+            <h5 className='fw-bold mx-auto'>{heading}</h5>
+          </div>
+          <div className="header-two">
+            <StyleButton className='d-flex align-items-center'>
+              <button className='btn' onClick={() => window.print()}>
+                <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>
+              </button>        
+              <button className='background-none' onClick={() => refetch()}>
+                <i className="bi bi-arrow-clockwise p-1" style={{ color: '#ffffff' }}></i>
+                <small style={{ color: '#ffffff', letterSpacing: '1px' }}>Refresh</small>
+              </button>
+            </StyleButton> 
+          </div>
+          <div className="header-three">
+            <SearchComponent 
+              onsubmit={onsubmit} 
+              onchange={onchange} 
+              customClass="search-comp"
+            />   
+          </div>
+        </StyleCustomFilter>
+      </div>
+       {/* <Row className="d-flex flex-row align-items-center p-2 card shadow-sm mb-2" style={{ backgroundColor: '#424242' }}>
         <StyleCustomFilter className="row">
           <Col lg={4} >
             <h5 className='text-white fw-bold' style={{ letterSpacing: 1, margin: 0 }}>{heading}</h5>
@@ -94,7 +150,7 @@ export default function CustomFilter({ heading, refetch }) {
           </Col>
         </StyleCustomFilter>
       </Row>  
-  
+   */}
        {isSearchLoading ? <Spinner animation='grow' /> :  <SearchResults data={searchResults}/>}
   
       </>

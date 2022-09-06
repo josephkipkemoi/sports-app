@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const StyleTimer = styled.div`
+    margin-left: 4px;
     span {
-        margin-left: 10px;
         letter-spacing: 2px;
         font-weight: bold;
+        margin-top: 2px;
+        margin-left: 4px;
     }
 `
 export default function CurrentTime() {
@@ -26,7 +28,10 @@ export default function CurrentTime() {
     }, [timer])
     return (
         <StyleTimer>
-           <span className="text-white">{`${hours}:${String(min).padStart(2, '0')}`}</span>
+            <div className="d-flex align-items-center">
+                <i className="bi bi-clock"></i>
+                <span className="text-white">{`${hours}:${String(min).padStart(2, '0')}`}</span>
+            </div>         
         </StyleTimer>
     )
 }

@@ -176,7 +176,7 @@ const StyleBetslip = styled.div`
   ::-webkit-scrollbar-track {
     background: #383838;
   }
-  ::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb { 
     background: #c3c3c3;
     border-radius: 8px;
   }
@@ -268,7 +268,7 @@ const BetslipCartHeader = ({ length }) => {
       return (
         <div 
         className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-        style={{ backgroundColor: '#ffffff', color: '#424242', borderTopLeftRadius: '6px', borderTopRightRadius: '6px'}} 
+        style={{ backgroundColor: '#191970', color: '#fff', borderTopLeftRadius: '6px', borderTopRightRadius: '6px'}} 
         onClick={openMobileBetslip}
         slip="active"
         >
@@ -372,11 +372,11 @@ const CartElements = (link, i) => {
             <div style={{ paddingTop: '7px', paddingRight: '14px', paddingLeft: '14px'}}>
               <div className='d-flex align-items-center justify-content-between'>
                 <div className='pt-2'>
-                    <FontAwesomeIcon icon={faSoccerBall} style={{ marginRight: '5px' }}/>
+                    <FontAwesomeIcon className="text-dark" icon={faSoccerBall} style={{ marginRight: '5px' }}/>
                     <Small>{link && link.betslip_teams}</Small>
                 </div>
                 <button 
-                className='close-btn fw-bold'
+                className='close-btn fw-bold text-dark'
                 id="close-btn"
                 onClick={() => removeSingleBetslipFixture(fixId)}
                 >
@@ -502,7 +502,7 @@ const CartElements = (link, i) => {
         fiveJackpotGames={fiveJackpotGames}
       /> 
     <StyleBetCart 
-    className='betcart-mb card bg-success shadow' 
+    className='betcart-mb card bg-light shadow' 
     >
         <ShareContainer 
         isModalOpen={modalOpen} 
@@ -874,7 +874,7 @@ const BetCartFormElements = ({ betData }) => {
       const possibleWin = res * betAmount
   
       return (
-          <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#424242', paddingBottom: '4px' }}>
+          <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#ebeded', paddingBottom: '4px' }}>
           {betData?.length !== 0 &&
            <div className='d-flex align-items-center justify-content-between'>
                 <Small>Total Odds:</Small>

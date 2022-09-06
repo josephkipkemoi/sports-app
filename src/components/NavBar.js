@@ -17,6 +17,16 @@ import styled from "styled-components";
 import AuthUser from "../hooks/AuthUser";
 
 const StyledTopRightNav = styledComponents.div`
+position: sticky;
+top: 0;
+z-index: 2;
+
+ h5 {
+    color: #001041;
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+ }
 .right-nav-link {
     display: inline-flex;
     position: absolute;
@@ -24,25 +34,122 @@ const StyledTopRightNav = styledComponents.div`
     right: 10.5px; 
     font-weight: 350;
 }
-
 nav {
-    background-color: #333;
-    
+    background-color: #fff;
 }
 nav a {
-    color: #9c9c9c;
+    color: #001041;
     transition: .3s;
 }
 nav a:hover, a:active {
-    color: #fff;
+    color: #191970;
+}
+.nav-links-mobile a {
+    color: #001041;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+.nav-links-mobile a:nth-child(1) {
+    color: #001041;
+    padding: 10px 15px;
+}
+.nav-links-mobile a:nth-child(2) {
+    padding: 10px 15px;
+    background-color: #1affff;
+    border-radius: 20px;
+    font-weight: 700;
+    margin-left: 12px;
+}
+.mobile-join {
+    margin-left: 6px;
 }
 @media screen and (max-width: 992px) {
     .right-nav-link a{
        margin-left: 6px;
+    }  
+}
+@media screen and (max-width: 992px) {
+    .nav-links-mobile a {
+        color: #001041;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 14px;
     }
-     
+    .nav-links-mobile a:nth-child(1) {
+        color: #001041;
+        padding: 10px 15px;
+    }
+    .nav-links-mobile a:nth-child(2) {
+        padding: 10px 15px;
+        background-color: #1affff;
+        border-radius: 20px;
+        font-weight: 700;
+        margin-left: 4px;
+    }
+    nav {
+        background-color: #fff;
+        border-bottom: none;
+        position: sticky;
+        width: 100%;
+        z-index: 2;
+    }
+    .navbar-toggler {
+       display: none;
+    }  
+}
+@media screen and (min-width: 992px) {
+    .nav-links-mobile  {
+        display: none;
+    }
 }
 `
+
+const StyleBottomNavBar = styledComponents.div`
+   .join {
+       background-color: #ffdf1b;
+       padding: 6px;
+       border-radius: 6px;
+       margin-top: -4px;
+       margin-right: 12px;
+       margin-left: 12px;
+       color: black;
+   }
+   .hide {
+    display: none;
+    }
+    .live-games {
+        width: 100px;
+    }
+   nav a {
+       color: #fff;
+   }
+   .time {
+    color: #fff;
+   }
+    nav {
+        background-color: #126e51;
+    }
+    .nav-link  {
+        margin-left: 24px;
+    }
+ 
+    @media screen and (max-width: 576px) {      
+       .time {
+          width: 30%;
+       }
+       .nav-end {
+        width: 60%;
+       }
+    }
+    @media screen and (max-width: 992px) {
+        nav {
+            background-color: #191970;
+            border-top: none;
+        }
+    }  
+`
+
 const topNavLinks = [
     {
         name: 'Sports',
@@ -84,7 +191,7 @@ export default function NavBar({ logout, login }) {
             <Link key={i} href={link.path} prefetch={false} >
                 <a 
                     itemProp="url"
-                    className="fnt-sze nav-link"
+                    className="fnt-sze nav-link "
                 >
                     {link.name}
                 </a>
@@ -97,28 +204,50 @@ export default function NavBar({ logout, login }) {
 
     return (
         <>
-        <StyledTopRightNav>
-        <nav className="navbar navbar-expand-lg navbar-light">
-                <div className="container-fluid">
-                    <Link href="/">
-                        <a className="navbar-brand text-light bg-success rounded p-2 d-flex" itemProp="url">
-                            <Image src="/logo.png" width="48" height="24"/>
-                        </a>
-                    </Link>
-                    <button className="navbar-toggler bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon "></span>
-                    </button>
-                   
-                    <div className="collapse navbar-collapse" id="navbarNavDropdown">
-                        <div className="navbar-nav me-auto mb-2 mb-lg-0">                            
-                            {topNavLinks.map(TopNavLinkElements)}
+        <StyledTopRightNav className="shadow-lg">
+            <nav >
+                    <div className="d-flex justify-content-between align-items-center p-2">
+                        <div className="col-mobile">
+                            <Link href="/">
+                                <a className="navbar-brand" itemProp="url">
+                                    {/* <Image src="/logo.png" width="48" height="24"/> */}
+                                    <h5>Pinaclebet</h5>
+                                </a>
+                            </Link>
+                        </div>
+                        {/* <div className="d-flex">
+                            <div className="d-flex ">                            
+                                {topNavLinks.map(TopNavLinkElements)}
+                            </div>
+                        </div> */}
+                        <div >
+                          
+                            <div className="nav-links-mobile d-flex align-items-center">
+                                <Link href="/login">
+                                    <a
+                                        itemProp="url"
+                                        className="d-flex align-items-center"
+                                    >
+                                        <i className="bi bi-arrow-right-circle"></i>
+                                        <span className="mobile-join">Login</span>                                        
+                                    </a>
+                                </Link>
+                                <Link href="/register">
+                                    <a
+                                        itemProp="url"
+                                        className="d-flex align-items-center"
+                                    >
+                                        <i className="bi bi-person-plus"></i>
+                                        <span className="mobile-join">Join</span>
+                                    </a>
+                                </Link>
+                            </div>
                         </div>
                     </div>
-                    
-                </div>
-        </nav>
+            </nav>
+            <BottomNavBar logout={logout} login={login} user={user}/>
+
         </StyledTopRightNav>
-        <BottomNavBar logout={logout} login={login} user={user}/>
         </>
     )
 }
@@ -152,62 +281,6 @@ const unauthLinks = [
     }
 ]
 
-const StyleBottomNavBar = styledComponents.div`
-   .join {
-       background-color: #ffdf1b;
-       padding: 6px;
-       border-radius: 6px;
-       margin-top: -4px;
-       margin-right: 12px;
-       margin-left: 12px;
-       color: black;
-   }
-   .hide {
-    display: none;
-    }
-    .live-games {
-        width: 100px;
-    }
-   nav a {
-       color: #fff;
-   }
-
-    nav {
-        background-color: #126e51;
-    }
-    .nav-link  {
-        margin-left: 24px;
-    }
- 
-    @media screen and (max-width: 570px) {
-        .custom-mx-auto {
-             margin: 0 !important;
-        }
-        .nav-link {
-            margin-left: 12px;
-        }
-    }
-    @media screen and (max-width: 570px) {      
-        .sports {
-            display: none;
-        }
-        .live-games {
-            display: none;
-        }
-        .align-right {
-            top: 56px;
-        }
-        .mobile {
-            display: none; 
-        }
-        .time {
-           position: absolute;
-           margin-top: 35px ;
-        }
-    }
-
-  
-`
 const StyleAuthenticated = styledComponents.div`
  span {
      color: ${props => props.theme.colors.primaryLight};
@@ -342,7 +415,7 @@ export const BottomNavBar = ({ login, user }) => {
                 <Link href={link.path}>
                     <a
                         itemProp="url"
-                        className="text-decoration-none mobile m-1"
+                        className="text-decoration-none m-1"
                         style={{ letterSpacing: '1px' }}
                     >
                         {link.name}
@@ -413,19 +486,17 @@ export const BottomNavBar = ({ login, user }) => {
     return (
         <StyleBottomNavBar>  
         <nav className="p-1" ref={linkBarRef}>
-            <Row>
-                <Col lg={6} md={6} sm={6}  className="d-flex justify-content-between align-items-center">
-                    <div className="time">
-                        <CurrentTime/>
-                    </div>
-                    <div>
-                        {midnavLinks.map(MidNavLinkItems)}
-                    </div>
+            <Row className="d-flex align-items-center mid-nav">
+                <Col lg={5} md={5} sm={5} className="time" >
+                    <CurrentTime/>
                 </Col>
-                <Col lg={6} md={6} sm={6} className="d-flex justify-content-end align-items-center">     
-                    {Boolean(user.uu_id) ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}  
+                <Col lg={7} md={7} sm={7} className="d-flex justify-content-start align-items-center nav-end">     
+                    {/* {Boolean(user.uu_id) ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   */}
                     {/* <Profile setProfileOpen={setProfileOpen} profileOpen={profileOpen}/>
                     <ProfileComponent profileOpen={profileOpen}/> */}
+                     <div>
+                        {midnavLinks.map(MidNavLinkItems)}
+                    </div>
                 </Col>
             </Row>
         </nav>

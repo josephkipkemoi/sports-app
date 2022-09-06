@@ -18,7 +18,21 @@ const StyleFavorites = styled.i`
     opacity: 1;
   }
 `
-
+const StyleGameComponent = styled.div`
+  small {
+    color: #001041;
+    font-weight: 700;
+    opacity: .8;
+  }
+  span {
+    color: #001041;
+  }
+  button {
+    background: #e3f1fd;
+    color: #001041 !important;
+  }
+ 
+`
 export default function GameComponent({ data, refetch }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
@@ -94,7 +108,7 @@ export default function GameComponent({ data, refetch }) {
       const OddsMarket = (odds, ii) => {        
         return (
           <React.Fragment key={ii+i+odds.odd}>         
-                <div className='d-sm-flex m-1 btn btn-success btn-sm' style={{ width: '30%', padding: 0, margin: 0}}>               
+                <div className='d-sm-flex m-1 btn btn-light btn-sm' style={{ width: '30%', padding: 0, margin: 0}}>               
                   <button 
                     className=' text-white w-100 flex-wrap p-2'   
                     id="fix-btn"
@@ -125,11 +139,11 @@ export default function GameComponent({ data, refetch }) {
       return ( 
         <React.Fragment key={i+name.name}>
               <div 
-                className='text-light w-100 p-2 fw-bold d-flex flex-row align-items-center'
-                style={{ lineHeight: '30px', backgroundColor: '#424242' }}
+                className=' w-100 p-2 fw-bold d-flex flex-row align-items-center'
+                style={{ lineHeight: '30px', backgroundColor: '#fff' }}
               >
                 <i className="bi bi-star-fill"></i>
-                <small className='text-white mt-1' style={{ marginLeft: 10, letterSpacing: 2 }}>{name.name}</small>
+                <small className=' mt-1' style={{ marginLeft: 10, letterSpacing: 2 }}>{name.name}</small>
               </div>
               <div className='d-flex justify-content-between flex-wrap'>
                 {name.values.map(OddsMarket)}
@@ -186,7 +200,8 @@ export default function GameComponent({ data, refetch }) {
     }, [])
  
     return (
-      <Row  className="custom-grid p-2">  
+      <StyleGameComponent>
+         <Row className="custom-grid">  
         {data.map((innerData,index) => {
           const oddsData = JSON.parse(innerData.odds)
  
@@ -195,60 +210,56 @@ export default function GameComponent({ data, refetch }) {
             <Col 
             lg={8} 
             sm={8} 
-            className="card custom-grid-box-main p-2 text-white" 
+            className="card custom-grid-box-main p-2" 
             style={{ borderRight: '0px', border: 'none', background: 'none' }}
             >  
       
-              <Row style={{ marginLeft: 2 }}>
-              <h6 className='header text-mute' style={{ letterSpacing: '1px' }}> 
+              <Row style={{ marginLeft: 2 }} className="d-flex align-items-center">
+              <h6 className=' text-mute' style={{ letterSpacing: '1px' }}> 
                 {innerData.flag ?
                     <img 
                     src={innerData.flag} 
                     className="img-fluid"                 
                     style={{ width : 16, marginRight: 5}}
                   /> 
-                : ''}
-               
-                  {innerData.country} | {innerData.league_name}
+                : ''}               
+                 <span className="header-span">{innerData.country} | {innerData.league_name}</span> 
               </h6>
               <div>
               <small style={{ marginRight: 5, lineHeight: '30px', letterSpacing: '1px' }}>
-                Bet ID: B360{innerData.fixture_id} 
+                Bet ID: P3{innerData.fixture_id} 
               </small>
            
               </div>
-
                   <Row>
                     <Col className='d-inline-flex'>
                       <StyleFavorites>
                         <i 
-                          className={`bi bi-star-fill ${innerData.favorite_active ? 'text-warning' : 'text-white'}`}
+                          className={`bi bi-star-fill ${innerData.favorite_active ? 'text-warning' : 'text-dark'}`}
                           onClick={() => updateFavorite(innerData.fixture_id, innerData.favorite_active)}                      
                         ></i>
                       </StyleFavorites>
                     
                       <div style={{ marginTop: 2.5, marginLeft: 10 }}>
-                        <span style={{ letterSpacing : '1px', color: '#ffffff', fontWeight: 500  }}>{innerData.home}</span>
+                        <span style={{ letterSpacing : '1px', fontWeight: 500  }}>{innerData.home}</span>
                         <i className="bi bi-dash"></i>
-                        <span style={{ letterSpacing : '1px', color: '#ffffff', fontWeight: 500  }}>{innerData.away}</span>
+                        <span style={{ letterSpacing : '1px', fontWeight: 500  }}>{innerData.away}</span>
                       </div>                    
                     </Col>
-                  </Row>
-                 
-              </Row>
-                     
+                  </Row>                 
+              </Row>                     
             </Col>
-            <Col lg={4} sm={4} className="card d-flex flex-row  active-btn" style={{ background: '#424242', borderLeft: '0px', border: 'none' }}>
+            <Col lg={4} sm={4} className="card d-flex flex-row active-btn" style={{ background: '#fff', borderLeft: '0px', border: 'none' }}>
           
               {oddsData.map((odd) => {             
                 return odd.id === 1 && odd.values.map((val, i) => {
                   return (
                      <div key={i} className='text-center mb-3 w-100 m-1'>
-                        <small className='header text-center text-white'>{val.value}</small>  
+                        <small className='header text-center'>{val.value}</small>  
                         <div onClick={() => activatBtn(index,i)}>                        
                           <button 
                             odds={val.odd} 
-                            className='btn btn-success btn-sm w-100 text-white active-btn-btn p-2'
+                            className='btn btn-sm w-100 active-btn-btn p-2'
                             id="fix-btn"
                             btn_id={i}
                             home_team={innerData.home} 
@@ -270,8 +281,7 @@ export default function GameComponent({ data, refetch }) {
 
                 <Small 
                   onClick={() => displayMoreMarkets(index, innerData.home, innerData.away, innerData.fixture_id)}
-                  className="text-warning fw-bold d-flex flex-column mt-3 p-2" 
-                   
+                  className="text-dark fw-bold d-flex flex-column mt-3 p-2"                    
                 >
                     <i className="bi bi-plus d-flex align-items-center" style={{ height: 20, marginTop: '2px' }}>
                     {oddsData.length} 
@@ -285,8 +295,8 @@ export default function GameComponent({ data, refetch }) {
             </Col>
             <div className='more-market' style={{ display: 'none' }}>
               <hr className='text-secondary'/>
-              <div className='fw-bold text-center text-white bg-success p-2 rounded' style={{ letterSpacing: 2 }}>
-                <span >More Markets</span>
+              <div className='fw-bold text-center bg-light p-2 rounded' style={{ letterSpacing: 2 }}>
+                <span className="text-dark">More Markets</span>
               </div>
               {oddsData.map(MoreFixtureMarket)}
             </div>
@@ -297,7 +307,8 @@ export default function GameComponent({ data, refetch }) {
           )
           
         })}
-
       </Row>
+      </StyleGameComponent>
+     
     )
 }

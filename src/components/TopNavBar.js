@@ -19,21 +19,30 @@ import  {
 import { useRouter } from "next/router";
 
 const StyleSideNav = styled.div`
-background-color: #383838;
- 
+background-color: #fff; 
 overflow-x: scroll;
 overflow-y: hidden;
-
 ::-webkit-scrollbar {
-  height: 6px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #383838;
+  background: #191970;
 }
 ::-webkit-scrollbar-thumb {
   background: #c3c3c3;
   border-radius: 8px;
 }
+.nav-container:nth-child(1) {
+  margin-left: 4px;
+}
+@media screen and (max-width: 992px) {
+ 
+  a {
+    background: #191970;
+    margin: 3px;  
+    border-radius: 6px;
+  }
+} 
 `
 const topNavLinks = [
     {
@@ -102,7 +111,7 @@ export default function TopNavBar() {
     const router = useRouter()
     const { pathname } = router
     const TopNavLinkItem = (link, i) => (
-        <div sm={1} key={i}>     
+        <div sm={1} key={i} className="nav-container">     
           <Link href={link.path} prefetch={false} className="icon-text-width">
             <a
               itemProp='url'
@@ -110,7 +119,7 @@ export default function TopNavBar() {
             >
               <FontAwesomeIcon 
                 icon={link.icon} 
-                className={`fa-2x mb-2 mt-2 ${link.path === pathname ? 'text-warning' : 'text-success'} `}
+                className={`fa-2x mb-2 mt-2 ${link.path === pathname ? 'text-warning' : 'text-white'} `}
               />
  
               <small 

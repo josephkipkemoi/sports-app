@@ -32,8 +32,7 @@ const GlobalStyles = createGlobalStyle`
  html, body {
     margin: 0;
     padding: 0;
-    font-family: 'Readex Pro', sans-serif;
-    font-size: 14px;
+    font-family: Roboto Condensed,Arial Narrow,sans-serif;
     box-sizing: border-box;
     overflow-x: hidden;
  }
