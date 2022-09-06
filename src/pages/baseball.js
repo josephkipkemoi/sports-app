@@ -8,21 +8,27 @@ import TopNavBar from "../components/TopNavBar";
 import BetslipContainer from "../components/BetslipContainer";
 
 const StyleBaseball = styled.div`
-    height: 100vh;
+height: 100vh;
+overflow-y: scroll;
+overflow-x: hidden;
+background-color: #ebeded;
 `
 export default function Baseball() {
     return (
-        <StyleBaseball>
+        <>
         <Row className="px-2">
             <Col lg={9} md={12} sm={12}>
                 <TopNavBar/>
                 <CustomFilter heading="Baseball"/>
+                <StyleBaseball>
+
+                </StyleBaseball>
             </Col>
             <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>
                 <BetslipContainer/>
                 <CustomerInfo/>
             </Col>
         </Row>
-        </StyleBaseball>
+        </>
     )
 }

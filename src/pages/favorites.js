@@ -12,6 +12,9 @@ import AuthUser from "../hooks/AuthUser";
 
 const StyledFavorites = styled.div`
  height: 100vh;
+ overflow-y: scroll;
+ overflow-x: hidden;
+ background-color: #ebeded;
  h5 {
     margin-left: 1rem;
     margin-top: 2px;
@@ -70,8 +73,8 @@ export default function Favorites() {
 
 const NoFavorites = () => {
     return (
-        <div className='text-center mt-5'>
-            <span className='text-light'>You do not have any favorites</span>
-        </div>
+        <StyledFavorites className='text-center mt-5'>
+            <span className='text-dark'>You do not have any favorites</span>
+        </StyledFavorites>
     )
 }

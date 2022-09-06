@@ -80,10 +80,8 @@ const StyledMain = styled.div`
 background: #424242;
 `
 
-function App() {
-
-  const { data, isLoading, error, refetch } = useGetV1CustomFixtureQuery()
- 
+function App({ data }) {
+   
   useEffect(() => {
 
     const currentSession = sessionStorage.getItem('session_id')
@@ -93,15 +91,6 @@ function App() {
     }  
 
   },[])
- 
-    
-  if(isLoading) {
-    return <Spinner animation='grow' />
-  }
-
-  if(error) {
-    return <span>Try again later!</span>
-  }
  
   return (
     <ThemedBody>
@@ -123,12 +112,8 @@ function App() {
                         right={50}
                         caret_position="right"
                       /> 
-                      <div className='d-flex justify-content-center'>
-                        { isLoading && <Spinner animation='grow'/> }
-                        { error && <span className='text-white'>Try again Later</span> }
-                      </div>
 
-                      <GameComponent data={data.fixtures} refetch={refetch}/>
+                      <GameComponent data={data} />
 
                      </div>
                      
@@ -151,6 +136,16 @@ function App() {
 
     </ThemedBody>
   );
+}
+
+export async function getServerSideProps(context) {
+  const data = await axios.get('api/custom_fixture')
+
+  return {
+    props: {
+      data: data.data.fixtures
+    }, // will be passed to the page component as props
+  }
 }
 
 export default App;

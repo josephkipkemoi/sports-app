@@ -5,7 +5,7 @@ import configData from '../../config.json';
 import { H5 } from "./Html";
 
 const StyleCustomerInfo = styled.div`
-  background-color: #383838;
+  background-color: #fff;
   padding: 12px;
 `
 export default function CustomerInfo() {
@@ -27,21 +27,26 @@ const StyleMpesaInfo = styled.div`
  }
  span {
   line-height: 24px;
-  color: #fff;
+  color: #001041;
   letter-spacing: 2px;
+  font-weight: 700;
  }
  .header {
-  background-color: #424242;
+  background-color: #001041;
  }
+ .mpesa-card {
+  background-color: #ebeded;
+ }
+
 `
 const MpesaInfo = () => {
     return (
       <StyleMpesaInfo>
-        <Card className='bg-success mt-3 rounded shadow'>
+        <Card className=' mt-3 rounded shadow border-0'>
           <Card.Header className='header'>
             <h6 className='fw-bold'>PAYBILL NUMBERS</h6>
           </Card.Header>
-          <Card.Body>
+          <Card.Body className="mpesa-card">
           <div className='d-flex justify-content-between'>
             <span>MPESA</span>
             <span className='fw-bold'>4075207</span>
@@ -55,8 +60,8 @@ const MpesaInfo = () => {
   const ContactSupport = () => {
     return (
       <StyleMpesaInfo>
-          <Card className='bg-success mt-3 rounded shadow'>
-          <Card.Header className='text-center text-white'>
+          <Card className='bg-white mt-3 rounded shadow border-0'>
+          <Card.Header className='text-center header'>
             <h6 className='fw-bold'>CUSTOMER CARE</h6>
           </Card.Header>
           <Card.Body>
@@ -85,15 +90,15 @@ const StyledFeatures = styled.div`
   padding: 8px;
 }
 h5 {
-  color: ${props => props.theme.colors.h5Color};
+  color: #001041;
+  font-weight: 700;
 }
 h6{
-  color: ${props => props.theme.colors.primaryLight};
- 
+  color: #001041;
+  font-weight: 700;
  }
 small, p{
-  color: ${props => props.theme.colors.primaryDark};
- 
+  color: #001041; 
  } 
 svg {
   margin-right: 4px;

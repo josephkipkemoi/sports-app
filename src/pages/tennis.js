@@ -8,21 +8,27 @@ import TopNavBar from "../components/TopNavBar";
 import BetslipContainer from "../components/BetslipContainer";
 
 const StyleTennis = styled.div`
-    height: 100vh;
+height: 100vh;
+overflow-y: scroll;
+overflow-x: hidden;
+background-color: #ebeded;
 `
 export default function Tennis() {
     return (
-        <StyleTennis>
-        <Row className="px-2">
-            <Col lg={9} md={12} sm={12}>
-                <TopNavBar/>
-                <CustomFilter heading="Tennis"/>
-            </Col>
-            <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>
-                <BetslipContainer/>
-                <CustomerInfo/>
-            </Col>
-        </Row>
-        </StyleTennis>
+        <>
+            <Row className="px-2">
+                <Col lg={9} md={12} sm={12}>
+                    <TopNavBar/>
+                    <CustomFilter heading="Tennis"/>
+                    <StyleTennis>
+
+                    </StyleTennis>
+                </Col>
+                <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>
+                    <BetslipContainer/>
+                    <CustomerInfo/>
+                </Col>
+            </Row>
+        </>
     )
 }
