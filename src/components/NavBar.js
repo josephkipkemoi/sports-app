@@ -15,6 +15,7 @@ import CurrentTime from "./CurrentTime";
 import { PersonSvgIcon } from "./Svg";
 import styled from "styled-components";
 import AuthUser from "../hooks/AuthUser";
+import Logo from "./Logo";
 
 const StyledTopRightNav = styledComponents.div`
 position: sticky;
@@ -211,7 +212,8 @@ export default function NavBar({ logout, login }) {
                             <Link href="/">
                                 <a className="navbar-brand" itemProp="url">
                                     {/* <Image src="/logo.png" width="48" height="24"/> */}
-                                    <h5>Pinaclebet</h5>
+                                    {/* <h5>Pinaclebet</h5> */}
+                                    <Logo/>
                                 </a>
                             </Link>
                         </div>

@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const StyleTimer = styled.div`
-    margin-left: 4px;
+    margin-left: 3px;
     span {
         letter-spacing: 2px;
         font-weight: bold;
         margin-top: 2px;
-        margin-left: 4px;
+        margin-left: 12px;
     }
 `
 export default function CurrentTime() {

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import  { 
     faStar, 
-    faMoneyBills,
     faSoccerBall,
     faTableTennis, 
     faGlobeAmericas,
@@ -15,6 +14,7 @@ import  {
     faGolfBall,
     faTableTennisPaddleBall,
     faCalendar,
+    faTrophy,
 }  from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 
@@ -53,7 +53,7 @@ const topNavLinks = [
     {
       name: 'Jackpots',
       path: '/jackpot',
-      icon: faMoneyBills
+      icon: faTrophy
     },
     {
       name: 'Soccer',
@@ -115,7 +115,7 @@ export default function TopNavBar() {
           <Link href={link.path} prefetch={false} className="icon-text-width">
             <a
               itemProp='url'
-              className='text-decoration-none text-secondary d-flex flex-column text-center p-2'         
+              className='text-decoration-none text-secondary d-flex flex-column text-center p-2 shadow'         
             >
               <FontAwesomeIcon 
                 icon={link.icon} 

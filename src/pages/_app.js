@@ -33,6 +33,7 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     font-family: Roboto Condensed,Arial Narrow,sans-serif;
+    font-size: 14px;
     box-sizing: border-box;
     overflow-x: hidden;
  }
