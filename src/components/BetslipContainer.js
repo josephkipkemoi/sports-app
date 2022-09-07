@@ -268,7 +268,7 @@ const BetslipCartHeader = ({ length }) => {
       return (
         <div 
         className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-        style={{ backgroundColor: '#191970', color: '#fff', borderTopLeftRadius: '6px', borderTopRightRadius: '6px'}} 
+        style={{ backgroundColor: '#001041', color: '#fff', borderTopLeftRadius: '6px', borderTopRightRadius: '6px', marginBottom: '8px'}} 
         onClick={openMobileBetslip}
         slip="active"
         >

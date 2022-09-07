@@ -12,7 +12,7 @@ const StyleMobileNavComponent = styled.div`
     z-index: 2;
     margin: 0;
     padding: 0;
-    background-color: #001041;
+    background-color: #191970;
     span {
         line-height: 12px;
     }
