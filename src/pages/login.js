@@ -1,12 +1,19 @@
+import Link from "next/link";
 import React, { useState } from "react";
-import { Button, Form, Card, Container } from "react-bootstrap";
+import { Form, Card, Container } from "react-bootstrap";
 import styled from "styled-components";
 import { withPublic } from "../components/RouteProtection";
 import useAuth from "../hooks/auth";
 
 const StyleLogin = styled.div`
-height: 50vh;
+height: auto;
 background-color: #fff;
+padding-bottom: 24px;
+a {
+    text-decoration: none;
+    color: #8b0000;
+    font-weight: bold;
+}
 `
 const Login = () => {
     const { login } = useAuth({ middleware: 'guest', redirectIfAuthenticated: '/' })
@@ -36,9 +43,9 @@ const Login = () => {
                 <Container className='custom-box'>
                 <Form>
                     <h3 className='mb-4 pt-4 fw-bold'>Login</h3>    
-                    <Card className='card-box shadow border-0'>
+                    <Card className='card-box shadow-sm border-0 mb-3'>
                         <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
-                        <h5 className='mt-2 mb-2'>User Information</h5>
+                        <h5 className='mt-2 mb-2 fw-bold'>Welcome Back</h5>
                         </Card.Header>
 
                         <Card.Body>
@@ -47,7 +54,7 @@ const Login = () => {
                                 <Form.Control 
                                     type='number' 
                                     placeholder='Phone number' 
-                                    className='shadow-sm'
+                                    className='shadow-sm p-3'
                                     name='phone_number'
                                     maxLength={10}
                                     required={true}
@@ -59,27 +66,33 @@ const Login = () => {
                                 <Form.Control 
                                     type='password' 
                                     placeholder='Password' 
-                                    className='shadow-sm' 
+                                    className='shadow-sm p-3' 
                                     autoComplete='new-password'
                                     name='password'
                                     required={true}
                                     onChange={handleUser}      
                                 />
                             </Form.Group>
+                            <div className="mt-4 text-end">
+                                <Link href="/forgot-password">
+                                    <a
+                                        itemProp="url"
+                                    >
+                                        Forgot Password ?
+                                    </a>
+                                </Link>
+                            </div>
                         </Card.Body>
                           
                     </Card>                
-                   
-                    <Button 
-                    style={{ backgroundColor: '#191970', borderColor: '#191970', letterSpacing: '1px' }} 
-                    type="submit" 
-                    className='w-100 shadow mt-4'
-                    onClick={submitForm}
-                    >
-                        Login
-                    </Button>
+                  
+                    <button className="btn w-100 p-3 shadow mt-2" style={{ backgroundColor: '#191970', color: '#fff' }} type="button" onClick={submitForm}>
+                        {isLoading ? <> <span class="spinner-border spinner-border-sm" role="status" ariaHidden="true"></span>
+                        Loading...</> : 'Login'}                   
+                    </button>
+
                     <div className='d-flex justify-content-center'>
-                        <Form.Group className='mt-4 text-center' controlId='formRememberCheckbox'>
+                        <Form.Group className='mt-3 text-center' controlId='formRememberCheckbox'>
                             <Form.Check 
                                 type="checkbox" 
                                 label="Remember Me"

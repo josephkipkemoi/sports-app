@@ -14,6 +14,7 @@ import Tooltip from '../components/Tooltip';
 import { BottomNavBar } from '../components/NavBar';
 import { useGetV1CustomFixtureQuery } from '../hooks/fixture';
 import { Spinner } from 'react-bootstrap';
+import CustomAds from '../hooks/CustomAds';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -99,7 +100,7 @@ function App({ data }) {
                   <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
                    <StyledMain>
                    <TopNavBar/>
-           
+                   <CustomAds/>
                    <CustomFilter heading="Highlights"/>
 
                    <StyleGameData>

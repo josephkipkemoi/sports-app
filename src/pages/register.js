@@ -5,6 +5,7 @@ import  useAuth  from '../hooks/auth';
 import { validateNumber } from '../lib/validation';
 import Support from '../components/Support';
 import config from '../../config.json';
+import Link from 'next/link';
 
 const StyleRegistration = styled.div`
 background-color: #fff;
@@ -102,7 +103,7 @@ small {
             <Container className='custom-box'>
                 <Form>
                     <h3 className='mb-4'>Open Account</h3>    
-                    <Card className='card-box shadow border-0'>
+                    <Card className='card-box shadow-sm border-0'>
                         <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
                         <h5 className='mt-2 mb-2'>Contact Information</h5>
                         </Card.Header>
@@ -125,7 +126,7 @@ small {
                           
                     </Card>                
                   
-                    <Card className='card-box shadow border-0 mt-4 mb-4'>
+                    <Card className='card-box shadow-sm border-0 mt-4 mb-4'>
                         <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
                             <h5>Create Password</h5>
                         </Card.Header>
@@ -156,8 +157,8 @@ small {
                         </Form.Group>
                         </Card.Body>
                     </Card>
-                    <div className='d-flex justify-content-center'>
-                        <Form.Group className='mb-3' controlId='formBasicCheckbox'>
+                    <div className='d-flex justify-content-start'>
+                        <Form.Group className='mb-1' controlId='formBasicCheckbox'>
                             <Form.Check 
                                 type="checkbox" 
                                 label="I have read and agree to the Terms & Conditions"
@@ -165,7 +166,21 @@ small {
                             />
                         </Form.Group>
                     </div>
-                   
+
+                    <div className='mb-2 text-end'>
+                        <span>
+                            Already have an account?
+                            <Link href="/login">
+                                <a
+                                    itemProp='url'
+                                    style={{ marginLeft: 5 }}
+                                >
+                                    Login
+                                </a>
+                            </Link>
+                        </span>
+                    </div>
+
                     <Button 
                     disabled={!!numberValidationMessage} 
                     style={{ backgroundColor: '#191970', borderColor: '#191970', letterSpacing: '1px' }} 
@@ -175,8 +190,9 @@ small {
                     >
                         Join {config.APP_NAME}
                     </Button>
-                    <div className='d-flex justify-content-center'>
-                        <Form.Group className='mt-4 text-center' controlId='formRememberCheckbox'>
+                   
+                    <div className='d-flex justify-content-start'>
+                        <Form.Group className='mt-3 text-center' controlId='formRememberCheckbox'>
                             <Form.Check 
                                 type="checkbox" 
                                 label="Remember Me"

@@ -36,15 +36,16 @@ const GlobalStyles = createGlobalStyle`
     font-size: 14px;
     box-sizing: border-box;
     overflow-x: hidden;
+    overflow-y: scroll;
  }
  ::-webkit-scrollbar {
-    width: 8px;
+    width: 4px;
   }
   ::-webkit-scrollbar-track {
-    background: ${props => props.theme.colors.h5Color};
+    background: #edebeb;
   }
   ::-webkit-scrollbar-thumb {
-    background: transparent;
+    background: #191970;
     border-radius: 8px;
   }
  

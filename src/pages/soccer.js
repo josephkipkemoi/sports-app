@@ -11,7 +11,10 @@ import { useGetV1CustomFixtureQuery } from "../hooks/fixture";
 import  Spinner  from "react-bootstrap/Spinner";
 
 const StyleSoccer = styled.div`
-    height: auto;
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: #ebeded;
 `
 
 export default function Soccer() {

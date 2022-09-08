@@ -888,5 +888,4 @@ const NoBetslipHistory = () => {
     )
 }
 
-// export default  withProtected(History) ;
-export default History;
+export default  withProtected(History);

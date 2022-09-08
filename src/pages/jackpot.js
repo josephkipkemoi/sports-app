@@ -28,7 +28,8 @@ const StyledJackpot = styled.div`
     }
 `
 const StyleJackpotContainer = styled.div`
-    max-height: 100vh;
+    height: 100vh;
+    background-color: #edebeb;
     overflow-y: scroll;
     overflow-x: hidden;
 `
@@ -120,8 +121,8 @@ export default function Jackpot() {
 
 const NoJackpotAvailable = () => {
     return (
-        <div className="text-center mt-5 text-white p-5">
-            <span>No games available! Check again later</span>
+        <div className="text-center mt-5 text-dark p-5">
+            <span>Coming Soon!</span>
         </div>
     )
 }
@@ -229,33 +230,38 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
         )
     }
     return (
-            <Row className="p-3" style={{ padding: 0, margin: 0 }}>
-                <div 
-                className="d-flex align-items-center justify-content-between text-white p-3 bg-dark rounded shadow-sm mb-3"
-                >
-                    <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
-                        <FontAwesomeIcon icon={faSoccerBall} className="text-white"/>
-                    </button>
-                    <div className="d-flex align-items-center">
-                        <span className="fw-bold" >{jackpot}</span>
-                        <span className="text-warning" style={{ marginRight: 10, marginLeft: 10 }}>
-                            KSH {(Number(jackpot_prize)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                        </span>
-                        <span>{games_count} Games</span>
-                    </div>
-                    <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
-                        <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>                
-                    </button>
+        <>
+          {data.length > 0 ? 
+            <Row className="p-3" style={{ padding: 0, margin: 0 }}>              
+            <div 
+            className="d-flex align-items-center justify-content-between text-white p-3 bg-dark rounded shadow-sm mb-3"
+            >
+                <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
+                    <FontAwesomeIcon icon={faSoccerBall} className="text-white"/>
+                </button>
+                <div className="d-flex align-items-center">
+                    <span className="fw-bold" >{jackpot}</span>
+                    <span className="text-warning" style={{ marginRight: 10, marginLeft: 10 }}>
+                        KSH {(Number(jackpot_prize)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    </span>
+                    <span>{games_count} Games</span>
                 </div>
-                <div className="col-lg-9 col-md-9 col-sm-9"></div>
-                <div className="col-lg-3 col-md-3 col-sm-3">
-                    <div className="d-flex justify-content-between text-light text-center">
-                        <span className=" w-100" style={{ width: '80px' }}>Home</span>
-                        <span className=" w-100" style={{ width: '80px' }}>Draw</span>
-                        <span className=" w-100" style={{ width: '80px' }}>Away</span>
-                    </div>
+                <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
+                    <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>                
+                </button>
+            </div>
+            <div className="col-lg-9 col-md-9 col-sm-9"></div>
+            <div className="col-lg-3 col-md-3 col-sm-3">
+                <div className="d-flex justify-content-between text-dark text-center">
+                    <span className=" w-100" style={{ width: '80px' }}>Home</span>
+                    <span className=" w-100" style={{ width: '80px' }}>Draw</span>
+                    <span className=" w-100" style={{ width: '80px' }}>Away</span>
                 </div>
-                {data.map(JackpotItems)}
-            </Row>
+            </div>
+            {data.map(JackpotItems)}
+        </Row>
+          : <NoJackpotAvailable/>}
+        </>          
     )
 }
+

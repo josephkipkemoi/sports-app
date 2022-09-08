@@ -510,7 +510,7 @@ export const BottomNavBar = ({ login, user }) => {
 
     return (
         <StyleBottomNavBar>  
-        <nav className="p-1" ref={linkBarRef}>
+        <nav className="p-2" ref={linkBarRef}>
             <Row className="d-flex align-items-center mid-nav">
                 <Col lg={5} md={5} sm={5} className="time" >
                     <CurrentTime/>
