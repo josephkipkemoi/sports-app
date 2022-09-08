@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router"
 import useAuth from "../hooks/auth";
+import AuthUser from "../hooks/AuthUser";
 
 export const withPublic = (WrappedComponent) => {
 
     return  (props) => {
         const router = useRouter()
-        const { user } = useAuth({ middleware: 'guest'   })
+        const { user } = useAuth({ middleware: 'guest' })
 
         useEffect( () => {
             if(Boolean(user?.data)) {
@@ -21,16 +22,12 @@ export const withPublic = (WrappedComponent) => {
 
 export const withProtected = (WrappedComponent) => {
     return (props) => {
-      const router = useRouter()
-      const { user } = useAuth({ middleware: 'guest' })
+
+      const { user } = useAuth({ middleware: 'guest', redirectIfNotAuthenticated: '/login' })
  
       useEffect(() => {
-        if(Boolean(user?.data) === false) {
-          router.replace('/login')
-          return null;
-        }
-        return null;
-      }, [user?.data])
+
+      }, [user])
 
       return <WrappedComponent {...props} />;
     };

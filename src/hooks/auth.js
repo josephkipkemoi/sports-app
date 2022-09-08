@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
 
-const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
+const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticated } = {}) => {
     const router = useRouter();
 
     const { data, error, mutate } = useSWR(`api/user`, async () => {
@@ -116,9 +116,9 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
     useEffect(() => {
 
         if (middleware === 'guest' && redirectIfAuthenticated && data?.data) router.push(redirectIfAuthenticated)
+        if (middleware === 'guest' && redirectIfNotAuthenticated && Boolean(data?.data) === false ) router.push(redirectIfNotAuthenticated)
         if(middleware === 'auth' && error) logout()
       
-
     }, [ error, data?.data])
 
     return {

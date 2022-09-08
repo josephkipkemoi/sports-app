@@ -218,14 +218,14 @@ const DepositComponent = () => {
             <Span className="d-block">Send money into your {APP_NAME} account</Span>
             <button 
             inc={configData.INCREMENT_DEPOSIT_100} 
-            onClick={incrementDepositAmount} modalId="modal-ref" 
+            onClick={incrementDepositAmount} modalid="modal-ref" 
             className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
             >
               + {configData.INCREMENT_DEPOSIT_100}
             </button>       
             <button 
             inc={configData.INCREMENT_DEPOSIT_250} 
-            modalId="modal-ref" 
+            modalid="modal-ref" 
             onClick={incrementDepositAmount} 
             className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
             >
@@ -233,7 +233,7 @@ const DepositComponent = () => {
             </button>       
             <button 
             inc={configData.INCREMENT_DEPOSIT_500} 
-            modalId="modal-ref" 
+            modalid="modal-ref" 
             onClick={incrementDepositAmount} 
             className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
             >
@@ -241,7 +241,7 @@ const DepositComponent = () => {
             </button>       
             <button 
             inc={configData.INCREMENT_DEPOSIT_1000} 
-            modalId="modal-ref" 
+            modalid="modal-ref" 
             onClick={incrementDepositAmount} 
             className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
             >
@@ -249,7 +249,7 @@ const DepositComponent = () => {
             </button>      
             <button 
             inc={configData.INCREMENT_DEPOSIT_5000} 
-            modalId="modal-ref" onClick={incrementDepositAmount} 
+            modalid="modal-ref" onClick={incrementDepositAmount} 
             className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
             >
               + {configData.INCREMENT_DEPOSIT_5000}
