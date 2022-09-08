@@ -7,6 +7,7 @@ import  useAuth  from '../hooks/auth';
 import { validateNumber } from '../lib/validation';
 import Support from '../components/Support';
 import config from '../../config.json';
+import { withPublic } from '../components/RouteProtection';
 
 const StyleRegistration = styled.div`
 background-color: #ebeded;
@@ -52,12 +53,13 @@ const countryOptions = [
     { name: 'country_residence', value: 'Tanzania', label: 'Tanzania' }
 ]
 
-export default function Register() {
+ const Register = () => {
+    
     const { register } = useAuth({
         middleware: 'guest',
         redirectIfAuthenticated: '/'
     })
- 
+    
     const [numberValidationMessage, setNumberValidationMessage] = useState('')
     const [errors, setErrors] = useState([])
 
@@ -183,3 +185,5 @@ export default function Register() {
         </StyleRegistration>
     )
 }
+
+export default Register;

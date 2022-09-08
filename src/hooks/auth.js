@@ -1,12 +1,10 @@
 import axios from '../lib/axios'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import useSWR from 'swr'
 
 const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
-    // const router = useRouter();
-
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const router = useRouter();
 
     const { data, error, mutate } = useSWR(`api/user`, async () => {
         const user = axios.get('api/user');
@@ -114,21 +112,14 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         localStorage.removeItem('share_code')
         window.location.pathname = '/'
     }
-    
-    function checkIfAuthenticated() {
 
-        if(!!localStorage.getItem('u_i')) {
-            setIsAuthenticated(true)
-        }
-    }
     useEffect(() => {
-        // if( user === null) localStorage.removeItem('u_s')
-        if (middleware === 'guest' && redirectIfAuthenticated && data?.user) router.push(redirectIfAuthenticated)
+
+        if (middleware === 'guest' && redirectIfAuthenticated && data?.data) router.push(redirectIfAuthenticated)
         if(middleware === 'auth' && error) logout()
       
-        checkIfAuthenticated()
 
-    }, [ error, data])
+    }, [ error, data?.data])
 
     return {
         user: data,
@@ -138,7 +129,6 @@ const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
         resetPassword,
         resendEmailVerification,
         logout,
-        isAuthenticated
     }
 
 }

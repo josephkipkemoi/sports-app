@@ -26,6 +26,7 @@ import Support from '../components/Support';
 import JackpotComponent from '../components/JackpotComponent';
 import Pagination from '../components/Pagination';
 import AuthUser from '../hooks/AuthUser';
+import { withProtected } from '../components/RouteProtection';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -35,8 +36,8 @@ const StyledHistory = styled.div`
     }
 `
 
-export default function History(){
-  
+function History(){
+
     return (
         <>
             <SportBetsHistoryProfile/>
@@ -619,6 +620,7 @@ const userProfileLinks = [
 export const UserProfile = () => {
 
     const { uu_id } = AuthUser()
+
 const UserProfileLinkElements = (link, i) => {
         return (
             <Link key={i} href={link.path}>
@@ -880,4 +882,4 @@ const NoBetslipHistory = () => {
     )
 }
 
- 
+export default  withProtected(History) ;

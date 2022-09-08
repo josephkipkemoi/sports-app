@@ -35,7 +35,7 @@ export default function Logo() {
     return (
         <StyleIcon>
             <svg width="170" height="40">
-                <text x="50%" y="60%"  text-anchor="middle"  >
+                <text x="50%" y="60%"  textAnchor="middle"  >
                     Pinaclebet
                 </text>
             </svg>

@@ -18,13 +18,14 @@ import axios from "../lib/axios"
 import { useRouter } from 'next/router';
 import Support from '../components/Support';
 import AuthUser from '../hooks/AuthUser';
+import { withProtected } from "../components/RouteProtection"
 
 const StyleProfile = styled.div`
     background-color: #ebeded;
     padding-bottom: 24px;
 `
 
-export default function Profile() {
+const Profile = () => {
 
     const router = useRouter()
     const { pathname } = router
@@ -338,3 +339,5 @@ const SupportComponent = () => {
         </div>
     )
 }
+
+export default withProtected(Profile)
