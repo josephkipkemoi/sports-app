@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { Button, Container, Form } from 'react-bootstrap';
+import { Button, Card, Container, Form } from 'react-bootstrap';
 import styled from 'styled-components';
-import Link from 'next/link';
-import Select from 'react-select';
 import  useAuth  from '../hooks/auth';
 import { validateNumber } from '../lib/validation';
 import Support from '../components/Support';
 import config from '../../config.json';
-import { withPublic } from '../components/RouteProtection';
 
 const StyleRegistration = styled.div`
-background-color: #ebeded;
+background-color: #fff;
 a {
     text-decoration: none;
     color: #8b0000;
@@ -18,8 +15,12 @@ a {
 }
 .custom-box {
     max-width: 530px;
-    padding-top: 32px;
-    padding-bottom: 64px;
+    padding-top: 22px;
+    padding-bottom: 22px;
+}
+hr {
+    margin: 0;
+    padding: 0;
 }
  input {
      padding: 15px 12px;
@@ -31,9 +32,18 @@ a {
  input[type=checkbox] {
      padding: 0;
  }
- h3, h6 {
+ h3, h5 {
      font-weight: bold;
+     color: #001041;
  }
+ label {
+    color: #001041; 
+ }
+ .card-box {
+    background-color: #fff;
+    border: 0;
+ }
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -45,13 +55,10 @@ input[type=number] {
 small {
     line-height: 30px;  
 }
+.card-red {
+    background-color: #1affff;
+}
 `
-
-const countryOptions = [
-    { name: 'country_residence', value: 'Kenya', label: 'Kenya' },
-    { name: 'country_residence', value: 'Uganda', label: 'Uganda' },
-    { name: 'country_residence', value: 'Tanzania', label: 'Tanzania' }
-]
 
  const Register = () => {
     
@@ -64,14 +71,12 @@ const countryOptions = [
     const [errors, setErrors] = useState([])
 
     const [userDetails, setUserDetails] = useState({
-        country_residence: countryOptions[0].value,
         phone_number: '',
-        email: '',
         password: '',
         password_confirmation: '',
     })
 
-    const { country_residence, phone_number, email, password, password_confirmation } = userDetails;
+    const { phone_number, password, password_confirmation } = userDetails;
 
     const handleUser = (e) => {
 
@@ -83,102 +88,103 @@ const countryOptions = [
             setNumberValidationMessage('')
         }
        
-        setUserDetails(prev => ({ ...prev, [e?.target?.name || 'country_residence'] : e?.target?.value || e.value}))
+        setUserDetails(prev => ({ ...prev, [e?.target?.name ] : e?.target?.value }))
     }
 
     const submitForm = (e) => {
         e.preventDefault();
 
-        register({ country_residence, phone_number, email, password, password_confirmation, setErrors })
+        register({ phone_number, password, password_confirmation, setErrors })
     }
 
     return (
         <StyleRegistration>
             <Container className='custom-box'>
                 <Form>
-                    <h3 className='mb-4'>Open Account</h3>
-                    <small className='d-block mb-4'>
-                        Get help - 
-                    <Link href="/contact">
-                        <a itemProp='url'> Contact Us</a>
-                    </Link>
-                    </small>
-                    <small className='d-block mb-2'>Country of residence</small>
-                    <Select 
-                        className="mb-5 shadow-sm" 
-                        options={countryOptions}
-                        defaultValue={countryOptions[0]}                     
-                        onChange={handleUser}
-                    />
-                    <hr/>
-                    <h6 className='mt-4 mb-4'>Contact information</h6>
-                    <Form.Group className='mb-3' controlId="formBasicEmail">
-                        <Form.Label><small className='d-block'>Enter Email</small></Form.Label>
-                        <Form.Control 
-                            type='email' 
-                            placeholder='Email address' 
-                            className='shadow-sm' 
-                            autoComplete='username'
-                            name='email'
-                            maxLength={50}
-                            required={true}
-                            onChange={handleUser}                             
-                        />
-                    </Form.Group>
-                    <Form.Group className='mb-5' controlId="formBasicPhoneNumber">
-                        <Form.Label><small className='d-block'>Contact Number</small></Form.Label>
-                        <Form.Control 
-                            type='number' 
-                            placeholder='Phone number' 
-                            className='shadow-sm'
-                            name='phone_number'
-                            maxLength={10}
-                            required={true}
-                            onChange={handleUser}      
-                        />
-                        <small className='text-danger'>{numberValidationMessage}</small>
-                    </Form.Group>
-                    <hr/>
-                    <h6 className='mt-4 mb-4'>Create login</h6>
-                    <Form.Group className='mb-3' controlId='formBasicPassword'>
-                        <Form.Label><small className='d-block'>Password</small></Form.Label>
-                        <Form.Control 
-                            type='password' 
-                            placeholder='Password' 
-                            className='shadow-sm' 
-                            autoComplete='new-password'
-                            name='password'
-                            required={true}
-                            onChange={handleUser}      
-                        />
-                    </Form.Group>
-                    <Form.Group className='mb-5' controlId='formBasicPassword2'>
-                        <Form.Label><small className='d-block'>Confirm password</small></Form.Label>
-                        <Form.Control 
-                            type='password' 
-                            placeholder='Confirm password' 
-                            className='shadow-sm' 
-                            autoComplete='new-password'
-                            name='password_confirmation'
-                            required={true}
-                            onChange={handleUser}      
-                        />
-                    </Form.Group>
-                    <Form.Group className='mb-3' controlId='formBasicCheckbox'>
-                        <Form.Check 
-                            type="checkbox" 
-                            label="I have read and agree to the Terms & Conditions"
-                            required={true}
-                        />
-                    </Form.Group>
+                    <h3 className='mb-4'>Open Account</h3>    
+                    <Card className='card-box shadow border-0'>
+                        <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
+                        <h5 className='mt-2 mb-2'>Contact Information</h5>
+                        </Card.Header>
+
+                        <Card.Body>
+                            <Form.Group className='mb-3' controlId="formBasicPhoneNumber">
+                                <Form.Label>Mobile Number</Form.Label>
+                                <Form.Control 
+                                    type='number' 
+                                    placeholder='Phone number' 
+                                    className='shadow-sm'
+                                    name='phone_number'
+                                    maxLength={10}
+                                    required={true}
+                                    onChange={handleUser}      
+                                />
+                                <small className='text-danger'>{numberValidationMessage}</small>
+                            </Form.Group> 
+                        </Card.Body>
+                          
+                    </Card>                
+                  
+                    <Card className='card-box shadow border-0 mt-4 mb-4'>
+                        <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
+                            <h5>Create Password</h5>
+                        </Card.Header>
+                        <Card.Body>
+                            <Form.Group className='mb-3' controlId='formBasicPassword'>
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control 
+                                type='password' 
+                                placeholder='Password' 
+                                className='shadow-sm' 
+                                autoComplete='new-password'
+                                name='password'
+                                required={true}
+                                onChange={handleUser}      
+                            />
+                        </Form.Group>
+                        <Form.Group className='mb-3' controlId='formBasicPassword2'>
+                            <Form.Label>Confirm password</Form.Label>
+                            <Form.Control 
+                                type='password' 
+                                placeholder='Confirm password' 
+                                className='shadow-sm' 
+                                autoComplete='new-password'
+                                name='password_confirmation'
+                                required={true}
+                                onChange={handleUser}      
+                            />
+                        </Form.Group>
+                        </Card.Body>
+                    </Card>
+                    <div className='d-flex justify-content-center'>
+                        <Form.Group className='mb-3' controlId='formBasicCheckbox'>
+                            <Form.Check 
+                                type="checkbox" 
+                                label="I have read and agree to the Terms & Conditions"
+                                required={true}
+                            />
+                        </Form.Group>
+                    </div>
+                   
                     <Button 
                     disabled={!!numberValidationMessage} 
-                    style={{ backgroundColor: '#126e51', borderColor: '#126e51' }} 
-                    type="submit" className='w-100'
+                    style={{ backgroundColor: '#191970', borderColor: '#191970', letterSpacing: '1px' }} 
+                    type="submit" 
+                    className='w-100 shadow'
                     onClick={submitForm}
                     >
                         Join {config.APP_NAME}
                     </Button>
+                    <div className='d-flex justify-content-center'>
+                        <Form.Group className='mt-4 text-center' controlId='formRememberCheckbox'>
+                            <Form.Check 
+                                type="checkbox" 
+                                label="Remember Me"
+                                required={false}
+                                className="text-center"
+                            />
+                        </Form.Group>
+                    </div>                  
                 </Form>               
             </Container>      
         <Support/>

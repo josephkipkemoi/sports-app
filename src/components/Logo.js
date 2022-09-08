@@ -4,7 +4,7 @@ import styled from "styled-components";
 const StyleIcon = styled.div`
 svg {
   position: absolute;
-  left: -6px;
+  left: -1px;
   top: 12px;
 }
 svg text {

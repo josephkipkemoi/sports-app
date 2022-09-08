@@ -27,6 +27,7 @@ import JackpotComponent from '../components/JackpotComponent';
 import Pagination from '../components/Pagination';
 import AuthUser from '../hooks/AuthUser';
 import { withProtected } from '../components/RouteProtection';
+import MobileNavComponent from '../components/MobileNavComponent';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -41,6 +42,7 @@ function History(){
     return (
         <>
             <SportBetsHistoryProfile/>
+            <MobileNavComponent/>
         </>
     )
 }

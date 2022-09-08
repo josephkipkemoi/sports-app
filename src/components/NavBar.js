@@ -16,6 +16,7 @@ import { PersonSvgIcon } from "./Svg";
 import styled from "styled-components";
 import AuthUser from "../hooks/AuthUser";
 import Logo from "./Logo";
+import useAuth from "../hooks/auth";
 
 const StyledTopRightNav = styledComponents.div`
 position: sticky;
@@ -54,6 +55,15 @@ nav a:hover, a:active {
 .nav-links-mobile a:nth-child(1) {
     color: #001041;
     padding: 10px 15px;
+}
+button {
+    color: #001041;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    margin-right: 1px;  
+    background-color: #ebeded;
 }
 .nav-links-mobile a:nth-child(2) {
     padding: 10px 15px;
@@ -184,9 +194,9 @@ const topNavLinks = [
     }
 ]
 
-export default function NavBar({ logout, login }) {
+export default function NavBar({ login }) {
     const user = AuthUser()
-
+    const { logout } = useAuth()
     const TopNavLinkElements = (link, i) => (        
         <div itemProp="name" key={i} className="nav-item">        
             <Link key={i} href={link.path} prefetch={false} >
@@ -203,6 +213,44 @@ export default function NavBar({ logout, login }) {
         </div>
     )
 
+    const AuthenticatedLinks = () => {
+        return (
+                <div className="nav-links-mobile d-flex align-items-center">
+                        <button
+                            className="d-flex align-items-center shadow-sm"
+                            onClick={logout}
+                        >
+                          <i className="bi bi-box-arrow-left"></i>
+                            <span className="mobile-join">Logout</span>                                        
+                        </button>
+                </div>
+        )
+    }
+
+    const UnAuthenticatedLinks = () => {
+        return (
+            <div className="nav-links-mobile d-flex align-items-center">                
+                <Link href="/login">
+                        <a
+                            itemProp="url"
+                            className="d-flex align-items-center"
+                        >
+                            <i className="bi bi-arrow-right-circle"></i>
+                            <span className="mobile-join">Login</span>                                        
+                        </a>
+                    </Link>
+                    <Link href="/register">
+                        <a
+                            itemProp="url"
+                            className="d-flex align-items-center"
+                        >
+                            <i className="bi bi-person-plus"></i>
+                            <span className="mobile-join">Join</span>
+                        </a>
+                    </Link>
+            </div>
+        )
+    }
     return (
         <>
         <StyledTopRightNav className="shadow-lg">
@@ -217,34 +265,9 @@ export default function NavBar({ logout, login }) {
                                 </a>
                             </Link>
                         </div>
-                        {/* <div className="d-flex">
-                            <div className="d-flex ">                            
-                                {topNavLinks.map(TopNavLinkElements)}
-                            </div>
-                        </div> */}
-                        <div >
-                          
-                            <div className="nav-links-mobile d-flex align-items-center">
-                                <Link href="/login">
-                                    <a
-                                        itemProp="url"
-                                        className="d-flex align-items-center"
-                                    >
-                                        <i className="bi bi-arrow-right-circle"></i>
-                                        <span className="mobile-join">Login</span>                                        
-                                    </a>
-                                </Link>
-                                <Link href="/register">
-                                    <a
-                                        itemProp="url"
-                                        className="d-flex align-items-center"
-                                    >
-                                        <i className="bi bi-person-plus"></i>
-                                        <span className="mobile-join">Join</span>
-                                    </a>
-                                </Link>
-                            </div>
-                        </div>
+            
+                        {Boolean(user?.uu_id) ? <AuthenticatedLinks/> : <UnAuthenticatedLinks/>}
+
                     </div>
             </nav>
             <BottomNavBar logout={logout} login={login} user={user}/>

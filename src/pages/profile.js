@@ -19,6 +19,7 @@ import { useRouter } from 'next/router';
 import Support from '../components/Support';
 import AuthUser from '../hooks/AuthUser';
 import { withProtected } from "../components/RouteProtection"
+import MobileNavComponent from "../components/MobileNavComponent"
 
 const StyleProfile = styled.div`
     background-color: #ebeded;
@@ -69,7 +70,8 @@ const Profile = () => {
                 </Link>
 
             </Container>      
-            <Support/>      
+            <Support/>  
+            <MobileNavComponent/>
         </StyleProfile>
     )
 }
