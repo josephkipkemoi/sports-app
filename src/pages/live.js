@@ -12,13 +12,13 @@ import { useRouter } from "next/router";
 import Container from "react-bootstrap/Container";
 import Image from "next/image";
 import { Small, Span } from "../components/Html";
-
+import MobileNavComponent from "../components/MobileNavComponent"
 
 const StyleLivePage = styled.div`
     height: 100vh;
     overflow-x: hidden;
     overflow-y: scroll;
-    background-color: #505050;
+    background-color: #fff;
     h5 {
         letter-spacing: 1px;
     }
@@ -37,16 +37,18 @@ export default function Live() {
     const { query: { fixture } } = router
    
     return (
-        <StyleLivePage>
+        <>
             <Row className="px-2">
                 <Col lg="9" md="9" sm="12" style={{ padding: 0 }}>
-                    <TopNavBar/>
+                    <TopNavBar/>            
+                    <StyleLivePage>
                     <JackpotAdvert/>
                     <LiveGamesNavBar/>
-                    {fixture === 'all' && <AllFixturesComponent/>}
-                    {fixture === 'live' && <LiveFixturesComponent/>}
-                    {fixture === 'finished' && <FinishedFixturesComponent/>} 
-                    {fixture === 'scheduled' && <ScheduledFixturesComponent/>}
+                        {fixture === 'all' && <AllFixturesComponent/>}
+                        {fixture === 'live' && <LiveFixturesComponent/>}
+                        {fixture === 'finished' && <FinishedFixturesComponent/>} 
+                        {fixture === 'scheduled' && <ScheduledFixturesComponent/>}
+                    </StyleLivePage>                    
                 </Col>
                 <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0 }}>
                     <CustomerInfo/>
@@ -54,8 +56,8 @@ export default function Live() {
             </Row>
            
             <Support/>
-
-        </StyleLivePage>
+            <MobileNavComponent/>
+        </>
     )
 }
 
@@ -218,50 +220,62 @@ const LiveFixturesComponent = () => {
     )
 }
 
+const StyleLiveGamesNav = styled.div`
+    background-color: #edebeb;
+    a {
+        background-color: #3558bd;
+        border: none;
+        color: #fff;
+    }
+`
+
 const LiveGamesNavBar = () => {
     return (
-        <nav className="p-3">
-            <Link href="/live?fixture=all">
-                <a
-                    itemProp="url"
-                    className="btn btn-secondary m-1"
-                >   
-                    All
-                </a>
-            </Link>
-            <Link href="/live?fixture=live">
-                <a
-                    itemProp="url"
-                    className="btn btn-secondary m-1"
-                >   
-                    Live
-                </a>
-            </Link>
-            <Link href="/live?fixture=finished">
-                <a
-                    itemProp="url"
-                    className="btn btn-secondary m-1"
-                >   
-                    Finished
-                </a>
-            </Link>
-            <Link href="/live?fixture=scheduled">
-                <a
-                    itemProp="url"
-                    className="btn btn-secondary m-1"
-                >   
-                    Schedule
-                </a>
-            </Link>
-        </nav>
+        <StyleLiveGamesNav>
+            <nav className="p-3">
+                <Link href="/live?fixture=all">
+                    <a
+                        itemProp="url"
+                        className="btn m-1"
+                    >   
+                        All
+                    </a>
+                </Link>
+                <Link href="/live?fixture=live">
+                    <a
+                        itemProp="url"
+                        className="btn m-1"
+                    >   
+                        Live
+                    </a>
+                </Link>
+                <Link href="/live?fixture=finished">
+                    <a
+                        itemProp="url"
+                        className="btn m-1"
+                    >   
+                        Finished
+                    </a>
+                </Link>
+                <Link href="/live?fixture=scheduled">
+                    <a
+                        itemProp="url"
+                        className="btn m-1"
+                    >   
+                        Schedule
+                    </a>
+                </Link>
+            </nav>
+        </StyleLiveGamesNav>       
     )
 }
 
 const StlyeJackpotAdvert = styled.div`
+    background-color: #edebeb;
 `
 const JackpotAdvert = () => {
     return (
-        <StlyeJackpotAdvert className="card m-2 p-4 bg-info shadow ">
+        <StlyeJackpotAdvert className="card m-2 p-4 bg-info shadow border-0 text-center">
             <h1 className="text-white d-flex fw-bold mx-auto">
                 Win upto KES 10,909,890.40 weekly on Mega Jackpot
             </h1>
@@ -272,7 +286,7 @@ const JackpotAdvert = () => {
 const NoLiveGamesComponent = () => {
     return (
         <div className="text-center mt-3">
-            <span className="text-white">Please refresh or check again later!</span>
+            <span className="text-dark">Please refresh or check again later!</span>
         </div>
     )
 }

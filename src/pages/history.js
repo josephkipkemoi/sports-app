@@ -32,6 +32,9 @@ import MobileNavComponent from '../components/MobileNavComponent';
 const StyledHistory = styled.div`
     height: 100vh;
     overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: #ebeded;
     .history-header {
         padding-top: 20px;
     }
@@ -54,25 +57,26 @@ const SportBetsHistoryProfile = () => {
     const { uu_id } = AuthUser()
 
     return (
-        <StyledHistory>
-            <Row>
+        <>
+            <Row className='flex-column-reverse'>
                 <Col lg="3" md="3" sm="4">
                     <UserProfile />
                 </Col>
                 <Col lg="9" md="9" sm="8">
-                    <HistoryFilter /> 
-                    <hr/>    
-                    {tab === 'all' && <AllTabHistory user_id={uu_id.id}/>}
-                    {tab === 'settled' && <SettledHistory user_id={uu_id.id}/>}
-                    {tab === 'unsettled' && <UnsettledHistory user_id={uu_id.id}/>}
-                    {tab === 'search' && <SearchFilterResults user_id={uu_id.id}/>}
-                    {(his_tab === 'jbets' && tab === 'j_all') && <AllJackpotHistory user_id={uu_id.id}/>} 
-                    {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={uu_id.id}/>} 
-                    {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={uu_id.id}/>} 
+                    <StyledHistory>
+                        <HistoryFilter /> 
+                        {tab === 'all' && <AllTabHistory user_id={uu_id.id}/>}
+                        {tab === 'settled' && <SettledHistory user_id={uu_id.id}/>}
+                        {tab === 'unsettled' && <UnsettledHistory user_id={uu_id.id}/>}
+                        {tab === 'search' && <SearchFilterResults user_id={uu_id.id}/>}
+                        {(his_tab === 'jbets' && tab === 'j_all') && <AllJackpotHistory user_id={uu_id.id}/>} 
+                        {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={uu_id.id}/>} 
+                        {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={uu_id.id}/>} 
+                    </StyledHistory>                   
                 </Col>
             </Row>    
             <Support/>       
-        </StyledHistory>
+        </>
     )
 }
 
@@ -599,6 +603,7 @@ const UnsettledHistory = ({ user_id }) => {
 const StyleUserProfile = styled.div`
 padding-top: 20px;
 background-color : #ebeded;
+border-radius: 0;
 `
 
 const userProfileLinks = [
@@ -628,7 +633,7 @@ const UserProfileLinkElements = (link, i) => {
             <Link key={i} href={link.path}>
                 <a
                     itemProp='url'
-                    className='d-flex justify-content-between text-decoration-none text-light d-block mb-3'
+                    className='d-flex justify-content-between text-decoration-none text-dark d-block mb-3'
                     style={{ letterSpacing: '1px' }}
                 >
                     {link.name}
@@ -643,7 +648,7 @@ const BalanceElement = () => {
         const {data, error, isLoading} = useGetBalanceByUserIdQuery(uu_id.id)
 
         if(error) {
-            return <span className="d-block fw-bold text-danger mt-1">Error</span>
+            return <span className="d-block fw-bold text-dark mt-1">Error</span>
         }
 
         if(isLoading) {
@@ -653,7 +658,7 @@ const BalanceElement = () => {
         const { amount } = data
 
         return (
-            <Span className='d-block fw-bold text-light'  style={{ letterSpacing: '1px' }}>
+            <Span className='d-block fw-bold text-dark'  style={{ letterSpacing: '1px' }}>
                 <FontAwesomeIcon 
                 icon={faRefresh} 
                 style={{ 
@@ -674,8 +679,8 @@ const BalanceElement = () => {
     }
        
     return (
-        <StyleUserProfile className='card m-2 p-2 bg-success'>
-            <Card className=' shadow text-light p-2 m-2' style={{ background: '#505050' }}>
+        <StyleUserProfile className='card p-2 bg-white border-0'>
+            <Card className=' shadow text-light p-2 m-2 border-0' style={{ background: '#edebeb' }}>
                 <Card.Header className="bg-light text-dark d-flex m-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-person-bounding-box" viewBox="0 0 16 16">
                         <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z"/>
@@ -684,7 +689,7 @@ const BalanceElement = () => {
                     <UserProfileElement/>
                 </Card.Header>
                 <Card.Body>
-                    <Span className='d-block text-light' style={{ letterSpacing: '1px' }}>Balance</Span>
+                    <Span className='d-block text-dark' style={{ letterSpacing: '1px' }}>Balance</Span>
                     <BalanceElement/>
                     <hr/>
 
@@ -708,9 +713,9 @@ const StyleFilterBtn = styled.div`
 `
 
 const StyleSearch = styled.div`
-    margin-right: 10px;
+ 
     button {
-        width: 162px;        
+        width: 102px;        
     }
 `
 
@@ -753,7 +758,7 @@ const HistoryFilter = () => {
                 >
                     <a 
                     itemProp="url" 
-                    className={`btn btn-outline-warning shadow ${tab === 'all' || tab === 'j_all' && 'active'}`}
+                    className={`btn btn-primary shadow ${tab === 'all' || tab === 'j_all' && 'active'}`}
                     >
                         All
                     </a>
@@ -763,7 +768,7 @@ const HistoryFilter = () => {
                 >
                     <a 
                     itemProp='url' 
-                    className={`btn btn-outline-warning shadow ${tab === 'settled' || tab === 'mega_jackpot' && 'active'}`}
+                    className={`btn btn-primary shadow ${tab === 'settled' || tab === 'mega_jackpot' && 'active'}`}
                     style={{ marginLeft: 5 }}
                     >
                         {his_tab === 'sbets' ? "Settled" : "Mega Jackpot"}
@@ -774,7 +779,7 @@ const HistoryFilter = () => {
                 >
                     <a 
                     itemProp='url' 
-                    className={`btn btn-outline-warning shadow ${tab === 'unsettled' || tab === 'five_jackpot' && 'active'}`}
+                    className={`btn btn-primary shadow ${tab === 'unsettled' || tab === 'five_jackpot' && 'active'}`}
                     style={{ marginLeft: 5 }}
                     >
                         {his_tab === 'sbets' ? "Unsettled" : "Five Jackpot"}
@@ -784,16 +789,16 @@ const HistoryFilter = () => {
         )
     }
     return (
-        <div className='history-header mb-3 card m-2 p-2 bg-success'>
+        <div className='history-header mb-3 card p-2 shadow border-0' style={{ backgroundColor: '#edebeb' }}>
             <div>
-                <StyleHeaderNav className='d-flex p-2'>
+                <StyleHeaderNav className='d-flex mb-2'>
                     <Link href="history?his_tab=sbets&tab=all">
                         <a
                             itemProp='url'
-                            className='text-decoration-none text-light'
+                            className='text-decoration-none text-dark'
                         >
                             <h5 
-                            className={`${his_tab === 'sbets' ? 'fw-bold active-h5' : ''}  p-3 text-light`}
+                            className={`${his_tab === 'sbets' ? 'fw-bold active-h5' : ''}  p-3 text-dark`}
                             >
                                 Sports Bets
                             </h5>
@@ -802,7 +807,7 @@ const HistoryFilter = () => {
                     <Link href="history?his_tab=jbets&tab=j_all">
                         <a
                            itemProp='url'
-                           className='text-decoration-none text-light'  
+                           className='text-decoration-none text-dark'  
                         >
                             <h5 
                             className={`${his_tab === 'jbets' ? 'fw-bold active-h5' : ''}  p-3`}
@@ -813,24 +818,23 @@ const HistoryFilter = () => {
                     </Link>
                 </StyleHeaderNav>          
             </div>
-            <Row className='d-flex p-2 '>
-            <Col sm="12" md="3" lg="3" className='mb-2'>
+            <div className='d-flex justify-content-between'>
+            <div>
                 <SportBetsLinks />          
-            </Col>
-            <Col sm="12" md="9" lg="9" className='d-flex justify-content-end'>
+            </div>
+            <div className='d-flex justify-content-end'>
                 <StyleSearch >
                     <button 
-                    type="search" 
-                    className='btn btn-outline-light d-flex justify-content-between float-end'
-                    onClick={openModal}
+                        type="search" 
+                        className='btn btn-primary d-flex justify-content-between float-end'
+                        onClick={openModal}
                     >
                         <span>All Dates </span>    
                         <i className="bi bi-caret-down"></i>                 
-                    </button>
-                    
+                    </button>                    
                 </StyleSearch>                
-            </Col>              
-            </Row>     
+            </div>              
+            </div>     
             <Modal show={isModalOpen} className="mt-5 pt-5" modalId="modal-ref">
                 <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
                     <h3 onClick={closeMenu}>X</h3>
@@ -876,7 +880,7 @@ const NoBetslipHistory = () => {
     return (
         <>
         <div className="text-center mt-5">
-            <Span className='text-light'>
+            <Span className='text-dark'>
                 You do not have any {his_tab === 'sbets' ? 'Sportsbook' : 'Jackpot'} bets
             </Span>
         </div>
@@ -884,4 +888,5 @@ const NoBetslipHistory = () => {
     )
 }
 
-export default  withProtected(History) ;
+// export default  withProtected(History) ;
+export default History;
