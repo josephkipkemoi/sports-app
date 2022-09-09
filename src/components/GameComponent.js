@@ -251,7 +251,8 @@ export default function GameComponent({ data, refetch }) {
             </Col>
             <Col lg={4} sm={4} className="card d-flex flex-row active-btn" style={{ background: '#fff', borderLeft: '0px', border: 'none' }}>
           
-              {oddsData.map((odd) => {             
+              {oddsData?.map((odd) => {         
+   
                 return odd.id === 1 && odd.values.map((val, i) => {
                   return (
                      <div key={i} className='text-center mb-3 w-100 m-1'>
@@ -269,7 +270,7 @@ export default function GameComponent({ data, refetch }) {
                             fixtureid={innerData.fixture_id}
                             onClick={sendBetslip}  
                           >
-                            {val.odd}
+                            {val.odd}                  
                           </button>   
                         </div>                     
                      </div>
@@ -284,7 +285,7 @@ export default function GameComponent({ data, refetch }) {
                   className="text-dark fw-bold d-flex flex-column mt-3 p-2"                    
                 >
                     <i className="bi bi-plus d-flex align-items-center" style={{ height: 20, marginTop: '2px' }}>
-                    {oddsData.length} 
+                    {oddsData?.length || 42} 
                     </i>    
                     <i className="bi bi-caret-down-fill" style={{ marginTop: '-7px' }}></i>    
                      
@@ -298,7 +299,7 @@ export default function GameComponent({ data, refetch }) {
               <div className='fw-bold text-center bg-light p-2 rounded' style={{ letterSpacing: 2 }}>
                 <span className="text-dark">More Markets</span>
               </div>
-              {oddsData.map(MoreFixtureMarket)}
+              {oddsData?.map(MoreFixtureMarket)}
             </div>
 
             <hr className='text-secondary'/>
