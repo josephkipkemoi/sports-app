@@ -118,7 +118,7 @@ export default function MyApp({ Component, pageProps }) {
                             <Component  {...pageProps}/>
                         </Provider>
                     </NavWrapper>    : 
-                      <div className="bg-success" style={{ height: '100vh' }}>
+                      <div style={{ height: '100vh', backgroundColor: '#191970' }}>
                         <StyleLoader>
                             <Image src="/logo.png" height="46" width="92"/>
                             <h5 className="d-block fw-bold mt-4" style={{ letterSpacing: '2px', color: '#ffffff' }}>

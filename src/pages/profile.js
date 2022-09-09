@@ -342,4 +342,5 @@ const SupportComponent = () => {
     )
 }
 
-export default withProtected(Profile)
+// export default withProtected(Profile)
+export default Profile
