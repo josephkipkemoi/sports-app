@@ -61,8 +61,6 @@ const checkTooltip = () => {
   
 }
 
-
- 
 const closeDisplay = async () => {
 setDisplay('none')
 sessionStorage.setItem('tooltip', 'off');
@@ -88,12 +86,24 @@ const switchDisplay = () => {
   }
 }
 
+const checkWindowSize = (width) => {
+  if(width < 992) {
+    setDisplay('none')
+    sessionStorage.setItem('tooltip', 'off');
+  }
+}
+
 useEffect(() => {
+ 
+  checkWindowSize(window.innerWidth)
+
 const toolTipStatus = sessionStorage.getItem('tooltip')
 
 const timer = setTimeout(() => {
-  number === 1 && setDisplay('block')
+  checkWindowSize(window.innerWidth)
   checkTooltip()
+  number === 1 && setDisplay('block')
+ 
 }, 3000)
 
 toolTipStatus === 'off' && clearTimeout(timer)
