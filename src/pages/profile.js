@@ -18,7 +18,7 @@ import axios from "../lib/axios"
 import { useRouter } from 'next/router';
 import Support from '../components/Support';
 import AuthUser from '../hooks/AuthUser';
-import { withProtected } from "../components/RouteProtection"
+import { withProtected } from "../hooks/RouteProtection"
 import MobileNavComponent from "../components/MobileNavComponent"
 
 const StyleProfile = styled.div`
@@ -342,5 +342,4 @@ const SupportComponent = () => {
     )
 }
 
-// export default withProtected(Profile)
-export default Profile
+export default withProtected(Profile)

@@ -17,6 +17,7 @@ import Collapse from "react-bootstrap/Collapse";
 import { PhoneSvgIcon } from "../components/Svg";
 import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 import { Modal } from "react-bootstrap";
+import { useGetFixtureIdsWhereOddsNullQuery } from "../hooks/fixture";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -595,7 +596,7 @@ const options = [
 ]
 
 const UserBetHistoryElement = ({ data }) => {
-
+ 
     const [isStatusChanged, setIsStatusChanged] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [betStatus, setBestatus] = useState(options[0].value)
@@ -618,22 +619,22 @@ const UserBetHistoryElement = ({ data }) => {
 
     }
     const BetHistoryElements = (link, i) => {
-    
+ 
         return (
             <React.Fragment key={i} >
                 <tr scope="row">
                     <td>{i+1}</td>
-                    <td>{link.stake_amount}</td>
-                    <td>{link.total_odds}</td>
-                    <td>{link.final_payout}</td>
-                    <td>{link.betslip_status}</td>
+                    <td>{link.bet_amount}</td>
+                    <td>{link.possible_payout / link.bet_amount}</td>
+                    <td>{link.possible_payout}</td>
+                    <td>{link.bet_status}</td>
                     <td>
                         <Select className="text-dark" options={options} onChange={setBetOption}/>
                     </td>
                     <td>
                         <button 
                         className="btn btn-danger btn-sm"  
-                        onClick={() => changeStatus(link.user_id, link.session_id)}>
+                        onClick={() => changeStatus(link.user_id, link.cart_id)}>
                             {isLoading ? 'Loading...' : 'Change' }
                             {isStatusChanged && <><i className="bi bi-check2-circle text-warning"></i></> }
                         </button>
@@ -749,6 +750,7 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
             fixtureOddsLoading={fixtureOddsLoading}
             />
             <CustomFixture/>
+            <FixtureOdds/>
             <ConsoleOutPut 
             fixtureLoaded={fixtureLoaded}
             fixtureOddsLoaded={fixtureOddsLoaded}
@@ -828,8 +830,6 @@ const CustomFixture = () => {
         }
     })
 
-
-    // console.log(fixtureDetails)
     const submitFixture = async (e) => {
         e.preventDefault()
         const res = await axios.patch('api/admin/fixture', {
@@ -939,6 +939,93 @@ const CustomFixture = () => {
              
             </Card.Body>
             
+        </Card>
+    )
+}
+
+const FixtureOdds = () => {
+    const [fixtureId, setFixtureId] = useState(null)
+
+    const [homeValues, setHomeValues] = useState({
+        value: '',
+        odd: ''
+    }) 
+    const [drawValues, setDrawValues] = useState({
+        value: '',
+        odd: ''
+    }) 
+    const [awayValues, setAwayValues] = useState({
+        value: '',
+        odd: ''
+    })
+
+    const { data, isLoading, error, refetch } = useGetFixtureIdsWhereOddsNullQuery()
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+    if(isLoading) {
+        return <span>Loading</span>
+    }
+
+    const fixture_ids = data.map(({ fixture_id }) => {
+        return {
+            value: fixture_id,
+            label: fixture_id
+        }
+    })
+
+    const submitOdds = async () => {
+        const odds = [{ id: 1, 
+                        name: 'Match Winner', 
+                        values: [ homeValues, drawValues, awayValues ] }]
+
+        const { status } = await axios.patch(`api/fixtures/custom_odds/${fixtureId}`, {
+            odds
+        })
+        
+        if(status === 200) {
+            refetch()
+        }
+    }
+
+    const handleChange = ({ value }) =>  setFixtureId(value)
+
+    const handleForm = (e) => {
+        const values = {
+            value: e.target.name,
+            odd: e.target.value
+        }
+
+        e.target.name === 'Home' && setHomeValues(values)
+        e.target.name === 'Draw' && setDrawValues(values)
+        e.target.name === 'Away' && setAwayValues(values)
+    }
+ 
+    return (
+        <Card>
+            <Card.Header>
+                <h1>Fixture {fixtureId} Odds</h1>
+            </Card.Header>
+            <Card.Body className="row align-items-center">
+                <Col>
+                    <Select options={fixture_ids} onChange={handleChange}/>
+                </Col>
+                <Col>
+                    <InputNumber className="form-control" placeholder="Home Odds" name="Home" onChange={handleForm}/>
+                </Col>
+                <Col>
+                    <InputNumber className="form-control" placeholder="Draw Odds" name="Draw" onChange={handleForm}/>
+                </Col>
+                <Col>
+                    <InputNumber className="form-control" placeholder="Away Odds" name="Away" onChange={handleForm}/>
+                </Col>
+            </Card.Body>
+            <Card.Footer>
+             <button className="btn btn-primary" onClick={submitOdds}>Update Odds</button>
+            </Card.Footer>
+
         </Card>
     )
 }

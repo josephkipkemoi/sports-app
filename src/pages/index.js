@@ -14,7 +14,7 @@ import Tooltip from '../components/Tooltip';
 import { BottomNavBar } from '../components/NavBar';
 import { useGetV1CustomFixtureQuery } from '../hooks/fixture';
 import { Spinner } from 'react-bootstrap';
-import CustomAds from '../hooks/CustomAds';
+import CustomAds from '../components/CustomAds';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -25,7 +25,7 @@ const ThemedBody = styled('div')`
 `
 
 const StyleGameData = styled('div')`
-height: 100vh;
+height: auto;
 overflow-y: scroll;
 overflow-x: hidden;
 background-color: #ebeded;

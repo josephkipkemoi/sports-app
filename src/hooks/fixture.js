@@ -19,6 +19,9 @@ export const CustomFixtureApi = createApi({
         }),
         getV1CustomFixtureById: builder.query({
             query: (fixture_id) => `api/custom_fixture/${fixture_id}`
+        }),
+        getFixtureIdsWhereOddsNull: builder.query({
+            query: () => 'api/fixtures/ids'
         })
     })
 })
@@ -28,5 +31,6 @@ export const {
     useGetCustomOddsQuery,
     useGetV1CustomFixtureQuery,
     useGetV1CustomFixtureByIdQuery,
+    useGetFixtureIdsWhereOddsNullQuery,
 } = CustomFixtureApi
 

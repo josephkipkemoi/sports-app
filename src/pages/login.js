@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { Form, Card, Container } from "react-bootstrap";
 import styled from "styled-components";
-import { withPublic } from "../components/RouteProtection";
+import { withPublic } from "../hooks/RouteProtection";
 import useAuth from "../hooks/auth";
 
 const StyleLogin = styled.div`
@@ -107,4 +107,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default withPublic(Login); 

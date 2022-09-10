@@ -50,7 +50,8 @@ const StyleCustomFilter = styled.div`
 display: flex;
 align-items: center;
 padding: 10px 15px;
-background-color: #fff;
+background-color: #191970;
+position: static;
 .header-one {
   width: 40%;
 }
@@ -74,7 +75,7 @@ background-color: #fff;
  h5 {
   margin: 0;
   padding: 0;
-  color: #001041;
+  color: #fff;
   text-transform: uppercase;
  }
 
@@ -102,7 +103,7 @@ export default function CustomFilter({ heading, refetch }) {
       <div>
         <StyleCustomFilter >
           <div className="header-one d-flex align-items-center">
-            <FontAwesomeIcon className="fa-lg" icon={faSoccerBall} />
+            <FontAwesomeIcon className="fa-lg text-white" icon={faSoccerBall} />
             <h5 className='fw-bold mx-auto'>{heading}</h5>
           </div>
           <div className="header-two">

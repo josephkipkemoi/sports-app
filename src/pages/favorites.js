@@ -9,7 +9,7 @@ import GameComponent from "../components/GameComponent";
 import BetslipContainer from "../components/BetslipContainer";
 import axios from "../lib/axios";
 import AuthUser from "../hooks/AuthUser";
-import { withProtected } from "../components/RouteProtection";
+import { withProtected } from "../hooks/RouteProtection";
 
 const StyledFavorites = styled.div`
  height: 100vh;

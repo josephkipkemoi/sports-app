@@ -26,7 +26,7 @@ import Support from '../components/Support';
 import JackpotComponent from '../components/JackpotComponent';
 import Pagination from '../components/Pagination';
 import AuthUser from '../hooks/AuthUser';
-import { withProtected } from '../components/RouteProtection';
+import { withProtected } from '../hooks/RouteProtection';
 import MobileNavComponent from '../components/MobileNavComponent';
 
 const StyledHistory = styled.div`
@@ -237,10 +237,15 @@ const AllTabHistory = ({ user_id }) => {
                         <small>{name.cart_id}</small>
                     </div>
                     <div 
-                    className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
+                    className="mt-2 d-flex align-items-center justify-content-between bg-info p-2 rounded text-light"
                     >   
                         <span>Bet Status</span> 
-                        <Span className='text-warning'>{name.bet_status}</Span>
+                        <Span 
+                            className={` text-center rounded text-warning fw-bold ${name.bet_status === 'Active' && 'text-dark bg-light'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
+                            style={{ width: 62 }}
+                        >
+                            {name.bet_status}
+                        </Span>
                     </div>
                     <div className='d-sm-flex justify-content-between mt-2 p-1'>
                         <div>
@@ -254,20 +259,20 @@ const AllTabHistory = ({ user_id }) => {
                     </div>                               
                     </div>
                     <div 
-                    className={`card p-3 mb-2 history-more-markets`}
-                    style={{ 
-                        borderTopRightRadius: 0, 
-                        borderTopLeftRadius: 0, 
-                        borderTop: 'none',
-                        display:'none' 
-                    }}
+                        className={`card p-3 mb-2 history-more-markets`}
+                        style={{ 
+                            borderTopRightRadius: 0, 
+                            borderTopLeftRadius: 0, 
+                            borderTop: 'none',
+                            display:'none' 
+                        }}
                     >
                     {historyData.map((d,i) => {       
                         return (
                             <div className='card p-3 mb-2 shadow' key={i}>
                                 <div>
                                     <small>Game ID: {d.fixture_id}</small>
-                                    <span className='d-block text-center bg-success rounded text-light p-1 m-1'>{d.betslip_teams}</span>
+                                    <span className='d-block text-center bg-info rounded text-light p-1 m-1'>{d.betslip_teams}</span>
                                 </div>                        
                                 <div className='d-flex justify-content-between'>
                                     <span>Market: {d.betslip_market}</span>
@@ -355,10 +360,15 @@ const SettledItems = (name , i) => {
                                 <small>{name.card_id}</small> 
                             </div>
                             <div 
-                            className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
+                                className="mt-2 d-flex align-items-center justify-content-between bg-info p-2 rounded text-light"
                             >   
                                 <span>Bet Status</span>
-                                <Span className="text-white fw-bold">{name.bet_status}</Span>
+                                <Span 
+                                    className={` text-center rounded text-warning fw-bold ${name.bet_status === 'Active' && 'text-dark bg-light'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
+                                    style={{ width: 62 }}
+                                >
+                                    {name.bet_status}
+                                </Span>                            
                             </div>
                             <div className='d-sm-flex justify-content-between mt-2 p-1'>
                                 <div>
@@ -447,7 +457,6 @@ const SearchFilterResults = ({ user_id }) => {
                     className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
                     >   
                     <span>Bet Status</span>
-                        {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
                         <Span className="text-warning">{name.betslip_status}</Span>
                     </div>
                     <div className='d-sm-flex justify-content-between mt-2 p-1'>
@@ -525,11 +534,15 @@ const UnsettledHistory = ({ user_id }) => {
                                 <small>{name.cart_id}</small>
                             </div>
                             <div 
-                            className="mt-2 d-flex align-items-center justify-content-between bg-success p-2 rounded text-light"
+                                className="mt-2 d-flex align-items-center justify-content-between bg-info p-2 rounded text-light"
                             >   
-                            <span>Bet Status</span>
-                                {/* {name.fixtures.length > 1 ? <span>Multi Bet</span> : <span>Single Bet</span>} */}
-                                <Span className="text-warning">{name.bet_status}</Span>
+                                <span className='text-white'>Bet Status</span>
+                                <Span 
+                                    className={` text-center rounded text-warning fw-bold ${name.bet_status === 'Active' && 'text-dark bg-light'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
+                                    style={{ width: 62 }}
+                                >
+                                    {name.bet_status}
+                                </Span>                            
                             </div>
                             <div className='d-sm-flex justify-content-between mt-2 p-1'>
                                 <div>
@@ -888,5 +901,4 @@ const NoBetslipHistory = () => {
     )
 }
 
-// export default  withProtected(History);
-export default History;
+export default withProtected(History);

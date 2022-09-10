@@ -12,7 +12,7 @@ export const HistoryApi = createApi({
             query: (user_id) => `${user_id}/betslips`
         }),
         getAllUserHistoryBetslipV1: builder.query({
-            query: (user_id) => `fixtures/carts?user_id=${user_id}&bet_status=Active`
+            query: (user_id) => `fixtures/carts?user_id=${user_id}&bet_status=All`
         }),
         getSettledHistoryBetslip: builder.query({
             query: (user_id) => `fixtures/carts?user_id=${user_id}&bet_status=Lost`

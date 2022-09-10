@@ -250,7 +250,7 @@ export default function GameComponent({ data, refetch }) {
               </Row>                     
             </Col>
             <Col lg={4} sm={4} className="card d-flex flex-row active-btn" style={{ background: '#fff', borderLeft: '0px', border: 'none' }}>
-          
+                
               {oddsData?.map((odd) => {         
    
                 return odd.id === 1 && odd.values.map((val, i) => {
