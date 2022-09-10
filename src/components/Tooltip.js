@@ -2,6 +2,8 @@
 import React, {useState, useEffect} from "react"
 import styled from "styled-components"
 import Card  from "react-bootstrap/Card"
+import axios from "../lib/axios"
+import AuthUser from "../hooks/AuthUser"
 
 const StlyeTooltip = styled.div`
 position: absolute;
@@ -42,10 +44,33 @@ export default function Tooltip ({ message, number, top, right, caret_position }
 const [display, setDisplay] = useState('none')
 
 const tooltips = document.getElementsByClassName('tool-tip')
+const user = AuthUser()
 
-const closeDisplay = () => {
+const checkTooltip = () => {
+  if(Boolean(user?.uu_id?.id) === true) {
+  
+    axios.get(`api/tooltips/status?user_id=${user.uu_id.id}`, {
+    })
+         .then(data =>{ 
+           if(Boolean(data.data.tooltip_active) === false) {
+              sessionStorage.setItem('tooltip', 'off')
+              setDisplay('none')
+           }
+        })
+  }
+  
+}
+
+
+ 
+const closeDisplay = async () => {
 setDisplay('none')
 sessionStorage.setItem('tooltip', 'off');
+const res = await axios.post(`api/tooltips/users/${user.uu_id.id}/status/update`, {
+  user_id: user.uu_id.id,
+  tooltip_status: false
+})
+ 
 }
 
 const switchDisplay = () => {
@@ -68,6 +93,7 @@ const toolTipStatus = sessionStorage.getItem('tooltip')
 
 const timer = setTimeout(() => {
   number === 1 && setDisplay('block')
+  checkTooltip()
 }, 3000)
 
 toolTipStatus === 'off' && clearTimeout(timer)

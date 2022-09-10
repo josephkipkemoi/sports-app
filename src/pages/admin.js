@@ -945,6 +945,7 @@ const CustomFixture = () => {
 
 const FixtureOdds = () => {
     const [fixtureId, setFixtureId] = useState(null)
+    const [updated, setUpdated] = useState(false)
 
     const [homeValues, setHomeValues] = useState({
         value: '',
@@ -977,6 +978,7 @@ const FixtureOdds = () => {
     })
 
     const submitOdds = async () => {
+        setUpdated(true)
         const odds = [{ id: 1, 
                         name: 'Match Winner', 
                         values: [ homeValues, drawValues, awayValues ] }]
@@ -984,23 +986,46 @@ const FixtureOdds = () => {
         const { status } = await axios.patch(`api/fixtures/custom_odds/${fixtureId}`, {
             odds
         })
-        
+
+  
+
         if(status === 200) {
             refetch()
         }
     }
 
-    const handleChange = ({ value }) =>  setFixtureId(value)
+    const handleChange = ({ value }) =>  {
+        let home = Number((Math.random() * 5).toFixed(2))
+        let draw = Number((Math.random() * 4).toFixed(2))
+        let away = Number((Math.random() * 6).toFixed(2))
 
-    const handleForm = (e) => {
-        const values = {
-            value: e.target.name,
-            odd: e.target.value
+        setFixtureId(value)
+        setUpdated(false)
+        
+        if(draw < 1 ) {
+            draw += 1
+        }
+        if(home < 1) {
+            home += 1
+        }
+        if(away < 1) {
+            away += 1
         }
 
-        e.target.name === 'Home' && setHomeValues(values)
-        e.target.name === 'Draw' && setDrawValues(values)
-        e.target.name === 'Away' && setAwayValues(values)
+        setHomeValues({
+            value: 'Home',
+            odd: Number(home).toFixed(2)
+        })
+
+        setDrawValues({
+            value: 'Home',
+            odd: Number(draw).toFixed(2)
+        })
+
+        setAwayValues({
+            value: 'Home',
+            odd: Number(away).toFixed(2)
+        })
     }
  
     return (
@@ -1013,17 +1038,19 @@ const FixtureOdds = () => {
                     <Select options={fixture_ids} onChange={handleChange}/>
                 </Col>
                 <Col>
-                    <InputNumber className="form-control" placeholder="Home Odds" name="Home" onChange={handleForm}/>
+                    <InputNumber className="form-control" placeholder={homeValues.odd} disabled/>
                 </Col>
                 <Col>
-                    <InputNumber className="form-control" placeholder="Draw Odds" name="Draw" onChange={handleForm}/>
+                    <InputNumber className="form-control" placeholder={drawValues.odd} disabled/>
                 </Col>
                 <Col>
-                    <InputNumber className="form-control" placeholder="Away Odds" name="Away" onChange={handleForm}/>
+                    <InputNumber className="form-control" placeholder={awayValues.odd} disabled/>
                 </Col>
             </Card.Body>
             <Card.Footer>
-             <button className="btn btn-primary" onClick={submitOdds}>Update Odds</button>
+             <button className="btn btn-primary" onClick={submitOdds} disabled={updated}>
+                Update Odds {updated ? 'Complete' : ''}
+            </button>
             </Card.Footer>
 
         </Card>
