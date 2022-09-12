@@ -41,7 +41,7 @@ const Profile = () => {
 
 
     useEffect(() => {
-     
+        
     },[pathname])
     return (
         <StyleProfile>
@@ -83,8 +83,8 @@ const AuthUserProfile = () => {
  
             return (
                  <Span className="d-block fw-bold mt-3">
-                  (254) {uu_id.phone_number}    
-                </Span>
+                  {uu_id.phone_number}    
+                 </Span>
             )
         
     
@@ -113,7 +113,16 @@ const BalanceComponent = () => {
 
     const BalanceElement = () => {
             const { uu_id } = AuthUser()
-            const { data, error, isLoading } = useGetBalanceByUserIdQuery(uu_id.id)
+            const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(uu_id.id)
+
+            const insertTransaction = async () => {
+                const res = await axios.post('api/mpesa/insert')
+                
+                if(res.status === 200) {
+                    refetch()
+                }
+            }
+
             if(error) {
                 return <span className="d-block fw-bold text-danger mt-1">Error</span>
             }
@@ -122,7 +131,10 @@ const BalanceComponent = () => {
                 return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
             }
             return (
-                <Span className="d-block fw-bold" style={{ width: 124 }}>Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                <Span className="d-block fw-bold" style={{ width: 124 }}>
+                    <i onClick={insertTransaction} className="bi bi-arrow-clockwise"></i>
+                    Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                </Span>
             )
     
     
@@ -202,11 +214,11 @@ const DepositComponent = () => {
         const short_code = config.BUSINESS_SHORT_CODE;
         const passkey = config.BUSINESS_PASSKEY;
         const timestamp = generateTimestamp().toString();
-        const phone_number = Number('254' + uu_id.phone_number)
+        const phone_number = Number(uu_id.phone_number)
         const password = generateBase64Encoding(short_code, passkey, timestamp);
-    
+
         if(authToken) {
-            axios.post('api/mpesa/push', {
+           const res = await axios.post('api/mpesa/push', {
                 token: authToken,
                 phone_number,
                 timestamp,
@@ -216,10 +228,7 @@ const DepositComponent = () => {
     
     }
 
-    const fetchMpesa = async () => {
-        // const res = await axios.get('api/mpesa/transaction')
-        // console.log(res)
-    }
+ 
 
     const mpesaAuth = async () => {
         const res = await axios.get('api/mpesa/auth')

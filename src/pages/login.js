@@ -87,7 +87,7 @@ const Login = () => {
                     </Card>                
                   
                     <button className="btn w-100 p-3 shadow mt-2" style={{ backgroundColor: '#191970', color: '#fff' }} type="button" onClick={submitForm}>
-                        {isLoading ? <> <span class="spinner-border spinner-border-sm" role="status" ariaHidden="true"></span>
+                        {isLoading ? <> <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                         Loading...</> : 'Login'}                   
                     </button>
 
