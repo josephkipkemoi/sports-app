@@ -94,8 +94,10 @@ small {
 
     const submitForm = (e) => {
         e.preventDefault();
-
-        register({ phone_number, password, password_confirmation, setErrors })
+        let mobile_number = phone_number.split('')
+        mobile_number.splice(0,1,'254')
+        mobile_number = mobile_number.join('')
+        register({ phone_number: mobile_number, password, password_confirmation, setErrors })
     }
 
     return (
