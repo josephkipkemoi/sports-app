@@ -115,12 +115,8 @@ const BalanceComponent = () => {
             const { uu_id } = AuthUser()
             const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(uu_id.id)
 
-            const insertTransaction = async () => {
-                const res = await axios.post('api/mpesa/insert')
-                
-                if(res.status === 200) {
-                    refetch()
-                }
+            const insertTransaction = () => {
+                refetch()
             }
 
             if(error) {
