@@ -162,6 +162,9 @@ const BalanceComponent = () => {
 }
 
 const DepositComponent = () => {
+
+    const [authToken, setAuthToken] = useState('')
+
     const { uu_id } = AuthUser()
  
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
@@ -195,25 +198,42 @@ const DepositComponent = () => {
     }
 
     const deposit = async () => {
+
         const short_code = config.BUSINESS_SHORT_CODE;
         const passkey = config.BUSINESS_PASSKEY;
         const timestamp = generateTimestamp().toString();
         const phone_number = Number('254' + uu_id.phone_number)
         const password = generateBase64Encoding(short_code, passkey, timestamp);
-        console.log(phone_number)
-        axios.post('api/mpesa/push', {
-            phone_number,
-            timestamp,
-            amount: depositAmount         
-        })
-
+    
+        if(authToken) {
+            axios.post('api/mpesa/push', {
+                token: authToken,
+                phone_number,
+                timestamp,
+                amount: depositAmount         
+            })
+        }
+    
     }
 
     const fetchMpesa = async () => {
         // const res = await axios.get('api/mpesa/transaction')
         // console.log(res)
     }
-  
+
+    const mpesaAuth = async () => {
+        const res = await axios.get('api/mpesa/auth')
+        if(res.status === 200) {
+            setAuthToken(res.data.access_token)
+        }
+     
+        return res
+    }
+
+    useEffect(() => {
+        mpesaAuth()        
+    }, [])
+
     return (
         <div className="shadow-sm p-4 mb-4">
             <h5>Deposit</h5>
