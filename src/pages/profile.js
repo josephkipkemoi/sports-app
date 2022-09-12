@@ -132,7 +132,9 @@ const BalanceComponent = () => {
             }
             return (
                 <Span className="d-block fw-bold" style={{ width: 124 }}>
-                    <i onClick={insertTransaction} className="bi bi-arrow-clockwise"></i>
+                    <button className="btn btn-light"  onClick={insertTransaction}>
+                        <i className="bi bi-arrow-clockwise"></i>
+                    </button>
                     Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </Span>
             )
