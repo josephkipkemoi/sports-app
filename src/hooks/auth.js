@@ -19,21 +19,24 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
 
     const csrf = () => axios.get('/sanctum/csrf-cookie')
 
-    const register = async ({ setErrors, ...props }) => {
+    const register = async ({ setErrors, setRegisterLoading, ...props }) => {
         await csrf()
         setErrors([])
         axios
             .post('api/register', props)
             .then((d) => {
                localStorage.setItem('uu_id', JSON.stringify(d.data))
+               setRegisterLoading(false)
                 window.location.pathname = '/'
                 mutate()
             })
             .catch(e => {
-          
-                if(e.response.status !== 422) throw error
-
-                setErrors(Object.values(e.response.data.errors).flat())
+                if(e.response.status === 500) {
+                    setErrors(['Duplicate mobile number detected, please log in to continue'])
+                } else if(e.status === 422) {
+                    setErrors(Object.values(e.response.data.errors).flat())
+                }
+                setRegisterLoading(false)
             })
     }
 
