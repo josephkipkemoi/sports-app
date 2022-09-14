@@ -5,6 +5,7 @@ import AuthUser from "../hooks/AuthUser";
 import BetslipContainer from "./BetslipContainer";
 import { BetslipSvgIcon, HomeSvgIcon, ListSvgIcon, PersonSvgIcon, WalletSvgIcon } from "./Svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRouter } from "next/router";
 
 const StyleMobileNavComponent = styled.div`
     position: fixed;
@@ -31,7 +32,8 @@ const StyleMobileNavComponent = styled.div`
 `
 export default function MobileNavComponent ({ length, openSlip }) {
     const { uu_id } = AuthUser()
-  
+    const router = useRouter()
+    const { pathname } = router
     return (
         <StyleMobileNavComponent className="w-100">
             <div 
@@ -40,23 +42,23 @@ export default function MobileNavComponent ({ length, openSlip }) {
                 <Link href="/">
                     <a
                         itemProp="url"
-                        className="d-flex flex-column align-items-center text-decoration-none text-white"
+                        className={`d-flex flex-column align-items-center text-decoration-none ${pathname == '/' ? 'text-warning' : 'text-white'}`}
                     >
                         <HomeSvgIcon width="20" height="20" />
-                        <span className="mt-2">Home</span>
+                        <span className={`mt-2 ${pathname === '/' ? 'text-warning' : 'text-white'}`}>Home</span>
                     </a>
                 </Link>               
                 <div className="d-flex flex-column align-items-center">
                     <Link href="/live?fixture=all">
                         <a
                             itemProp="url"
-                            className="d-flex flex-column align-items-center text-decoration-none text-white"
+                            className={`d-flex flex-column align-items-center text-decoration-none ${pathname == '/live' ? 'text-warning' : 'text-white'}`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-mic-fill" viewBox="0 0 16 16">
                                 <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"/>
                                 <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"/>
                             </svg>
-                            <span className="mt-2">Live</span>
+                            <span className={`mt-2 ${pathname == '/live' ? 'text-warning' : 'text-white'}`}>Live</span>
                         </a>
                     </Link>
            
@@ -71,7 +73,7 @@ export default function MobileNavComponent ({ length, openSlip }) {
                 <Link href="/history?his_tab=sbets&tab=all">
                     <a
                         itemProp="url"
-                        className="d-flex flex-column align-items-center text-decoration-none text-white"
+                        className={`d-flex flex-column align-items-center text-decoration-none ${pathname == '/history' ? 'text-warning' : 'text-white'}`}
                     >   
                         {/* <ListSvgIcon width="20" height="20" /> */}
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="bi bi-collection-fill" viewBox="0 0 16 16">
@@ -84,7 +86,7 @@ export default function MobileNavComponent ({ length, openSlip }) {
                   <Link href="/profile">
                         <a
                         itemProp="url"
-                        className="d-flex flex-column align-items-center text-decoration-none text-white"
+                        className={`d-flex flex-column align-items-center text-decoration-none ${pathname == '/profile' ? 'text-warning' : 'text-white'}`}
                         >
                             <PersonSvgIcon width="20" height="20" />
                             <span className="mt-2">Profile</span>
