@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { Button, Card, Container, Form } from 'react-bootstrap';
+import { Button, Card, Container, Form, Spinner } from 'react-bootstrap';
 import styled from 'styled-components';
 import  useAuth  from '../hooks/auth';
 import { validateNumber } from '../lib/validation';
 import Support from '../components/Support';
 import config from '../../config.json';
 import Link from 'next/link';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBan } from "@fortawesome/free-solid-svg-icons";
+import { Small, Span } from '../components/Html';
+import { ClosedEyeSvgIcon, OpenEyeSvgIcon } from "../components/Svg";
 
 const StyleRegistration = styled.div`
 background-color: #fff;
@@ -59,8 +63,23 @@ small {
 .card-red {
     background-color: #1affff;
 }
+.icon-width {
+    width: 48px;    
+}
+.close-btn {
+    position: absolute;
+    right: 8px;
+    top: 0;
+}
 `
-
+const StylePassword = styled.div`
+    position: relative;
+`
+const StyleEyeIcon = styled.div`
+    position: absolute;
+    bottom: 18px;
+    right: 15px;
+`
  const Register = () => {
     
     const { register } = useAuth({
@@ -70,6 +89,12 @@ small {
     
     const [numberValidationMessage, setNumberValidationMessage] = useState('')
     const [errors, setErrors] = useState([])
+    const [passwordValidation, setPasswordValidation] = useState(false)
+    const [registerLoading, setRegisterLoading] = useState(false)
+    const [passwordShow, setPasswordShow] = useState(false)
+    const [confirmPasswordShow, setConfirmPasswordShow] = useState(false)
+    const [passwordType, setPasswordType] = useState('password')
+    const [confirmPasswordType, setConfirmPasswordType] = useState('password')
 
     const [userDetails, setUserDetails] = useState({
         phone_number: '',
@@ -93,11 +118,39 @@ small {
     }
 
     const submitForm = (e) => {
-        e.preventDefault();
+        e.preventDefault()
+      
+        if(password !== password_confirmation) {
+           return setPasswordValidation(true)
+        }
+        setRegisterLoading(true)
         let mobile_number = phone_number.split('')
         mobile_number.splice(0,1,'254')
         mobile_number = mobile_number.join('')
-        register({ phone_number: mobile_number, password, password_confirmation, setErrors })
+
+        register({ phone_number: mobile_number, password, password_confirmation, setErrors, setRegisterLoading })     
+    }
+
+    const closeErrors = () => {
+        setErrors([])
+    }
+
+    const showPassword = () => {
+        setPasswordShow(prev => !prev)
+        if(passwordShow) {
+            setPasswordType('password')
+        } else {   
+            setPasswordType('text')
+        }
+    }
+
+    const confirmShowPassword = () => {
+        setConfirmPasswordShow(prev => !prev)
+        if(confirmPasswordShow) {
+            setConfirmPasswordType('password')
+        } else {   
+            setConfirmPasswordType('text')
+        }
     }
 
     return (
@@ -107,12 +160,27 @@ small {
                     <h3 className='mb-4'>Open Account</h3>    
                     <Card className='card-box shadow-sm border-0'>
                         <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
-                        <h5 className='mt-2 mb-2'>Contact Information</h5>
+                        <h5 className='mt-2 mb-2'>Account Details</h5>
                         </Card.Header>
+
+                        {errors.length > 0 ? 
+                          <div className="alert alert-warning mt-2" role="alert">
+                            <Span className="d-flex align-items-center">
+                                <div className="align-items-center icon-width">
+                                    <FontAwesomeIcon icon={faBan} size="2x"/>
+                                </div>
+                                <div className="align-items-center">
+                                    <h6 className="fw-bold">Registration Failed</h6>
+                                    {errors[0]}
+                                </div>     
+                                <Small className="close-btn fw-bold" onClick={closeErrors}>X</Small>                           
+                            </Span>
+                         </div>
+                        : ''}
 
                         <Card.Body>
                             <Form.Group className='mb-3' controlId="formBasicPhoneNumber">
-                                <Form.Label>Mobile Number</Form.Label>
+                                <Form.Label>Mobile Number *</Form.Label>
                                 <Form.Control 
                                     type='number' 
                                     placeholder='Phone number' 
@@ -122,87 +190,106 @@ small {
                                     required={true}
                                     onChange={handleUser}      
                                 />
-                                <small className='text-danger'>{numberValidationMessage}</small>
+                                <span className='text-danger'>{numberValidationMessage}</span>
                             </Form.Group> 
+                            <Form.Group className='mb-3' controlId='formBasicPassword'>
+                                <StylePassword>
+                                    <Form.Label>Password *</Form.Label>
+                                    <Form.Control 
+                                        type={passwordType}
+                                        placeholder='Password' 
+                                        className='shadow-sm' 
+                                        autoComplete='new-password'
+                                        name='password'
+                                        required={true}
+                                        onChange={handleUser}      
+                                    />
+                                    <StyleEyeIcon>
+                                        {passwordShow ? 
+                                        <OpenEyeSvgIcon onClick={showPassword} width="16" height="16" /> :
+                                        <ClosedEyeSvgIcon onClick={showPassword} width="16" height="16" />                       
+                                        }                                      
+                                    </StyleEyeIcon>
+                                </StylePassword>
+                           
+                            </Form.Group>
+
+                            {passwordValidation ? 
+                                <div className='d-flex justify-content-start mb-2'>
+                                    <span className='text-danger fw-bold'>Please enter the same password as above</span>
+                                </div>
+                            : '' }
+                          
+                            <Form.Group className='mb-3' controlId='formBasicPassword2'>
+                                <StylePassword>
+                                <Form.Label>Confirm password *</Form.Label>
+                                <Form.Control 
+                                    type={confirmPasswordType}
+                                    placeholder='Confirm password' 
+                                    className='shadow-sm' 
+                                    autoComplete='new-password'
+                                    name='password_confirmation'
+                                    required={true}
+                                    onChange={handleUser}      
+                                />
+                                    <StyleEyeIcon>
+                                        {confirmPasswordShow ? 
+                                        <OpenEyeSvgIcon onClick={confirmShowPassword} width="16" height="16" /> :
+                                        <ClosedEyeSvgIcon onClick={confirmShowPassword} width="16" height="16" />                       
+                                        }                                      
+                                    </StyleEyeIcon>
+                                </StylePassword>
+                               
+                            </Form.Group>                         
+
+                            <div className='d-flex justify-content-start'>
+                                <Form.Group className='mb-1' controlId='formBasicCheckbox'>
+                                    <Form.Check 
+                                        type="checkbox" 
+                                        label="I have read and agreed to the Terms & Conditions, the Privacy Policy, that I am 18 years old or over and that all information given is true."
+                                        required={true}
+                                    />
+                                </Form.Group>
+                            </div>
+
+                            <div className='d-flex justify-content-start'>
+                                <Form.Group className='mt-1 mb-3 text-center' controlId='formRememberCheckbox'>
+                                    <Form.Check 
+                                        type="checkbox" 
+                                        label="Keep me logged in."
+                                        required={false}
+                                        className="text-center"
+                                    />
+                                </Form.Group>
+                            </div>                 
+
+                            <Button 
+                                disabled={!!numberValidationMessage || !password || !password_confirmation || registerLoading} 
+                                style={{ backgroundColor: '#191970', borderColor: '#191970', letterSpacing: '1px' }} 
+                                type="submit" 
+                                className='w-100 shadow rounded mb-2'
+                                onClick={submitForm}
+                            >
+                                { registerLoading ? <Spinner animation='grow'/> : `Join ${config.APP_NAME}`}
+                            </Button>
+
+                            <div className='mb-3 mt-2 text-end'>
+                                <span>
+                                    Already have an account?
+                                    <Link href="/login">
+                                        <a
+                                            itemProp='url'
+                                            style={{ marginLeft: 5 }}
+                                        >
+                                            Login
+                                        </a>
+                                    </Link>
+                                </span>
+                            </div>  
+
                         </Card.Body>
                           
                     </Card>                
-                  
-                    <Card className='card-box shadow-sm border-0 mt-4 mb-4'>
-                        <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
-                            <h5>Create Password</h5>
-                        </Card.Header>
-                        <Card.Body>
-                            <Form.Group className='mb-3' controlId='formBasicPassword'>
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control 
-                                type='password' 
-                                placeholder='Password' 
-                                className='shadow-sm' 
-                                autoComplete='new-password'
-                                name='password'
-                                required={true}
-                                onChange={handleUser}      
-                            />
-                        </Form.Group>
-                        <Form.Group className='mb-3' controlId='formBasicPassword2'>
-                            <Form.Label>Confirm password</Form.Label>
-                            <Form.Control 
-                                type='password' 
-                                placeholder='Confirm password' 
-                                className='shadow-sm' 
-                                autoComplete='new-password'
-                                name='password_confirmation'
-                                required={true}
-                                onChange={handleUser}      
-                            />
-                        </Form.Group>
-                        </Card.Body>
-                    </Card>
-                    <div className='d-flex justify-content-start'>
-                        <Form.Group className='mb-1' controlId='formBasicCheckbox'>
-                            <Form.Check 
-                                type="checkbox" 
-                                label="I have read and agree to the Terms & Conditions"
-                                required={true}
-                            />
-                        </Form.Group>
-                    </div>
-
-                    <div className='mb-2 text-end'>
-                        <span>
-                            Already have an account?
-                            <Link href="/login">
-                                <a
-                                    itemProp='url'
-                                    style={{ marginLeft: 5 }}
-                                >
-                                    Login
-                                </a>
-                            </Link>
-                        </span>
-                    </div>
-
-                    <Button 
-                    disabled={!!numberValidationMessage} 
-                    style={{ backgroundColor: '#191970', borderColor: '#191970', letterSpacing: '1px' }} 
-                    type="submit" 
-                    className='w-100 shadow'
-                    onClick={submitForm}
-                    >
-                        Join {config.APP_NAME}
-                    </Button>
-                   
-                    <div className='d-flex justify-content-start'>
-                        <Form.Group className='mt-3 text-center' controlId='formRememberCheckbox'>
-                            <Form.Check 
-                                type="checkbox" 
-                                label="Remember Me"
-                                required={false}
-                                className="text-center"
-                            />
-                        </Form.Group>
-                    </div>                  
                 </Form>               
             </Container>      
         <Support/>

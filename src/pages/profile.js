@@ -180,6 +180,7 @@ const DepositComponent = () => {
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
 
     const [depositAmount, setDepositAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
+    const [depositLoading, setDepositLoading] = useState(false)
 
     const updateDepositAmount = (e) => {
         e.preventDefault()
@@ -208,7 +209,7 @@ const DepositComponent = () => {
     }
 
     const deposit = async () => {
-
+        setDepositLoading(true)
         const short_code = config.BUSINESS_SHORT_CODE;
         const passkey = config.BUSINESS_PASSKEY;
         const timestamp = generateTimestamp().toString();
@@ -222,11 +223,19 @@ const DepositComponent = () => {
                 timestamp,
                 amount: depositAmount         
             })
+
+           if(res.status === 200) {
+            setTimeout(() => {
+                setDepositLoading(false)
+            }, 3000)
+          
+
+           }
         }
     
     }
 
- 
+    const enableDepositButton = () => setDepositLoading(false)
 
     const mpesaAuth = async () => {
         const res = await axios.get('api/mpesa/auth')
@@ -239,6 +248,7 @@ const DepositComponent = () => {
 
     useEffect(() => {
         mpesaAuth()        
+ 
     }, [])
 
     return (
@@ -282,17 +292,22 @@ const DepositComponent = () => {
             className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
             >
               + {configData.INCREMENT_DEPOSIT_5000}
-            </button>     
+            </button>   
+            {depositLoading ? <Small className="d-block text-danger">
+                Check Mpesa prompt and proceed
+            </Small> : ''}  
+          
             <InputNumber 
             className="d-block form-control p-3" 
-            value={depositAmount}
+            placeholder={depositAmount}
             onChange={updateDepositAmount}
             />
             <Small className="d-block text-danger">
                 Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Small>
-            <Button variant="warning" onClick={deposit}>
-                Deposit
+      
+            <Button variant="warning" onClick={deposit} disabled={depositLoading}>
+                { depositLoading ? 'Loading...' : 'Deposit'}
             </Button>
         </div>
     )
