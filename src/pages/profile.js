@@ -12,7 +12,7 @@ import config from '../../config.json';
 import { 
     InputNumber, 
     Span,
-    Small 
+    Small, 
 } from "../components/Html";
 import axios from "../lib/axios"
 import { useRouter } from 'next/router';
@@ -20,10 +20,23 @@ import Support from '../components/Support';
 import AuthUser from '../hooks/AuthUser';
 import { withProtected } from "../hooks/RouteProtection"
 import MobileNavComponent from "../components/MobileNavComponent"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faRefresh } from "@fortawesome/free-solid-svg-icons"
 
 const StyleProfile = styled.div`
-    background-color: #ebeded;
+    background-color: #fff;
     padding-bottom: 24px;
+
+    .refresh {
+        width: auto;
+        padding-right: 8px;
+        padding-left: 0px;
+        overflow: hidden;
+    }
+    .amount {
+        width: 80px;
+        overflow: hidden;
+    }
 `
 
 const Profile = () => {
@@ -37,8 +50,6 @@ const Profile = () => {
         e.preventDefault()
         logout()
     }
-
-
 
     useEffect(() => {
         
@@ -82,17 +93,17 @@ const AuthUserProfile = () => {
             const { uu_id } = AuthUser()
  
             return (
-                 <Span className="d-block fw-bold mt-3">
+                 <h6 className="d-block fw-bold mt-3">
                   {uu_id.phone_number}    
-                 </Span>
+                 </h6>
             )
         
     
     }   
 
     return (
-        <div className="pt-4 text-center">
-            <button className="btn btn-secondary rounded-circle p-3 ">
+        <div className="pt-3 pb-2 text-center">
+            <button className="btn btn-light rounded-pill p-3 text-dark">
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     width="32" 
@@ -124,14 +135,16 @@ const BalanceComponent = () => {
             }
         
             if(isLoading) {
-                return <Spinner className="d-block mx-auto mt-2" animation="grow" size="sm"/>
+                return <Spinner className="d-block mt-2 pb-3" animation="grow" size="sm"/>
             }
             return (
-                <Span className="d-block fw-bold" style={{ width: 124 }}>
-                    <button className="btn btn-light"  onClick={insertTransaction}>
-                        <i className="bi bi-arrow-clockwise"></i>
-                    </button>
-                    Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                <Span className="fw-bold d-flex align-items-center justify-content-start" style={{ width: 124 }}>
+                    <div className="refresh btn btn-sm" onClick={insertTransaction}>
+                        <FontAwesomeIcon  icon={faRefresh} />
+                    </div>
+                    <span className="text-dark amount">
+                        Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}    
+                    </span>        
                 </Span>
             )
     
@@ -139,13 +152,13 @@ const BalanceComponent = () => {
     }
     
     return (
-        <div className="d-sm-flex justify-content-between shadow-sm p-4 mb-4">
+        <div className="d-sm-flex justify-content-between shadow-sm p-4 mb-4 bg-light rounded ">
             <div >
-                <div className="row align-items-center">
+                <div className="row align-items-center ">
                     <div className="col" style={{ width: 32 }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-wallet2" viewBox="0 0 16 16">
                             <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
-                        </svg>
+                        </svg>                      
                     </div>
                     <div className="col d-flex flex-column">
                         <Span className="d-block">Balance</Span>
@@ -160,9 +173,16 @@ const BalanceComponent = () => {
                             <path d="M3 2.5a2.5 2.5 0 0 1 5 0 2.5 2.5 0 0 1 5 0v.006c0 .07 0 .27-.038.494H15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 14.5V7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2.038A2.968 2.968 0 0 1 3 2.506V2.5zm1.068.5H7v-.5a1.5 1.5 0 1 0-3 0c0 .085.002.274.045.43a.522.522 0 0 0 .023.07zM9 3h2.932a.56.56 0 0 0 .023-.07c.043-.156.045-.345.045-.43a1.5 1.5 0 0 0-3 0V3zM1 4v2h6V4H1zm8 0v2h6V4H9zm5 3H9v8h4.5a.5.5 0 0 0 .5-.5V7zm-7 8V7H2v7.5a.5.5 0 0 0 .5.5H7z"/>
                         </svg>
                     </div>
-                    <div className="col">
-                        <Span className="d-block">Bonus</Span>
-                        <Span className="d-block fw-bold" style={{ width: 124 }}>Kes {(0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
+                    <div className="col d-flex flex-column">
+                        <Span className="d-block">Balance</Span>
+                        <Span className="fw-bold d-flex align-items-center justify-content-start" style={{ width: 124 }}>
+                            <div className="refresh btn btn-sm" >
+                                <FontAwesomeIcon  icon={faRefresh} />
+                            </div>
+                            <span className="text-dark amount">
+                                Kes 0.00
+                            </span>  
+                        </Span>                    
                     </div>
                 </div>      
             </div>         
@@ -252,7 +272,7 @@ const DepositComponent = () => {
     }, [])
 
     return (
-        <div className="shadow-sm p-4 mb-4">
+        <div className="shadow-sm p-4 mb-4 bg-light">
             <h5>Deposit</h5>
             <Span className="d-block">Send money into your {APP_NAME} account</Span>
             <button 
@@ -306,7 +326,7 @@ const DepositComponent = () => {
                 Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Small>
       
-            <Button variant="warning" onClick={deposit} disabled={depositLoading}>
+            <Button variant="warning" onClick={deposit} disabled={depositLoading || true}>
                 { depositLoading ? 'Loading...' : 'Deposit'}
             </Button>
         </div>
@@ -322,7 +342,7 @@ const WithdrawComponent = () => {
     } = configData;
 
     return (
-        <div className="shadow-sm p-4 mb-4">
+        <div className="shadow-sm p-4 mb-4 bg-light">
             <h5>Withdraw</h5>
             <Span>Withdraw from your {APP_NAME} wallet</Span>
             <InputNumber className="d-block form-control p-3" placeholder="Enter amount"/>
@@ -339,7 +359,7 @@ const WithdrawComponent = () => {
 
 const PreferenceComponent = () => {
     return (
-        <div className="shadow-sm p-4 mb-4">
+        <div className="shadow-sm p-4 mb-4 bg-info">
             <h5>Display</h5>
             <Span>Switch between light theme and dark theme</Span>
             <svg 

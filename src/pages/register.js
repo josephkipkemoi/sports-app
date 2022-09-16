@@ -123,9 +123,11 @@ const StyleEyeIcon = styled.div`
         if(password !== password_confirmation) {
            return setPasswordValidation(true)
         }
+        
         setRegisterLoading(true)
+
         let mobile_number = phone_number.split('')
-        mobile_number.splice(0,1,'254')
+        mobile_number.splice(0,1)
         mobile_number = mobile_number.join('')
 
         register({ phone_number: mobile_number, password, password_confirmation, setErrors, setRegisterLoading })     

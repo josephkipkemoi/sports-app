@@ -56,7 +56,7 @@ const Login = () => {
     const handleUser = (e) => {   
 
         const validatedNum = e?.target?.name === 'phone_number' && validateNumber( e.target.value )
-        console.log(validatedNum)
+ 
         if(!!validatedNum) {
             setNumberValidationMessage(validatedNum)
         } else {
@@ -70,7 +70,12 @@ const Login = () => {
     const submitForm = (e) => {
         e.preventDefault();
 
-        login({ phone_number, password, setErrors, setIsLoading })
+        let mobile_number = phone_number.split('')
+        mobile_number.splice(0,1, '254')
+        mobile_number = mobile_number.join('')
+
+        login({ phone_number: mobile_number, password, setErrors, setIsLoading })
+        
     }
 
     const showPassword = () => {
