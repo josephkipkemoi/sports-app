@@ -219,13 +219,30 @@ export default function BetslipContainer({ megaJackpotId, market, fiveJackpotId,
     const [modalOpen, setIsModalOpen] = useState(false)
     const [mobileCartHeight, setMobileCartHeight] = useState('auto')
     const [code, setCode] = useState('')
+
+    const postSharedCode = async (shareId, user_id, codes) => {
+      const betslips = codes.map(c => {
+        return sessionStorage.getItem(c)
+      })
  
-    const postSharedCode = async (session_id, user_id, codes) => {
-      const share_code = session_id.substring(session_id.length, 6);
+      if(user_id) {
         const res = await axios.post('api/social-share/codes', {
+              codes,
+              user_id,
+              share_code:shareId,
+              betslips: JSON.stringify(betslips),
+          })
+
+          if(res.status === 201) {
+            const { data: { share_code } } = res
+            setCode(share_code)
+            sessionStorage.setItem('session_id', Date.now())
+          }
+        } else {
+          const res = await axios.post('api/social-share/codes', {
             codes,
-            user_id,
-            share_code,
+            share_code:shareId,
+            betslips: JSON.stringify(betslips),
         })
 
         if(res.status === 201) {
@@ -233,17 +250,19 @@ export default function BetslipContainer({ megaJackpotId, market, fiveJackpotId,
           setCode(share_code)
           sessionStorage.setItem('session_id', Date.now())
         }
+        }
+    
     }
 
     const toggleShareBtn = (e) => {
-      const session_id = sessionStorage.getItem('session_id')
-      const user_id = localStorage.getItem('u_i')
-      const codes = sessionStorage.getItem('fixture_ids')
-     
-      if(e.target.getAttribute('share_code') === 'share_code') {
-        postSharedCode(session_id, user_id, codes)
+      const random = (Math.random() + 1).toString(36).substring(7);
+      const codes = JSON.parse(sessionStorage.getItem('fixture_ids'))
+      const user = JSON.parse(localStorage.getItem('uu_id'));
+
+      if(e.target.getAttribute('share_code')) {
+        postSharedCode(random, user?.uu_id?.id, codes)
       }
-    
+   
       setIsModalOpen(prev => !prev)
 
     }
@@ -298,7 +317,7 @@ const BetslipCartHeader = ({ length }) => {
           }
             <div className='btn btn-light btn-sm text-dark shadow-sm' share_code="share_code"  onClick={toggleShareBtn}>
               <FontAwesomeIcon icon={faShare} style={{ marginRight: '5px' }} share_code="share_code"/>
-              <Small className='text-dark fw-bold share-btn' share_code="share_code" >Share</Small>
+              <small className='text-dark fw-bold share-btn' share_code="share_code" >Share</small>
             </div>  
         </div>
       )
@@ -307,7 +326,7 @@ const BetslipCartHeader = ({ length }) => {
 const EmptyCart = () => {
     
       const LoadBetCodeComponent = () => {
-        const [code, setCode] = useState('')
+        // const [code, setCode] = useState('')
     
         const handleBetCode = (e) => {
           const betCode = e.target.value
@@ -1112,25 +1131,25 @@ const CongratulationModal = ({ isModalOpen, closeModal, historyRoute, market }) 
 }
 
 const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
-    const [session, setSession] = useState('')
+
     const [isCopied, setIsCopied] = useState(false)
     const [copiedSmall, setCopiedSmall] = useState('none')
     const [copiedSmall2, setCopiedSmall2] = useState('none')
     const [isCodeCopied, setIsCodeCopied] = useState(false)
-  
-    const fullUrl = `https://www.bet360.co.ke?sp_s=${share_code}`
-    const codeSession = session
-  
+ 
+    const fullUrl = `https://www.pinaclebet.com/share/${share_code}`
+
     const [social, setSocial] = useState({
       facebook: '',
       twitter: '',
       whatsapp: '',
       telegram: ''
     })
+
     const { getSocialShareLinks } = useSocialShare()
-    const fetchSocialLinks = async (session_id) => {
-      const data = await getSocialShareLinks(session_id)
-     
+    const fetchSocialLinks = async (share_code) => {
+      const data = await getSocialShareLinks(share_code)
+    
       setSocial(prev => ({
         ...prev,
         facebook: data.links.facebook,
@@ -1156,7 +1175,7 @@ const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
     }
   
     const handleCodeClick = () => {
-      copyToClipboard(session)
+      copyToClipboard(share_code)
       .then(() => {
         setIsCodeCopied(true)
         setCopiedSmall('')
@@ -1170,6 +1189,10 @@ const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
       })
     }
   
+    useEffect(() => {
+      fetchSocialLinks(share_code)
+  
+    }, [])
   return (
       <Modal show={isModalOpen} className="mt-5">
         <StyleShareContainer>
@@ -1178,7 +1201,9 @@ const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
          <h6 onClick={toggleShareBtn} className="bg-secondary p-2 rounded-pill text-light cursor-pointer h6-close">X</h6>
         </Modal.Header>
         <Modal.Body>
-          <span className='d-flex justify-content-center m-2'>Share this bet with friends so that they can bet on it too!</span>
+          <span className='d-flex justify-content-center m-2'>
+            Share this bet with friends so that they can bet on it too!
+          </span>
           <div className='mb-2 mt-3 p-3'>
             <Row>
               <Col className='d-flex justify-content-around'>

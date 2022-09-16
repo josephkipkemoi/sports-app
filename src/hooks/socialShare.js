@@ -5,7 +5,7 @@ const useSocialShare = () => {
 
     const getSocialShareLinks = async (session_id) => {
         await csrf()
-
+     
         const res = await axios.get(`api/social-share?betSession=${session_id}`)
         if(res.status === 200)
         return res.data
