@@ -74,7 +74,7 @@ const Login = () => {
         mobile_number.splice(0,1, '254')
         mobile_number = mobile_number.join('')
 
-        login({ phone_number: mobile_number, password, setErrors, setIsLoading })
+        login({ phone_number: Number(mobile_number), password, setErrors, setIsLoading })
         
     }
 
