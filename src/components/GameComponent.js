@@ -5,6 +5,7 @@ import { Small } from "./Html";
 import axios from '../lib/axios';
 import styled from "styled-components";
 import AuthUser from "../hooks/AuthUser";
+import { useRouter } from "next/router";
 
 const StyleFavorites = styled.i`
   i {
@@ -37,6 +38,7 @@ export default function GameComponent({ data, refetch }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
     const { uu_id } = AuthUser()
+    const router = useRouter()
 
     const sendBetslip = (e)  => {
   
@@ -70,12 +72,38 @@ export default function GameComponent({ data, refetch }) {
       setId(prev => prev.concat(fixtureId))
 
     }
+
+    const fetchSharedFixtureIds =  () => {
+      const shareCode = sessionStorage.getItem('share_code')
     
-    const updateFixtureIds = () => {   
+      const loadIds = async () => {
+        if(shareCode) {
+          const data = await axios.get(`api/social-share/codes/show?share_code=${shareCode}`)
+            
+        if(data?.data ) {
+            const sharedIds = data.data.codes.map((c,i) => {
+              const betslips =  JSON.parse(data.data.betslips)
+              sessionStorage.setItem(JSON.parse(betslips[i]).fixture_id, betslips[i])
+              return c
+            })
+
+            setId(prev => prev.concat(sharedIds))
+            router.push('?sp=act')
+        }
+          
+        }
+      }
+      setTimeout( loadIds, 500)
+      clearTimeout(loadIds)
+    }
+    
+    const updateFixtureIds =  () => {   
       const fixtureIds = JSON.parse(sessionStorage.getItem('fixture_ids'))
+    
       if(fixtureIds?.length > 0) {   
         setId(prev => prev.concat(fixtureIds))
       } else {
+        fetchSharedFixtureIds()
         sessionStorage.setItem('fixture_ids', JSON.stringify(fixIds))
       }
   
@@ -195,6 +223,7 @@ export default function GameComponent({ data, refetch }) {
       btn[i].classList.add('active')
     }
 
+    
     useEffect(() => {
       updateFixtureIds()
     }, [])

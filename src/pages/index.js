@@ -11,9 +11,6 @@ import CustomerInfo from '../components/CustomerInfo';
 import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
-import { BottomNavBar } from '../components/NavBar';
-import { useGetV1CustomFixtureQuery } from '../hooks/fixture';
-import { Spinner } from 'react-bootstrap';
 import CustomAds from '../components/CustomAds';
 
 const ThemedBody = styled('div')`
