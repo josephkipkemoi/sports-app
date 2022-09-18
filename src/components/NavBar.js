@@ -254,7 +254,7 @@ export default function NavBar({ login }) {
     return (
         <>
         <StyledTopRightNav className="shadow-lg">
-            <nav >
+            <nav id="main-nav">
                     <div className="d-flex justify-content-between align-items-center p-2">
                         <div className="col-mobile">
                             <Link href="/">
