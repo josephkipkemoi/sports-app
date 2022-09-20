@@ -19,7 +19,7 @@ import Script from "next/script";
 import useAuth from "../hooks/auth";
 import Loader from "../components/Loader";
 import Image from "next/image";
-
+import sw from '../../service-worker'
 
 if(typeof document !== 'undefined') {
     if(!window.sayHello) {
@@ -82,6 +82,18 @@ export default function MyApp({ Component, pageProps }) {
 
     useEffect(() => {
         setLoading(true)
+        if('serviceWorker' in navigator) {
+            // Wait for the load event not to block other work
+            window.addEventListener('load', async () => {
+              // try to register the service worker
+              try {
+                  const reg = await navigator.serviceWorker.register(sw)
+                  console.log('Service worker registered')
+              } catch (err) {
+                console.log('Service worker registration failed!', err)
+              }
+            })
+          }
     }, [])
     
     
