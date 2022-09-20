@@ -80,7 +80,7 @@ position: static;
  }
 
 `
-export default function CustomFilter({ heading, refetch }) {
+export default function CustomFilter({ heading }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [searchResults, setSearchResults] = useState([])
     const [isSearchLoading, setIsSearchLoading] = useState(false)
@@ -111,7 +111,7 @@ export default function CustomFilter({ heading, refetch }) {
               <button className='btn' onClick={() => window.print()}>
                 <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>
               </button>        
-              <button className='background-none' onClick={() => refetch()}>
+              <button className='background-none'>
                 <i className="bi bi-arrow-clockwise p-1" style={{ color: '#ffffff' }}></i>
                 <small style={{ color: '#ffffff', letterSpacing: '1px' }}>Refresh</small>
               </button>

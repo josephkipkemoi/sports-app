@@ -9,6 +9,7 @@ import BetslipContainer from "../components/BetslipContainer";
 import GameComponent from "../components/GameComponent";
 import { useGetV1CustomFixtureQuery } from "../hooks/fixture";
 import  Spinner  from "react-bootstrap/Spinner";
+import axios from "../lib/axios";
 
 const StyleSoccer = styled.div`
     height: 100vh;
@@ -17,24 +18,15 @@ const StyleSoccer = styled.div`
     background-color: #ebeded;
 `
 
-export default function Soccer() {
-    const { data, isLoading, error, refetch } = useGetV1CustomFixtureQuery()
-
-    if(isLoading) {
-        return <Spinner animation='grow' />
-      }
-    
-      if(error) {
-        return <span>Try again later!</span>
-      }
+export default function Soccer({ data }) { 
     
     return (
         <StyleSoccer>
             <Row className="px-2">
                 <Col lg={9} md={12} sm={12}>
                     <TopNavBar  />
-                    <CustomFilter heading="Soccer" refetch={refetch}/>
-                    <GameComponent data={data.fixtures} refetch={refetch}/>
+                    <CustomFilter heading="Soccer" />
+                    <GameComponent data={data} />
                 </Col>
                 <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>
                     <BetslipContainer/>
@@ -44,3 +36,13 @@ export default function Soccer() {
         </StyleSoccer>
     )
 }
+
+export async function getServerSideProps(context) {
+    const data = await axios.get('api/custom_fixture')
+  
+    return {
+      props: {
+        data: data.data.fixtures
+      }, // will be passed to the page component as props
+    }
+  }

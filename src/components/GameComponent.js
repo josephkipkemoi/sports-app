@@ -34,7 +34,7 @@ const StyleGameComponent = styled.div`
   }
  
 `
-export default function GameComponent({ data, refetch }) {
+export default function GameComponent({ data }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
     const { uu_id } = AuthUser()
@@ -184,9 +184,7 @@ export default function GameComponent({ data, refetch }) {
     const removeSingleFavorite = async (fixture_id) => {
       const { status } = await axios.delete(`api/users/${uu_id.id}/favorites/${fixture_id}/remove`)
       
-      if(status === 200) {
-          refetch()
-      }
+     
     }
 
 
@@ -204,9 +202,6 @@ export default function GameComponent({ data, refetch }) {
         fixture_id
       });
      
-      if(status === 201) {
-         refetch()
-      }
 
     }  
 

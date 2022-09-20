@@ -1,7 +1,16 @@
 // Pinaclebet ServiceWorker
 const cacheName = 'cache-v1'
 // List of files to be precached
-const precachedResources = ['/', '/history', '/profile', '/jackpot', '/soccer']
+const precachedResources = [    '/', 
+                                '/history?his_tab=sbets&tab=all', 
+                                '/history?his_tab=sbets&tab=settled', 
+                                '/history?his_tab=sbets&tab=unsettled', 
+                                '/history?his_tab=jbets&tab=j_all',
+                                '/history?his_tab=jbets&tab=mega_jackpot',
+                                '/history?his_tab=jbets&tab=five_jackpot',
+                                '/profile', '/jackpot', 
+                                '/soccer'
+                            ]
 
 // When the service worker is installing, open the cache and add the precache resources to it
 self.addEventListener('install', (e) => {
