@@ -866,10 +866,10 @@ const BetCartFormElements = ({ betData }) => {
           return
         }   
         const sessionId = Number(sessionStorage.getItem('session_id'))
- 
+
         const res = await axios.post('api/users/fixtures/cart', {
           user_id: uu_id.id,
-          cart_id: sessionId,
+          cart_id: Number(sessionId.toString().substring(0,5)),
           bet_amount: betAmount,
           possible_payout: possibleWin,
           cart: JSON.stringify(betData)
@@ -911,7 +911,7 @@ const BetCartFormElements = ({ betData }) => {
             <div className='d-flex'>
               <button className='custom-sm-btn fw-bold btn btn-secondary text-light' onClick={decrementBetAmount}>-</button>
               <InputNumber 
-              value={betAmount}
+              placeholder={betAmount}
               className="form-control custom-input"
               onChange={updateBetAmount}
               />
