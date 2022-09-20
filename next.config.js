@@ -13,6 +13,11 @@ const baseConfig = {
     },
     compiler: {
         styledComponents: true
+    },
+    pwa: {
+        dest: 'public',
+        register: true,
+        skipWaiting: true,
     }
 }
  
