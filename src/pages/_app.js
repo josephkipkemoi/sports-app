@@ -8,7 +8,6 @@ import styled, {
     createGlobalStyle,
     ThemeProvider as StyledThemeProvider
 } from 'styled-components';
-import reset from 'styled-reset';
 
 import 'swagger-ui-react/swagger-ui.css';
 

@@ -1,14 +1,7 @@
-// Pinaclebet Service Worker
-import React, { useEffect } from "react"
 
-
-export default function sw() {
     const cacheName = 'cache-v1'
-   
     // List of files to be precached
     const precachedResources = ['/']
-
-    useEffect(() => {
 
             // When the service worker is installing, open the cache and add the precache resources to it
             self.addEventListener('install', (e) => {
@@ -29,10 +22,7 @@ export default function sw() {
                     })
                 )
             })
-    }, [])
-    
-    return <></>
-}
+
 
 
 
