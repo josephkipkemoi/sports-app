@@ -24,11 +24,6 @@ button {
   border-bottom-left-radius: 0px;
 }
  
-@media screen and (max-width: 990px) {
-  .search-comp {
-      display: none !important;
-  } 
-}
 @media screen and (min-width: 990px) {
   .custom-search {
     display: none !important;
@@ -69,7 +64,7 @@ position: static;
      display: none;
   }
   .header-three {
-    display: none;
+    width: 30px;
   }
 }
  h5 {
@@ -159,11 +154,11 @@ export default function CustomFilter({ heading }) {
     )
 }
 
-export const SearchComponent = ({ onsubmit, onchange, customClass }) => {
+export const SearchComponent = ({ onsubmit, onchange }) => {
   return (
     <StyleSearch >
-      <div className={`d-flex ${customClass}`}>
-      <input 
+      <div className={`d-flex`}>
+      {/* <input 
             type="search" 
             placeholder="Search" 
             className="form-control text-white"
@@ -171,9 +166,9 @@ export const SearchComponent = ({ onsubmit, onchange, customClass }) => {
             style={{ background: '#424242', borderRight: 'none', borderColor: '#198754' }}
             aria-label="Search"
             id="searchInpt"
-            />
-            <button id="searchBtn" className='btn btn-success d-flex align-items-center p-1' onClick={onsubmit}>        
-              <i className="bi bi-search" style={{ marginLeft: 3, marginRight: 5, color: '#ffffff' }}></i>
+            /> */}
+            <button id="searchBtn" className='btn d-flex align-items-center border-0' onClick={onsubmit}>        
+              <i className="bi bi-search" style={{ color: '#ffffff' }}></i>
             </button>
       </div>
          
