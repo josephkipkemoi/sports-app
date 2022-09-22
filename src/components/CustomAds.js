@@ -16,9 +16,9 @@ const StyleCustomAds = styled.div`
 `
 export default function CustomAds() {
     return (
-        <StyleCustomAds className="d-flex">
-            <Card className="w-100 border-0 bg-info">
-                <Card.Body style={{ paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
+        <StyleCustomAds className="d-flex bg-light">
+            <Card className="w-100 border-0 bg-light m-1 rounded">
+                <Card.Body className="rounded" style={{ paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
                    <CarouselComponent/>
                 </Card.Body>
             </Card>
@@ -29,30 +29,27 @@ export default function CustomAds() {
 const CarouselComponent = () => {
 
     return (
-         <Carousel controls={false} indicators={false}  >
+         <Carousel controls={false} indicators={false} className="m-2 rounded">
             <Carousel.Item 
                 interval={2000} 
-                className="card border-0 shadow p-3" 
-                style={{ backgroundColor: '#3aa335' }}
+                className="card border-0 shadow p-1 d-flex align-items-center rounded" 
+                style={{ backgroundColor: '#fff' }}
             >
-                {/* <Image width={220} height={40} src="https://www.pinaclebet.com/mpesa.svg" /> */}
-                <h4 className="text-center fw-bold" style={{ fontSize: '24px', color: '#fff' }}>
+                <Image width={75} height={75} src="https://www.pinaclebet.com/mpesa.jpeg" />
+                {/* <h4 className="text-center fw-bold" style={{ fontSize: '24px', color: '#fff' }}>
                     MPESA PAYBILL
-                </h4>
-                <h4 className="text-center fw-bold pt-2" style={{ fontSize: '32px', color: '#fff' }}>
-                    4075207
+                </h4> */}
+                <h4 className="text-center fw-bold p-2 m-1 w-100 rounded" style={{ fontSize: '16px', color: '#fff', backgroundColor: 'green' }}>
+                   Account No 07-XXX-XXX
                 </h4>
             </Carousel.Item>    
             <Carousel.Item 
                 interval={1500} 
-                className="card border-0 shadow p-3" 
-                style={{ backgroundImage: 'linear-gradient(#3aa335,#3aa335)'  }}
+                className="card border-0 shadow p-1 d-flex align-items-center rounded" 
             >
-                <h4 className="text-center fw-bold" style={{ fontSize: '24px', color: '#fff' }}>
-                    ACCOUNT NO 
-                </h4>
-                <h4 className="text-center fw-bold pt-2" style={{ fontSize: '32px', color: '#fff'}}> 
-                    07-XXX-XXX
+                <Image width={75} height={75} src="https://www.pinaclebet.com/mpesa.jpeg" />
+                <h4 className="text-center fw-bold p-2 m-1 w-100 rounded" style={{ fontSize: '16px', color: '#fff', backgroundColor: 'green' }}>                  
+                   Paybill 4075207
                 </h4>
             </Carousel.Item>
          </Carousel>
