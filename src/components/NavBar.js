@@ -516,8 +516,9 @@ export const BottomNavBar = ({ login, user }) => {
                 {midnavLinks.map(MidNavLinkItems)}
             </div>
             
-            
-            <i className="bi bi-bell-fill btn btn-sm text-white rounded-circle" style={{ border: '1px solid #fff' }}></i>        
+            {Boolean(user?.uu_id?.id) ?
+                <i className="bi bi-bell-fill btn btn-sm text-white rounded-circle" style={{ border: '1px solid #fff' }}></i>       
+            : <div></div>}
         </nav>
     
              <Modal show={isModalOpen} className="mt-5 pt-5" modalid="modal-ref">
