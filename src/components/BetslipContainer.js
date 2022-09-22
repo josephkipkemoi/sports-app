@@ -871,7 +871,7 @@ const BetCartFormElements = ({ betData }) => {
           user_id: uu_id.id,
           cart_id: Number(sessionId.toString().substring(0,5)),
           bet_amount: betAmount,
-          possible_payout: possibleWin,
+          possible_payout: Math.floor(possibleWin),
           cart: JSON.stringify(betData)
         })
   
