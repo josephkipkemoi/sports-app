@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Carousel } from "react-bootstrap";
 import styled from "styled-components";
+import Image from "next/image";
 
 const StyleCustomAds = styled.div`
     background-color: #edebeb;
@@ -34,6 +35,7 @@ const CarouselComponent = () => {
                 className="card border-0 shadow p-3" 
                 style={{ backgroundColor: '#3aa335' }}
             >
+                {/* <Image width={220} height={40} src="https://www.pinaclebet.com/mpesa.svg" /> */}
                 <h4 className="text-center fw-bold" style={{ fontSize: '24px', color: '#fff' }}>
                     MPESA PAYBILL
                 </h4>
