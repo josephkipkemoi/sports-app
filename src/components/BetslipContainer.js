@@ -24,6 +24,7 @@ import axios from "../lib/axios";
 import MobileNavComponent from "./MobileNavComponent";
 import useAuth from "../hooks/auth";
 import AuthUser from "../hooks/AuthUser";
+import { randomString } from "../hooks/generateRandomId";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -865,13 +866,15 @@ const BetCartFormElements = ({ betData }) => {
           setLoading(false)
           return
         }   
-        const sessionId = Number(sessionStorage.getItem('session_id'))
+        
+        const cart_id = randomString()
+        const possible_payout = Math.floor(possibleWin)
 
         const res = await axios.post('api/users/fixtures/cart', {
-          user_id: uu_id.id,
-          cart_id: Number(sessionId.toString().substring(0,5)),
+          cart_id,
+          possible_payout,
           bet_amount: betAmount,
-          possible_payout: Math.floor(possibleWin),
+          user_id: uu_id.id,
           cart: JSON.stringify(betData)
         })
   

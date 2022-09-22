@@ -6,9 +6,6 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import useClickOutside from "../hooks/useClickOutside";
-import  Col  from "react-bootstrap/Col";
-import  Row  from "react-bootstrap/Row";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { SearchComponent } from "./CustomFilter";
 import CurrentTime from "./CurrentTime";
@@ -259,8 +256,6 @@ export default function NavBar({ login }) {
                         <div className="col-mobile">
                             <Link href="/">
                                 <a className="navbar-brand" itemProp="url">
-                                    {/* <Image src="/logo.png" width="48" height="24"/> */}
-                                    {/* <h5>Pinaclebet</h5> */}
                                     <Logo/>
                                 </a>
                             </Link>
@@ -510,20 +505,19 @@ export const BottomNavBar = ({ login, user }) => {
 
     return (
         <StyleBottomNavBar>  
-        <nav className="p-2" ref={linkBarRef}>
-            <Row className="d-flex align-items-center mid-nav">
-                <Col lg={5} md={5} sm={5} className="time" >
-                    <CurrentTime/>
-                </Col>
-                <Col lg={7} md={7} sm={7} className="d-flex justify-content-start align-items-center nav-end">     
-                    {/* {Boolean(user.uu_id) ? <AuthenticatedItems/> : unauthLinks.map(UnAuthenticatedItems)}   */}
-                    {/* <Profile setProfileOpen={setProfileOpen} profileOpen={profileOpen}/>
-                    <ProfileComponent profileOpen={profileOpen}/> */}
-                     <div>
-                        {midnavLinks.map(MidNavLinkItems)}
-                    </div>
-                </Col>
-            </Row>
+        <nav 
+        className="pt-2 pb-2 d-flex align-items-center justify-content-between" 
+        ref={linkBarRef}
+        style={{ paddingRight: 8, paddingLeft: 8 }}
+        >
+            <CurrentTime/>
+         
+            <div>
+                {midnavLinks.map(MidNavLinkItems)}
+            </div>
+            
+            
+            <i className="bi bi-bell-fill btn btn-sm text-white rounded-circle" style={{ border: '1px solid #fff' }}></i>        
         </nav>
     
              <Modal show={isModalOpen} className="mt-5 pt-5" modalid="modal-ref">

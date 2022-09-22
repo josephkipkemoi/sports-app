@@ -632,6 +632,7 @@ const UserBetHistoryElement = ({ data }) => {
                         <Select className="text-dark" options={options} onChange={setBetOption}/>
                     </td>
                     <td>
+                        {console.log(link)}
                         <button 
                         className="btn btn-danger btn-sm"  
                         onClick={() => changeStatus(link.user_id, link.cart_id)}>

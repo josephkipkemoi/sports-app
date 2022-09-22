@@ -22,7 +22,7 @@ import Pagination from '../components/Pagination';
 import AuthUser from '../hooks/AuthUser';
 import { withProtected } from '../hooks/RouteProtection';
 import MobileNavComponent from '../components/MobileNavComponent';
-import { StarSvgIcon } from '../components/Svg';
+import { RefreshButton } from '../components/HtmlElements';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -32,6 +32,9 @@ const StyledHistory = styled.div`
     background-color: #ebeded;
     .history-header {
         padding-top: 20px;
+    }
+    .game-id {
+        text-transform: uppercase;
     }
 `
 
@@ -88,16 +91,9 @@ const AllJackpotHistory = ({ user_id }) => {
 
     return (
         <>
-           <button 
-               className='btn btn-light border-0 shadow-sm d-flex align-items-center mx-auto mb-3'
-               onClick={refetch}
-           >
-               Refresh
-               <FontAwesomeIcon
-                   icon={faRefresh}
-                   style={{ marginLeft: 5 }}
-               />
-           </button>
+           <div className='d-flex justify-content-center mb-2'>
+            <RefreshButton refetch={refetch}/>
+            </div>
         
         {data.data.length > 0 ? 
             <div className='bg-dark p-2 rounded'>
@@ -121,16 +117,9 @@ const MegaJackpotHistory = ({ user_id }) => {
 
     return (
         <>
-           <button 
-               className='btn btn-light border-0 shadow-sm d-flex align-items-center mx-auto mb-3'
-               onClick={refetch}
-           >
-               Refresh
-               <FontAwesomeIcon
-                   icon={faRefresh}
-                   style={{ marginLeft: 5 }}
-               />
-           </button>
+            <div className='d-flex justify-content-center mb-2'>
+                <RefreshButton refetch={refetch}/>
+            </div>
         {data.data.length > 0 ? 
            <div className='bg-dark p-2 rounded'>
            <JackpotComponent data={data}/>
@@ -153,16 +142,9 @@ const FiveJackpotHistory = ({ user_id }) => {
  
     return (
         <>
-          <button 
-                className='btn btn-light border-0 shadow-sm d-flex align-items-center mx-auto mb-3'
-                onClick={refetch}
-            >
-                Refresh
-                <FontAwesomeIcon
-                    icon={faRefresh}
-                    style={{ marginLeft: 5 }}
-                />
-            </button>
+          <div className='d-flex justify-content-center mb-2'>
+            <RefreshButton refetch={refetch}/>
+         </div>
          {data.data.length > 0 ? 
             <div className='bg-dark p-2 rounded'>
           
@@ -207,9 +189,9 @@ const AllTabHistory = ({ user_id }) => {
                     style={{ 
                         borderBottomRightRadius: 0, 
                         borderBottomLeftRadius: 0,
-                        borderBottom: 'none', 
+                        borderBottom: '1px dotted cyan', 
                         cursor: 'pointer',
-                        borderTop: '1px solid lightgray'
+                        borderTop: '3px solid lightgray'
                     }}
                     onClick={() => openMoreMarkets(i)}
                     >
@@ -229,7 +211,7 @@ const AllTabHistory = ({ user_id }) => {
                     </div>
                     <div>
                         <small>Bet ID:</small>
-                        <small>{name.cart_id}</small>
+                        <small className='game-id'>{name.cart_id}</small>
                     </div>
                     <div 
                     className="mt-2 d-flex align-items-center justify-content-between bg-danger p-2 rounded-0 text-dark"
@@ -274,7 +256,7 @@ const AllTabHistory = ({ user_id }) => {
                         return (
                             <div className='mb-2 border-0' key={i}>
                                 <div>
-                                    <small>Game ID: {d.fixture_id}</small>
+                                    <small className='game-id'>Game ID: {d.fixture_id}</small>
                                     <span className='d-block text-center bg-dark rounded-0 text-light p-1'>
                                         {d.betslip_teams}
                                     </span>
@@ -297,21 +279,12 @@ const AllTabHistory = ({ user_id }) => {
  
     return (
         <>
-            <div className='d-flex justify-content-center '>
-            <button 
-                className='btn btn-light border-0 shadow-sm d-flex align-items-center '
-                onClick={refetch}
-            >
-                Refresh
-                <FontAwesomeIcon
-                    icon={faRefresh}
-                    style={{ marginLeft: 5 }}
-                />
-            </button>
-        </div>
+            <div className='d-flex justify-content-center mb-2'>
+                <RefreshButton refetch={refetch}/>
+            </div>
           {data?.data.length > 0 ?
           <>
-           <div className='bg-info rounded p-2'>
+           <div className='bg-white rounded p-2'>
             {data.data.map(BetHistoryElements) }
             {data?.data.length >= 5 && <Pagination data={data}/>} 
             </div>
@@ -595,16 +568,7 @@ const UnsettledHistory = ({ user_id }) => {
     return (
         <>
          <div className='d-flex justify-content-center mb-2'>
-            <button 
-                className='btn btn-outline-success border-0 shadow-sm d-flex align-items-center'
-                onClick={refetch}
-            >
-                Refresh
-                <FontAwesomeIcon
-                    icon={faRefresh}
-                    style={{ marginLeft: 5 }}
-                />
-            </button>
+            <RefreshButton refetch={refetch}/>
         </div>
 
             {data.data.length > 0 ? 
