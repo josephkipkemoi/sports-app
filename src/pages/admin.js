@@ -18,6 +18,7 @@ import { PhoneSvgIcon } from "../components/Svg";
 import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 import { Modal } from "react-bootstrap";
 import { useGetFixtureIdsWhereOddsNullQuery } from "../hooks/fixture";
+import { ProgressBarElement } from "../components/HtmlElements";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -82,7 +83,7 @@ export default function Admin() {
             <Link href={link.path} key={i}>
                 <a
                     itemProp="url"
-                    className="text-decoration-none text-dark p-3 "
+                    className="text-decoration-none text-dark p-3 btn"
                 >
                     {link.name}
                 </a>
@@ -632,7 +633,6 @@ const UserBetHistoryElement = ({ data }) => {
                         <Select className="text-dark" options={options} onChange={setBetOption}/>
                     </td>
                     <td>
-                        {console.log(link)}
                         <button 
                         className="btn btn-danger btn-sm"  
                         onClick={() => changeStatus(link.user_id, link.cart_id)}>
@@ -741,6 +741,17 @@ const UserProfileElement = ({ user_id }) => {
 }
 
 const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fixtureLoaded, fixtureOddsLoaded, fixtureOddsLoading }) => {
+    const [startUpdate, setStartUpdate] = useState(false)
+
+    const handleUpdate = (e) => {
+        if(e.target.innerText === 'Start') {
+            setStartUpdate(true)
+        } 
+        if(e.target.innerText === 'Close') {
+            setStartUpdate(false)
+        }
+    }
+
     return (
         <div className="p-3 card mt-2 bg-danger shadow-lg">
             <FixturesElement 
@@ -751,7 +762,15 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
             fixtureOddsLoading={fixtureOddsLoading}
             />
             <CustomFixture/>
-            <FixtureOdds/>
+            <div className="card p-2 mt-4">
+                <div className="d-flex justify-content-center m-2">
+                    <button className="btn btn-primary btn-lg" onClick={handleUpdate}>
+                        { startUpdate ? 'Close' : 'Start'}
+                    </button>
+                </div>
+                {startUpdate ?  <FixtureOdds setStartUpdate={setStartUpdate}/> : '' }
+            </div>
+        
             <ConsoleOutPut 
             fixtureLoaded={fixtureLoaded}
             fixtureOddsLoaded={fixtureOddsLoaded}
@@ -944,9 +963,15 @@ const CustomFixture = () => {
     )
 }
 
-const FixtureOdds = () => {
-    const [fixtureId, setFixtureId] = useState(null)
+const FixtureOdds = ({ setStartUpdate }) => {    
+
+    const { data, isLoading, error, refetch } = useGetFixtureIdsWhereOddsNullQuery()
+    const [ids, setIds] = useState(0)
     const [updated, setUpdated] = useState(false)
+    const [fixtureId, setFixtureId] = useState(0)
+    const [maxLength, setMaxLength] = useState(null)
+    const [progress, setProgress] = useState(0)
+    const [isUpdateComplete, setIsUpdateComplete] = useState(false)
 
     const [homeValues, setHomeValues] = useState({
         value: '',
@@ -961,47 +986,13 @@ const FixtureOdds = () => {
         odd: ''
     })
 
-    const { data, isLoading, error, refetch } = useGetFixtureIdsWhereOddsNullQuery()
-
     if(error) {
         return <span>Error</span>
     }
-
-    if(isLoading) {
-        return <span>Loading</span>
-    }
-
-    const fixture_ids = data.map(({ fixture_id }) => {
-        return {
-            value: fixture_id,
-            label: fixture_id
-        }
-    })
-
-    const submitOdds = async () => {
-        setUpdated(true)
-        const odds = [{ id: 1, 
-                        name: 'Match Winner', 
-                        values: [ homeValues, drawValues, awayValues ] }]
-
-        const { status } = await axios.patch(`api/fixtures/custom_odds/${fixtureId}`, {
-            odds
-        })
-
-  
-
-        if(status === 200) {
-            refetch()
-        }
-    }
-
-    const handleChange = ({ value }) =>  {
+    const handleChange = () =>  {
         let home = Number((Math.random() * 5).toFixed(2))
         let draw = Number((Math.random() * 4).toFixed(2))
         let away = Number((Math.random() * 6).toFixed(2))
-
-        setFixtureId(value)
-        setUpdated(false)
         
         if(draw < 1 ) {
             draw += 1
@@ -1028,32 +1019,83 @@ const FixtureOdds = () => {
             odd: Number(away).toFixed(2)
         })
     }
- 
-    return (
-        <Card>
-            <Card.Header>
-                <h1>Fixture {fixtureId} Odds</h1>
-            </Card.Header>
-            <Card.Body className="row align-items-center">
-                <Col>
-                    <Select options={fixture_ids} onChange={handleChange}/>
-                </Col>
-                <Col>
-                    <InputNumber className="form-control" placeholder={homeValues.odd} disabled/>
-                </Col>
-                <Col>
-                    <InputNumber className="form-control" placeholder={drawValues.odd} disabled/>
-                </Col>
-                <Col>
-                    <InputNumber className="form-control" placeholder={awayValues.odd} disabled/>
-                </Col>
-            </Card.Body>
-            <Card.Footer>
-             <button className="btn btn-primary" onClick={submitOdds} disabled={updated}>
-                Update Odds {updated ? 'Complete' : ''}
-            </button>
-            </Card.Footer>
+  
+    const updateFixture = async (sessionFixtureId, home, draw ,away) => {       
 
+         if(sessionFixtureId === 'undefined') {
+            return
+         }
+        const odds = [{ id: 1, 
+            name: 'Match Winner', 
+            values: [ {value: 'Home', odd: home}, {value: 'Draw', odd: draw}, {value: 'Away', odd: away} ] }]
+  
+    
+        const { status } = await axios.patch(`api/fixtures/custom_odds/${sessionFixtureId}`, {
+            odds
+        })  
+
+        if(status === 200) {
+            setProgress(prev => prev += 1)
+            setUpdated(prev => !prev)   
+            refetch()
+        }
+    }
+ 
+    function update(sessionFixtureId, homeOdds, drawOdds, awayOdds) {
+
+
+        if(Boolean(sessionFixtureId) === false) {
+            alert('Update complete')
+            setStartUpdate(false)
+        }
+
+        handleChange()  
+        updateFixture(sessionFixtureId, homeOdds, drawOdds, awayOdds)
+    }
+
+    useEffect(() => {
+        const dataLength = sessionStorage.getItem('data_length')
+        setMaxLength(dataLength)
+        const sessionFixtureId = sessionStorage.getItem('update_id')
+        setFixtureId(sessionFixtureId)
+        const homeOdds = sessionStorage.getItem('update_home')
+        const drawOdds = sessionStorage.getItem('update_draw')
+        const awayOdds = sessionStorage.getItem('update_away')
+
+        const time = setTimeout(() => {
+            update(sessionFixtureId, homeOdds, drawOdds, awayOdds)
+        }, 350)
+
+        if(Number(dataLength) === Number(progress)) {
+            sessionStorage.removeItem('data_length')
+            sessionStorage.removeItem('progress')
+            setIsUpdateComplete(true)
+            return clearTimeout(time)
+        }
+         return () => clearTimeout(time)        
+    
+    }, [updated])
+
+    if(isLoading) {
+        return <span>Loading</span>
+    }
+    
+    sessionStorage.setItem('update_home', homeValues.odd)
+    sessionStorage.setItem('update_draw', drawValues.odd)
+    sessionStorage.setItem('update_away', awayValues.odd)   
+    sessionStorage.setItem('update_id',(data[ids]?.fixture_id))    
+    sessionStorage.setItem('progress', progress)
+
+    if(Boolean(maxLength) === false) {
+         sessionStorage.setItem('data_length', data?.length)
+    }  
+
+    return (
+        <Card>    
+            <Card.Body>
+                <h6>{maxLength}</h6>
+             {isUpdateComplete ? <h5>update complete!</h5> : <ProgressBarElement now={progress} max={maxLength}/>}
+            </Card.Body>
         </Card>
     )
 }

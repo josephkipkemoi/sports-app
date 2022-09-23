@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
-
+import  ProgressBar  from 'react-bootstrap/ProgressBar';
 export const RefreshButton = ({ refetch }) => {
     return (
         <button 
@@ -14,4 +14,8 @@ export const RefreshButton = ({ refetch }) => {
         />
         </button>
     )
+}
+
+export const ProgressBarElement = ({ now, max }) => {
+    return <ProgressBar animated={true} min={0} max={max} now={now} />;
 }
