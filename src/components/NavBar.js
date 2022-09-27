@@ -14,6 +14,8 @@ import styled from "styled-components";
 import AuthUser from "../hooks/AuthUser";
 import Logo from "./Logo";
 import useAuth from "../hooks/auth";
+import NotificationComponent from "./NotificationComponent";
+import { useGetUnreadNotificationsQuery } from "../hooks/notifications";
 
 const StyledTopRightNav = styledComponents.div`
 position: sticky;
@@ -501,7 +503,8 @@ export const BottomNavBar = ({ login, user }) => {
     }
     const linkBarRef = React.useRef()
 
-    useClickOutside(linkBarRef, closeMenu)    
+    useClickOutside(linkBarRef, closeMenu)  
+
 
     return (
         <StyleBottomNavBar>  
@@ -516,9 +519,7 @@ export const BottomNavBar = ({ login, user }) => {
                 {midnavLinks.map(MidNavLinkItems)}
             </div>
             
-            {Boolean(user?.uu_id?.id) ?
-                <i className="bi bi-bell-fill btn btn-sm text-white rounded-circle" style={{ border: '1px solid #fff' }}></i>       
-            : <div></div>}
+            <NotificationComponent user={user}/>
         </nav>
     
              <Modal show={isModalOpen} className="mt-5 pt-5" modalid="modal-ref">
@@ -584,6 +585,7 @@ export const BottomNavBar = ({ login, user }) => {
         </StyleBottomNavBar>
     )
 }
+
 
 const StyleProfile = styled.div`
 .profile {
