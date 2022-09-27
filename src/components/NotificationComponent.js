@@ -34,7 +34,6 @@ export default function NotificationComponent({ user }) {
 
         setNotificationLength(data.data.length)
         setUnreadData(data.data) 
-
     }
 
     const handleReadNotifications = async () => {
@@ -52,7 +51,7 @@ export default function NotificationComponent({ user }) {
                     width="20" 
                     height="20" 
                     fill="currentColor" 
-                    className="bi bi-bell text-white" 
+                    className="bi bi-bell text-white bg-none rounded-circle" 
                     viewBox="0 0 16 16"
                     onClick={handleNotification}
                 >
@@ -67,7 +66,7 @@ export default function NotificationComponent({ user }) {
                     {notificationsLength}
                 </small> }
              
-                {notificationOpen ? <NotificationContainer handleReadNotifications={handleReadNotifications} unreadData={unreadData} setNotificationLength={setNotificationLength} setNotificationOpen={setNotificationOpen} user_id={user?.uu_id?.id} />  : '' }
+                {notificationOpen ? <NotificationContainer handleNotification={handleNotification} handleReadNotifications={handleReadNotifications} unreadData={unreadData} setNotificationLength={setNotificationLength} setNotificationOpen={setNotificationOpen} user_id={user?.uu_id?.id} />  : '' }
                       
            </StyleNotificationCount>
             : <div></div>}
@@ -99,7 +98,7 @@ const StyleNotificationContainer = styled.div`
     }
 `
 
-const NotificationContainer = ({  user_id, unreadData, handleReadNotifications }) => {
+const NotificationContainer = ({  user_id, unreadData, handleReadNotifications, handleNotification }) => {
 
     const [allData, setAllData] = useState([]) 
 
@@ -123,8 +122,9 @@ const NotificationContainer = ({  user_id, unreadData, handleReadNotifications }
   
 
     const NotificationElements = (l, i) => {
+ 
         return (
-            <div key={i} className="d-flex align-items-center justify-content-between alert alert-info shadow-sm">   
+            <div key={i} className={`d-flex align-items-center justify-content-between alert alert-info shadow-sm border-0 ${Boolean(l.read_at) ? "opacity-50" : "opacity-100"} `}>   
                 <div className='icon-div'>
                     <FontAwesomeIcon icon={faCheckCircle} size="3x" className='text-success'/>
                 </div>
@@ -132,7 +132,7 @@ const NotificationContainer = ({  user_id, unreadData, handleReadNotifications }
                     <span>{l.data.message}</span>
                 </div>
                 <div className='times-div'>
-                    <FontAwesomeIcon icon={faTimes} />
+                    <FontAwesomeIcon icon={faTimes}/>
                 </div>
             </div>
         )
@@ -144,10 +144,14 @@ const NotificationContainer = ({  user_id, unreadData, handleReadNotifications }
 
     return (
         <StyleNotificationContainer className='mx-auto p-3'>
-            <h4 className='fw-bold'>Notifications</h4>
-            <div className='mb-3'>
+            <div className='d-flex align-items-start justify-content-between mt-2 mb-3'>
+                <h3 className='fw-bold'>Notifications</h3>
+                <FontAwesomeIcon icon={faTimes} size="lg" className="p-1" onClick={handleNotification}/>
+            </div>
+            <div className='mb-2'>
+            <hr style={{ color: 'lightgray' }}/>
                 <button 
-                    className='btn btn-warning rounded-pill' 
+                    className={`btn btn-warning rounded-pill m-1 ${activeNotification === 1 ? 'active' : ''}`}
                     name="all" 
                     onClick={setActiveNotificationTab}
                 >
@@ -161,10 +165,17 @@ const NotificationContainer = ({  user_id, unreadData, handleReadNotifications }
                     Unread
                 </button>
             </div>
-            <div className='w-100'>
-                <button className='w-100 text-danger' onClick={handleReadNotifications}>Mark all as read</button>
+            <hr style={{ color: 'lightgray' }}/>
+
+            <div className='w-100 mt-3'>
+                <button 
+                    className='w-100  btn btn-outline-danger' 
+                    onClick={handleReadNotifications}
+                >
+                    Mark all as read
+                </button>
             </div>
-        
+            <hr style={{ color: 'lightgray' }}/>
             <div className='mt-3'>
                 {activeNotification === 1 && allData.map(NotificationElements)}
                 {activeNotification === 2 && unreadData.map(NotificationElements)}
