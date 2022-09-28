@@ -252,7 +252,8 @@ const AllTabHistory = ({ user_id }) => {
                             zIndex: '1' 
                         }}
                     >
-                    {historyData.map((d,i) => {       
+                    {historyData.map((d,i) => {  
+                       
                         return (
                             <div className='mb-2 border-0' key={i}>
                                 <div>
@@ -267,7 +268,7 @@ const AllTabHistory = ({ user_id }) => {
                                 </div>
                                 <div className='d-flex justify-content-between'>
                                     <span>Picked: {d.betslip_picked}</span>
-                                    <span>Outcome: _ - _</span>
+                                    <span>Outcome:  {Boolean(name.outcome) ? name.outcome : '_ - _'}</span>
                                 </div>
                             </div>
                         )

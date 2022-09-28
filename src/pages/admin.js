@@ -601,6 +601,7 @@ const UserBetHistoryElement = ({ data }) => {
     const [isStatusChanged, setIsStatusChanged] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [betStatus, setBestatus] = useState(options[0].value)
+    const [outcome, setOutcome] = useState('0:0')
 
     const setBetOption = (e) => {
         setBestatus(e.value)
@@ -618,6 +619,14 @@ const UserBetHistoryElement = ({ data }) => {
             setIsStatusChanged(true)
         }
 
+    }
+
+    const handleHistorySubmit = async (cart_id) => {
+        const res = await axios.patch('api/admin/history/updateCartHistory', {
+            id: cart_id,
+            outcome,
+        })
+    
     }
     const BetHistoryElements = (link, i) => {
  
@@ -640,6 +649,12 @@ const UserBetHistoryElement = ({ data }) => {
                             {isStatusChanged && <><i className="bi bi-check2-circle text-warning"></i></> }
                         </button>
                     </td>
+                    <td>
+                        <input type="text" className="form-control" onChange={(e) => setOutcome(e.target.value)}/>
+                    </td>
+                    <td>
+                        <button className="btn btn-primary btn-sm" onClick={() => handleHistorySubmit(link.id)}>Submit</button>
+                    </td>
                 </tr>
             </React.Fragment>
         )
@@ -657,6 +672,8 @@ const UserBetHistoryElement = ({ data }) => {
                         <th scope="col">Status</th>
                         <th scope="col">Change Status</th>
                         <th scope="col">Update Status</th>
+                        <th scope="col">Outcome</th>
+                        <th scope="col">Update Outcome</th>
                     </tr>
                 </thead>
                 <tbody >
@@ -669,7 +686,6 @@ const UserBetHistoryElement = ({ data }) => {
 
 const UserProfileElement = ({ user_id }) => {
 
-    if(user_id) {
         const { data, error, isLoading } = useGetAdminUserBalanceByIdQuery(user_id)
         const userBalance = useGetBalanceByUserIdQuery(user_id)
         const [newUserBalance, setNewUserBalance] = useState(0)
@@ -682,7 +698,7 @@ const UserProfileElement = ({ user_id }) => {
         if(error) {
             return <span>Error</span>
         }
-    
+ 
         const { user_profile, history_profile } = data
    
         const { email, country_residence, phone_number } = user_profile
@@ -737,7 +753,6 @@ const UserProfileElement = ({ user_id }) => {
                             <UserBetHistoryElement data={history_profile}/>
             </>
         )
-    }
 }
 
 const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fixtureLoaded, fixtureOddsLoaded, fixtureOddsLoading }) => {
