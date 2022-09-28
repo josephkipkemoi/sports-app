@@ -8,7 +8,7 @@ import config from '../../config.json';
 import Link from 'next/link';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBan } from "@fortawesome/free-solid-svg-icons";
-import { Small, Span } from '../components/Html';
+import { InputNumber, Small, Span } from '../components/Html';
 import { ClosedEyeSvgIcon, OpenEyeSvgIcon } from "../components/Svg";
 
 const StyleRegistration = styled.div`
@@ -100,12 +100,12 @@ const StyleEyeIcon = styled.div`
         phone_number: '',
         password: '',
         password_confirmation: '',
+        agree_terms: '',
     })
 
-    const { phone_number, password, password_confirmation } = userDetails;
+    const { phone_number, password, password_confirmation, agree_terms } = userDetails;
 
     const handleUser = (e) => {
-
         const validatedNum = e?.target?.name === 'phone_number' && validateNumber( e.target.value )
         
         if(!!validatedNum) {
@@ -114,7 +114,7 @@ const StyleEyeIcon = styled.div`
             setNumberValidationMessage('')
         }
        
-        setUserDetails(prev => ({ ...prev, [e?.target?.name ] : e?.target?.value }))
+        setUserDetails(prev => ({ ...prev, [e?.target?.name ] : e.target.name === 'agree_terms' ?  e?.target?.checked :e?.target?.value }))
     }
 
     const submitForm = (e) => {
@@ -130,7 +130,7 @@ const StyleEyeIcon = styled.div`
         mobile_number.splice(0,1, '254')
         mobile_number = mobile_number.join('')
 
-        register({ phone_number: Number(mobile_number), password, password_confirmation, setErrors, setRegisterLoading })     
+        register({ phone_number: Number(mobile_number), password, password_confirmation, agree_terms ,setErrors, setRegisterLoading })     
     }
 
     const closeErrors = () => {
@@ -162,7 +162,7 @@ const StyleEyeIcon = styled.div`
                     <h3 className='mb-4'>Open Account</h3>    
                     <Card className='card-box shadow-sm border-0'>
                         <Card.Header style={{ backgroundColor: '#1affff', borderBottom: '0' }}>
-                        <h5 className='mt-2 mb-2'>Account Details</h5>
+                            <h5 className='mt-2 mb-2'>Account Details</h5>
                         </Card.Header>
 
                         {errors.length > 0 ? 
@@ -185,7 +185,7 @@ const StyleEyeIcon = styled.div`
                                 <Form.Label>Mobile Number *</Form.Label>
                                 <Form.Control 
                                     type='number' 
-                                    placeholder='Phone number' 
+                                    placeholder='0700000000' 
                                     className='shadow-sm'
                                     name='phone_number'
                                     maxLength={10}
@@ -250,6 +250,8 @@ const StyleEyeIcon = styled.div`
                                         type="checkbox" 
                                         label="I have read and agreed to the Terms & Conditions, the Privacy Policy, that I am 18 years old or over and that all information given is true."
                                         required={true}
+                                        name="agree_terms"
+                                        onChange={handleUser}      
                                     />
                                 </Form.Group>
                             </div>

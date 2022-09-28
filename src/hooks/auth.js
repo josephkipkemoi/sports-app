@@ -33,7 +33,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
             .catch(e => {
                 if(e.response.status === 500) {
                     setErrors(['Duplicate mobile number detected, please log in to continue'])
-                } else if(e.status === 422) {
+                } else if(e.status !== 422) {
                     setErrors(Object.values(e.response.data.errors).flat())
                 }
                 setRegisterLoading(false)
