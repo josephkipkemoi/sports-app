@@ -46,7 +46,6 @@ export default function Support() {
     const [display, setDisplay] = useState('none')
     const [isMessageSent, setIsMessageSent] = useState(false)
     const [isBtnDisabled, setIsBtnDisabled] = useState(false)
-  
 
     const SupportForm = () => {
         return (
@@ -81,7 +80,7 @@ export default function Support() {
         const submitMessage = async () => {
        
             const res = await axios.post('api/support', formDetails)
-    
+
             if(res.status === 200) {
                 setIsMessageSent(true)
                 setIsBtnDisabled(true)

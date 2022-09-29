@@ -16,7 +16,8 @@ import Logo from "./Logo";
 import useAuth from "../hooks/auth";
 import NotificationComponent from "./NotificationComponent";
 import { useGetUnreadNotificationsQuery } from "../hooks/notifications";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeadset } from "@fortawesome/free-solid-svg-icons";
 const StyledTopRightNav = styledComponents.div`
 position: sticky;
 top: 0;
@@ -518,7 +519,6 @@ export const BottomNavBar = ({ login, user }) => {
             <div>
                 {midnavLinks.map(MidNavLinkItems)}
             </div>
-            
             <NotificationComponent user={user}/>
         </nav>
     
