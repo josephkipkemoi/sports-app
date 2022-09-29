@@ -51,7 +51,7 @@ export default function NotificationComponent({ user }) {
         <>
            {Boolean(user?.uu_id?.id) ?
            <StyleNotificationCount className='d-flex align-items-center' >
-                {/* <div className='customer-care'>
+                <div className='customer-care'>
                     <Link href="/contact">
                         <a
                             itemProp='url'
@@ -68,7 +68,7 @@ export default function NotificationComponent({ user }) {
                             <FontAwesomeIcon icon={faMessage} className="text-white" size='xl'/>
                         </a>
                     </Link>
-                </div> */}
+                </div>
                 <svg xmlns="http://www.w3.org/2000/svg" 
                     width="20" 
                     height="20" 

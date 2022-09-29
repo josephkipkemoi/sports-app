@@ -692,7 +692,7 @@ const UserProfileElement = ({ user_id }) => {
         const userBalance = useGetBalanceByUserIdQuery(user_id)
         const [newUserBalance, setNewUserBalance] = useState(0)
         const [isBalanceUpdated, setIsBalanceUpdated] = useState(false)
-        const [newNum, setNewNum] = useState('')
+        // const [newNum, setNewNum] = useState('')
 
         if(isLoading) { 
             return <Spinner animation="grow"/>
@@ -721,13 +721,13 @@ const UserProfileElement = ({ user_id }) => {
             setNewUserBalance(e.target.value)
         }
 
-        const handleUserUpdate = async () => {
-            const res = await axios.patch('api/admin/users/updateUser', {
-                user_id,
-                phone_number: Number(newNum)
-            })
-            console.log(res)
-        }
+        // const handleUserUpdate = async () => {
+        //     const res = await axios.patch('api/admin/users/updateUser', {
+        //         user_id,
+        //         phone_number: Number(newNum)
+        //     })
+        //     console.log(res)
+        // }
 
         return (
             <>
@@ -746,10 +746,10 @@ const UserProfileElement = ({ user_id }) => {
                             <div className="text-dark d-flex flex-column ">
                                 <span className="mb-3">Residence: {country_residence}</span>
                                 <span className="mb-3">Number: {phone_number}</span>
-                                <div>
+                                {/* <div>
                                     <InputNumber onChange={(e) => setNewNum(e.target.value)} className="form-control" placeholder="New Number" />
                                     <button className="btn btn-primary" onClick={handleUserUpdate}>Update</button>
-                                </div>                             
+                                </div>                              */}
                                 <span className="mb-3">Email: {email}</span>
                                 <div className="d-flex align-items-center mb-3">
                                     <label htmlFor="balance">Balance: </label>
