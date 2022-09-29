@@ -6,6 +6,7 @@ import  Card  from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import styled from "styled-components";
 import { InputNumber, Small, Span } from "../components/Html";
+import MobileNavComponent from "../components/MobileNavComponent";
 import { FacebookIconSvg, MailSvgIcon, SendSvgIcon, TelegramSvgIcon, TwitterSvgIcon, WhatsAppSvgIcon } from "../components/Svg";
 import axios from "../lib/axios";
 
@@ -134,7 +135,7 @@ export default function Contact() {
                         Chat with us via Social Media
                     </Card.Header>
                     <Card.Body>
-                        <div className="d-flex justify-content-between p-1">
+                        <div className="d-sm-flex justify-content-between p-1">
                             <button className="btn">
                                 <FacebookIconSvg width="32" height="32" />
                             </button>
@@ -154,6 +155,8 @@ export default function Contact() {
                     </Card.Body>
                 </Card>
             </Container>
+
+            <MobileNavComponent/>
 
             <ModalContainer isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
 
