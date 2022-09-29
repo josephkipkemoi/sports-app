@@ -10,6 +10,7 @@ import { CustomFixtureApi } from "../hooks/fixture";
 import { HistoryApi } from "../hooks/history";
 import { JackpotApi } from "../hooks/jackpot";
 import { LiveFixturesApi } from "../hooks/liveFixtures";
+import { MessageApi } from "../hooks/messages";
 import { NotificationsApi } from "../hooks/notifications";
  
 export const store = configureStore({
@@ -24,6 +25,7 @@ export const store = configureStore({
         [LiveFixturesApi.reducerPath]: LiveFixturesApi.reducer,
         [JackpotApi.reducerPath]: JackpotApi.reducer,
         [NotificationsApi.reducerPath]: NotificationsApi.reducer,
+        [MessageApi.reducerPath]: MessageApi.reducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware({
         immutableCheck: false,
@@ -39,6 +41,7 @@ export const store = configureStore({
         LiveFixturesApi.middleware,
         JackpotApi.middleware,
         NotificationsApi.middleware,
+        MessageApi.middleware,
     )
 })
 

@@ -483,8 +483,10 @@ const UpdateJackpotPrize = () => {
 }
 
 const CustomerFeedback = () => {
+    const [message, setMessage] = useState('')
+
     const {data, error, isLoading } = useGetAllCustomerMessagesQuery()
-    const [open, setOpen] = useState(false);
+ 
     if(error) {
         return <span>Error</span>
     }
@@ -493,33 +495,42 @@ const CustomerFeedback = () => {
         return <Spinner animation="grow"/>
     }
 
+    const handleInput = (e) => {
+        setMessage(e.target.value)
+    }
+
+    const submitMessage = (originalMessage, phoneNumber) => {
+        const num = Number('254' + phoneNumber)
+         axios.post('api/admin/users/message', {
+            message,
+            phone_number: num,
+            original_message: originalMessage
+        })
+        
+    }
+
     const MessageItems = (link, i) => {
 
          return (
             <React.Fragment key={i}>
                 <div className=" m-1 d-flex flex-row">                    
-                                <Button                        
-                                aria-controls="example-collapse-text"
-                                aria-expanded={open}
-                                onClick={() => setOpen(!open)}
-                                className="d-flex"
-                                >
-                                    <PhoneSvgIcon width="16" height="16"/>
-                                    <small className="text-light bg-primary">
-                                        {link.phone_number}
-                                    </small>
-                                </Button>
-                                                  
-                                <Collapse in={open}>
-                                    <div id="example-collapse-text" className="card p-2 shadow" style={{ marginLeft: 15 }}>
-                                       <span>
-                                       {link.name} | {link.email}
-                                        </span> 
-                                       <p>
-                                        {link.message}
-                                       </p> 
-                                    </div>
-                                </Collapse>
+                    <PhoneSvgIcon width="16" height="16"/>
+                        <small className="text-dark">
+                            {link.phone_number}
+                        </small>
+                                                   
+                       <div id="example-collapse-text" className="card p-2 shadow" style={{ marginLeft: 15 }}>
+                            <span>
+                                {link.name} | {link.email}
+                            </span> 
+                            <p>
+                                {link.message}
+                            </p> 
+                        </div>
+                        <div>
+                            <textarea className="form-control" onChange={handleInput}/>
+                            <button className="btn btn-primary" onClick={() => submitMessage(link.message, link.phone_number)}>Reply</button>
+                        </div>
                 </div>    
                 <hr/>        
             </React.Fragment>
