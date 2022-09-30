@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Card, Container, Form, Spinner } from 'react-bootstrap';
 import styled from 'styled-components';
 import  useAuth  from '../hooks/auth';
@@ -103,6 +103,8 @@ const StyleEyeIcon = styled.div`
         agree_terms: '',
     })
 
+    const inputRef = useRef(null)
+
     const { phone_number, password, password_confirmation, agree_terms } = userDetails;
 
     const handleUser = (e) => {
@@ -155,6 +157,10 @@ const StyleEyeIcon = styled.div`
         }
     }
 
+    useEffect(() => {
+       inputRef.current.focus()
+    }, [])
+
     return (
         <StyleRegistration>
             <Container className='custom-box'>
@@ -190,7 +196,8 @@ const StyleEyeIcon = styled.div`
                                     name='phone_number'
                                     maxLength={10}
                                     required={true}
-                                    onChange={handleUser}      
+                                    onChange={handleUser} 
+                                    ref={inputRef}     
                                 />
                                 <span className='text-danger'>{numberValidationMessage}</span>
                             </Form.Group> 

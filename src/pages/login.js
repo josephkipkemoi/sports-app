@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Form, Card, Container } from "react-bootstrap";
 import styled from "styled-components";
 import { withPublic } from "../hooks/RouteProtection";
@@ -51,6 +51,8 @@ const Login = () => {
         password: '',
     })
 
+    const inputRef = useRef(null)
+
     const { phone_number, password } = userDetails;
 
     const handleUser = (e) => {   
@@ -90,6 +92,10 @@ const Login = () => {
     const closeErrors = () => {
         setErrors([])
     }
+
+    useEffect(() => {
+        inputRef.current.focus()
+    }, [])
  
     return (
         <StyleLogin>
@@ -125,7 +131,8 @@ const Login = () => {
                                     name='phone_number'
                                     maxLength={10}
                                     required={true}
-                                    onChange={handleUser}      
+                                    onChange={handleUser}  
+                                    ref={inputRef}    
                                 />
                                 <Small className="text-danger">{numberValidationMessage}</Small>
                             </Form.Group> 
