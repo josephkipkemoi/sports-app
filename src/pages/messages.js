@@ -96,6 +96,7 @@ export default function Messages() {
                         </h4>
                     </Card.Header>
                     <Card.Body>
+                        <button className="btn btn-outline-secondary w-100 mb-3">Mark all as read</button>
                         {data.map(MessagesElement)}
                     </Card.Body>
                 </Card>
