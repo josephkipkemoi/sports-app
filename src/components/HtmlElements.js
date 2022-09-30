@@ -4,14 +4,14 @@ import  ProgressBar  from 'react-bootstrap/ProgressBar';
 export const RefreshButton = ({ refetch }) => {
     return (
         <button 
-            className='btn btn-outline-light btn-sm border-0 shadow-sm d-flex align-items-center m-1 text-secondary'
+            className='btn btn-outline-secondary border-0 shadow-sm d-flex align-items-center m-1'
             onClick={refetch}
         >
+            <FontAwesomeIcon
+                icon={faRefresh}
+                style={{ marginRight: 8 }}
+            />
             Refresh
-        <FontAwesomeIcon
-            icon={faRefresh}
-            style={{ marginLeft: 5 }}
-        />
         </button>
     )
 }
