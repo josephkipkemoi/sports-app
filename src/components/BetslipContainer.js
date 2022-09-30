@@ -869,7 +869,7 @@ const BetCartFormElements = ({ betData }) => {
         
         const cart_id = randomString()
         const possible_payout = Math.floor(possibleWin)
-
+  
         const res = await axios.post('api/users/fixtures/cart', {
           cart_id,
           possible_payout,

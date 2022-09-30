@@ -210,7 +210,7 @@ const AllTabHistory = ({ user_id }) => {
                 </div>
                 <div>
                     <small>Bet ID:</small>
-                    <small>{name.card_id}</small> 
+                    <small>{name.cart_id}</small> 
                 </div>
                 <div 
                     className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} ${name.bet_status === 'Active' && 'bg-info'} bg-secondary shadow rounded-pill text-white`}
@@ -320,6 +320,7 @@ const SettledHistory = ({ user_id }) => {
 
     const SettledItems = (name , i) => {
         const historyData = JSON.parse(name.cart)
+
                 return (
                     <div key={i} className="mb-2 ">
                         <div 
@@ -346,8 +347,8 @@ const SettledHistory = ({ user_id }) => {
                            
                             </div>
                             <div>
-                                <small>Bet ID:</small>
-                                <small>{name.card_id}</small> 
+                                <small>Bet ID: </small>
+                                <small>{name.cart_id}</small> 
                             </div>
                             <div 
                                 className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} shadow rounded-pill text-white`}
