@@ -578,8 +578,9 @@ const UsersProfileComponent = () => {
     return (
         <Card className="mt-2 bg-danger">
                 <Card.Body className="bg-light rounded">
-                    <Row>
-                        <Col sm="12" md="6" lg="6">
+                    <h5>Registered Users: {data.users.length}</h5>
+                    <Row>                        
+                        <Col sm="12" md="6" lg="6">                            
                             <h5 className="text-dark fw-bold">Select User</h5>
                             <Select options={options} className="text-dark" onChange={selectUser}/>                        
                         </Col>
