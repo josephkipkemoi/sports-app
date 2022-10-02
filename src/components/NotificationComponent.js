@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faTimes, faHeadset, faMessage } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 const StyleNotificationCount = styled.div`
+
     small {
         height: 16px;
         width: 16px;
@@ -107,8 +108,9 @@ const StyleNotificationContainer = styled.div`
     top: 34px;
     background: white;
     width: 90vw;
-    height: 100vh;
+    height: auto;
     border-radius: .5rem;
+    padding-bottom: .25rem;
     .icon-div {
         width: 20%;
     }
