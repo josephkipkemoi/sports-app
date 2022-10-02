@@ -552,7 +552,7 @@ const UsersProfileComponent = () => {
 
     const [userId, setUserId] = useState(null)
 
-    const { data, isLoading, error } = useGetAllUsersQuery()
+    const { data, isLoading, error, refetch } = useGetAllUsersQuery()
 
     if(error) {
         return <span>Error...</span>
@@ -561,7 +561,7 @@ const UsersProfileComponent = () => {
     if(isLoading) {
         return <Spinner animation="grow"/>
     }
-
+    console.log(data.notPlaced)
     const options =  data.users.map(n => {
         return {
             user_id: n.id,
@@ -578,11 +578,17 @@ const UsersProfileComponent = () => {
     return (
         <Card className="mt-2 bg-danger">
                 <Card.Body className="bg-light rounded">
-                    <h5>Registered Users: {data.users.length}</h5>
+                    <div className="d-flex flex-column">
+                        <p>Registered Users: {data.users.length}</p>
+                        <p>Total Amount Placed: {Number(data.wagers).toLocaleString(undefined, {})}</p>
+                        <p>Avg.: {Number(data.avg).toLocaleString(undefined, {})}</p>
+                        <p>Not placed: {Number(data.notPlaced).toLocaleString(undefined, {})} </p>
+                    </div>
                     <Row>                        
                         <Col sm="12" md="6" lg="6">                            
                             <h5 className="text-dark fw-bold">Select User</h5>
-                            <Select options={options} className="text-dark" onChange={selectUser}/>                        
+                            <Select options={options} className="text-dark" onChange={selectUser}/>    
+                            <button className="btn btn-primary m-2" onClick={refetch}>Refresh Users</button>                    
                         </Col>
                         <Col sm="12" md="12" lg="12">
                             <UserProfileElement user_id={userId}/>
