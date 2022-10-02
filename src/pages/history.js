@@ -15,7 +15,7 @@ import {    useGetAllUserHistoryBetslipV1Query,
             useGetUnsettledHistoryBetslipQuery, 
         } from '../hooks/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faRefresh, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
 import JackpotComponent from '../components/JackpotComponent';
 import Pagination from '../components/Pagination';
@@ -23,6 +23,7 @@ import AuthUser from '../hooks/AuthUser';
 import { withProtected } from '../hooks/RouteProtection';
 import MobileNavComponent from '../components/MobileNavComponent';
 import { RefreshButton } from '../components/HtmlElements';
+import axios from '../lib/axios';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -159,62 +160,90 @@ const AllTabHistory = ({ user_id }) => {
 
     const [pageNumber, setPageNumber] = useState(1)
     const { data, error, isLoading, refetch } = useGetAllUserHistoryBetslipV1Query({user_id, pageNumber})
-   
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [cartId, setCartId] = useState('');
+
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
     }
 
     if(isLoading) {
         return  <div className='d-flex justify-content-center'>
-        <Spinner className='mt-5' animation="grow" size="lg"/>
-    </div>
+                    <Spinner className='mt-5' animation="grow" size="lg"/>
+                </div>
     }
+
+    const closeModal = () => setIsModalOpen(false)
  
-    const openMoreMarkets = (i) => {
+    const openMoreMarkets = (i,e) => {
         const elements = document.getElementsByClassName('history-more-markets')[i];
-        
-        if( elements.style.display === 'none') {
-            elements.style.display = 'block'
-        } else {
-            elements.style.display = 'none'
+
+        if(Boolean(e.target.getAttribute('clickcart')) === true) {        
+            if( elements.style.display === 'none') {
+                elements.style.display = 'block'
+            } else {
+                elements.style.display = 'none'
+            }
         }
+  
+    }
+
+    const removeSingleBetHistory = async (cart_id) => {     
+        const res = await axios.delete(`api/users/fixtures/carts/delete?user_id=${user_id}&cart_id=${cart_id}`)
+        if(res.status === 200) {
+            refetch()
+            closeModal()
+        }
+    }
+
+    const openDeleteModal = (cart_id) => {
+        setIsModalOpen(true)
+        setCartId(cart_id)
     }
 
     const BetHistoryElements = (name, i) => {
         const historyData = JSON.parse(name.cart)
    
         return (
-            <div key={i} className="mb-2 ">
+            <div key={i} className="mb-2" clickcart="true">
             <div 
             className="card cursor-pointer border-0" 
             style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}
-            onClick={() => openMoreMarkets(i)}
+          
+            clickcart="true"
             >
                 <div 
                     className="card p-3 border-0 bg-light shadow-sm"
                     style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+                    onClick={(e) => openMoreMarkets(i,e)}
+                    clickcart="true"
                 >
-                <div className='d-flex justify-content-between'>
-                    <div>
-                    <Span className='text-secondary'>
-                        {new Date(name.created_at).getDate()}/
-                        {new Date(name.created_at).getMonth()}/
-                        {new Date(name.created_at).getFullYear()}
-                    </Span>
-                    <Span className='text-secondary' style={{ marginLeft: 5 }}>
-                        {new Date(name.created_at).getHours()}:
-                        {new Date(name.created_at).getMinutes()}
-                    </Span>
+                <div className='d-flex justify-content-between' clickcart="true" onClick={(e) => openMoreMarkets(i,e)}>
+                    <div clickcart="true">
+                        <Span className='text-secondary'>
+                            {new Date(name.created_at).getDate()}/
+                            {new Date(name.created_at).getMonth()}/
+                            {new Date(name.created_at).getFullYear()}
+                        </Span>
+                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                            {new Date(name.created_at).getHours()}:
+                            {new Date(name.created_at).getMinutes()}
+                        </Span>
                     </div>                                                            
-               
+                    <div clickcart={0}>
+                        <div className='btn' clickcart={0} onClick={() => openDeleteModal(name.cart_id)}>
+                            <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} className="text-danger"/>
+                        </div>
+                    </div>
                 </div>
-                <div>
+                <div clickcart="true">
                     <small>Bet ID:</small>
-                    <small>{name.cart_id}</small> 
+                    <small className='fw-bold' style={{ textTransform: 'uppercase' }}>{name.cart_id}</small> 
                 </div>
                 <div 
                     className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} ${name.bet_status === 'Active' && 'bg-info'} bg-secondary shadow rounded-pill text-white`}
-                >   
+                    clickcart="true"
+               >   
                     <span style={{ paddingLeft: 12 }}>Bet Status</span>
                     <Span 
                         className={`d-flex align-items-center text-center rounded text-warning fw-bold ${name.bet_status === 'Won' && 'text-white bg-success'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
@@ -224,12 +253,12 @@ const AllTabHistory = ({ user_id }) => {
                         <span className='text-white'>{name.bet_status}</span>
                     </Span>                            
                 </div>
-                <div className='d-flex justify-content-between mt-2 p-1'>
-                    <div>
+                <div className='d-flex justify-content-between mt-2 p-1' clickcart="true">
+                    <div clickcart="true">
                         <Span>Stake Amount: </Span>
                         <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                     </div>
-                    <div>
+                    <div clickcart="true">
                         <Span>Final Payout: </Span>
                         <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                     </div>  
@@ -283,9 +312,18 @@ const AllTabHistory = ({ user_id }) => {
                     </div>
                     {data.data.map(BetHistoryElements) }
                 </div>
+                
                 <div>
                     {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
                 </div>
+
+                <AlertModal 
+                    closeModal={closeModal} 
+                    isModalOpen={isModalOpen}
+                    removeSingleBetHistory={removeSingleBetHistory}
+                    cartId={cartId}
+                />
+
             </div>          
           </>
         : 
@@ -899,6 +937,32 @@ const HistoryFilter = () => {
                 </Modal.Body>                            
             </Modal>      
         </div>
+    )
+}
+
+const StyleAlertModal = styled.div`
+
+`
+
+const AlertModal = ({ closeModal, isModalOpen, removeSingleBetHistory, cartId }) => {
+    return (
+        <StyleAlertModal>
+            <Modal show={isModalOpen} centered className="p-3">
+                <Modal.Body>
+                    <div className="d-flex justify-content-end times">
+                        <FontAwesomeIcon icon={faTimesCircle} size="lg" onClick={closeModal}/>
+                    </div>
+                    <div className='mt-4'>
+                        <h4 className='fw-bold'>Are you sure you want to delete this Bet?</h4>
+                        <h6 className='text-secondary'>This action cannot be undone!</h6>
+                    </div>                  
+                    <div className="d-flex justify-content-end">
+                        <button className='btn btn-light' onClick={closeModal}>Cancel</button>
+                        <button className='btn btn-danger shadow' onClick={() => removeSingleBetHistory(cartId)}>Delete</button>
+                    </div>              
+                </Modal.Body>
+            </Modal>
+        </StyleAlertModal>       
     )
 }
 

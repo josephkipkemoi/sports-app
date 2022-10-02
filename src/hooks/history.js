@@ -21,7 +21,7 @@ export const HistoryApi = createApi({
             query: ({user_id, pageNumber}) => `fixtures/carts?page=${pageNumber}&user_id=${user_id}&bet_status=Unsettled`
         }),
         removeSingleHistoryBetslip: builder.query({
-            query: (user_id, session_id) => `betslips/delete?user_id=${user_id}&session_id=${session_id}`
+            query: ({user_id, cart_id}) => `fixtures/carts/delete?user_id=${user_id}&cart_id=${cart_id}`
         }),
         getBetSessionFixtures: builder.query({
             query: ({ userId, pid }) => `${userId}/sessions/${pid}/history`
