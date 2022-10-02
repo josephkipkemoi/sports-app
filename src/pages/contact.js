@@ -1,6 +1,6 @@
 import { faBan, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
 import  Card  from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
@@ -38,6 +38,7 @@ const StyleContact = styled.div`
 
 export default function Contact() {
    
+    const inputRef = useRef(null)
     const [formDetails, setFormDetails] = useState({
         name: '',
         phone_number: '',
@@ -73,6 +74,10 @@ export default function Contact() {
         setErrors([])
     }
 
+    useEffect(() => {
+        inputRef.current.focus()
+    }, [])
+
     return (
         <StyleContact>
             <div className="h2-touch">
@@ -101,7 +106,7 @@ export default function Contact() {
                         : ''}
 
                         <label htmlFor="name" className="mb-2">Your Name *</label>
-                        <input id="name" type="text" value={name} name="name" className="form-control mb-3" onChange={handleForm}/>
+                        <input id="name" ref={inputRef} type="text" value={name} name="name" className="form-control mb-3" onChange={handleForm}/>
 
                         <label htmlFor="phone_number" className="mb-2">Mobile Number *</label>
                         <InputNumber id="phone_number" value={phone_number} name="phone_number" className="form-control mb-3" onChange={handleForm}/>

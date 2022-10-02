@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
@@ -50,7 +50,8 @@ function History(){
 }
 
 const SportBetsHistoryProfile = () => {
-    
+
+
     const router = useRouter()
     const { tab , his_tab} = router.query
     const { uu_id } = AuthUser()
@@ -63,7 +64,7 @@ const SportBetsHistoryProfile = () => {
                 </Col>
                 <Col lg="9" md="9" sm="8">
                     <StyledHistory>
-                        <HistoryFilter /> 
+                        <HistoryFilter  /> 
                         {tab === 'all' && <AllTabHistory user_id={uu_id.id}/>}
                         {tab === 'settled' && <SettledHistory user_id={uu_id.id}/>}
                         {tab === 'unsettled' && <UnsettledHistory user_id={uu_id.id}/>}
@@ -80,8 +81,9 @@ const SportBetsHistoryProfile = () => {
 }
 
 const AllJackpotHistory = ({ user_id }) => {
+    
     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'All'})
- 
+
     if(isLoading) {
         return <Spinner animation='grow' />
     }
@@ -302,6 +304,8 @@ const AllTabHistory = ({ user_id }) => {
         </div>
         )
     }
+
+ 
 
     return (
         <>            
@@ -865,6 +869,8 @@ const StyleHeaderNav = styled.div`
     }
 `
 const HistoryFilter = () => {
+    const positionRef = useRef(null)
+
     const router = useRouter()
     const [dates, setDates] = useState({
         from_date: '',
@@ -893,6 +899,7 @@ const HistoryFilter = () => {
                     <a 
                     itemProp="url" 
                     className={`btn btn-primary shadow ${tab === 'all' || tab === 'j_all' && 'active'}`}
+                    ref={positionRef}
                     >
                         All
                     </a>
@@ -922,6 +929,12 @@ const HistoryFilter = () => {
             </StyleFilterBtn>  
         )
     }
+
+
+    useEffect(() => {
+        positionRef.current.focus()
+    }, [])
+
     return (
         <div className='history-header mb-3 card p-2 shadow border-0' style={{ backgroundColor: '#edebeb' }}>
             <div>

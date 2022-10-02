@@ -1,7 +1,7 @@
 import { faHeadset, faArrowRight, faInbox } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Spinner } from "react-bootstrap";
 import  Card  from "react-bootstrap/Card";
 import  Container  from "react-bootstrap/Container";
@@ -35,6 +35,35 @@ const StyleMessages = styled.div`
 
 `
 export default function Messages() {
+    
+    const positionRef = useRef(null)  
+
+    useEffect(() => {
+        positionRef.current.focus()
+    }, [])
+
+    return (
+        <StyleMessages>
+            <Container>
+                <Card className="border-0 pt-2">
+                    <Card.Header className="bg-primary text-white">
+                        <h4 className="d-flex align-items-center" >
+                            <FontAwesomeIcon icon={faInbox} style={{ marginRight: 8 }}/>
+                            Inbox
+                        </h4>
+                    </Card.Header>
+                    <Card.Body>
+                        <button className="btn btn-outline-secondary w-100 mb-3" ref={positionRef}>Mark all as read</button>
+                        <MessageComponent/>
+                    </Card.Body>
+                </Card>
+            </Container>
+            <MobileNavComponent/>
+        </StyleMessages>
+    )
+}
+
+const MessageComponent = () => {
 
     const number = JSON.parse(localStorage.getItem('uu_id')).uu_id.phone_number
     const { data, isLoading, error } = useGetAdminMessagesQuery(number)
@@ -42,11 +71,10 @@ export default function Messages() {
     if(error) {
         return <span>Error</span>
     }
-
     if(isLoading) {
         return <Spinner animation="grow" />
     }
-   
+
     const MessagesElement = (l, i) => {
 
         return (
@@ -85,23 +113,6 @@ export default function Messages() {
             </React.Fragment>
         )
     }
-    return (
-        <StyleMessages>
-            <Container>
-                <Card className="border-0 pt-2">
-                    <Card.Header className="bg-primary text-white">
-                        <h4 className="d-flex align-items-center">
-                            <FontAwesomeIcon icon={faInbox} style={{ marginRight: 8 }}/>
-                            Inbox
-                        </h4>
-                    </Card.Header>
-                    <Card.Body>
-                        <button className="btn btn-outline-secondary w-100 mb-3">Mark all as read</button>
-                        {data.map(MessagesElement)}
-                    </Card.Body>
-                </Card>
-            </Container>
-            <MobileNavComponent/>
-        </StyleMessages>
-    )
+   
+    return ( data.map(MessagesElement))
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -108,14 +108,17 @@ const topNavLinks = [
 ]
 
 export default function TopNavBar() {
+    
+    const positionRef = useRef(null)
     const router = useRouter()
     const { pathname } = router
+
     const TopNavLinkItem = (link, i) => (
         <div sm={1} key={i} className="nav-container">     
           <Link href={link.path} prefetch={false} className="icon-text-width">
             <a
               itemProp='url'
-              className='text-decoration-none text-secondary d-flex flex-column text-center p-2 shadow'         
+              className='text-decoration-none text-secondary d-flex flex-column text-center p-2 shadow'     
             >
               <FontAwesomeIcon 
                 icon={link.icon} 
@@ -130,10 +133,14 @@ export default function TopNavBar() {
             </a>
           </Link>
         </div>
-      )
+    )
+
+    useEffect(() => {
+      positionRef.current.focus()
+    }, [])
     
       return (
-        <StyleSideNav className='d-flex justify-content-between shadow rounded'>
+        <StyleSideNav className='d-flex justify-content-between shadow rounded' ref={positionRef}>
             {topNavLinks.map(TopNavLinkItem)}
         </StyleSideNav>
       )

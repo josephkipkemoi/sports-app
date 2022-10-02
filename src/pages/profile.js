@@ -1,5 +1,5 @@
 import Link from "next/link"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Button, Container, Spinner } from "react-bootstrap"
 import styled from "styled-components"
 import useAuth from "../hooks/auth"
@@ -89,6 +89,8 @@ const Profile = () => {
 
 const AuthUserProfile = () => {
 
+    const positionRef = useRef(null)
+
     const AuthProfileElement = () => {
             const { uu_id } = AuthUser()
  
@@ -97,13 +99,15 @@ const AuthUserProfile = () => {
                   {uu_id.phone_number}    
                  </h6>
             )
-        
-    
     }   
+
+    useEffect(() => {
+        positionRef.current.focus()
+    }, [])
 
     return (
         <div className="pt-3 pb-2 text-center">
-            <button className="btn btn-light rounded-pill p-3 text-dark">
+            <button className="btn btn-light rounded-pill p-3 text-dark" ref={positionRef}>
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     width="32" 
