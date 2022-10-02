@@ -15,7 +15,7 @@ import {    useGetAllUserHistoryBetslipV1Query,
             useGetUnsettledHistoryBetslipQuery, 
         } from '../hooks/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRefresh, faTrash, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faRefresh, faTrash, faTimesCircle, faSignal } from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
 import JackpotComponent from '../components/JackpotComponent';
 import Pagination from '../components/Pagination';
@@ -249,8 +249,13 @@ const AllTabHistory = ({ user_id }) => {
                         className={`d-flex align-items-center text-center rounded text-warning fw-bold ${name.bet_status === 'Won' && 'text-white bg-success'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
                         style={{ paddingRight: 12 }}
                     >
-                        <span style={{ marginRight: 8 }}>{name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}</span>
-                        <span className='text-white'>{name.bet_status}</span>
+                        <span style={{ marginRight: 6 }}>
+                            {name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}
+                            {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle text-white" ></i>}
+                            {name.bet_status === 'Pending' && <i className="bi bi-hourglass-split text-white" ></i>}
+                            {name.bet_status === 'Active' && <i className="bi bi-bullseye text-white" ></i>}
+                        </span>
+                        <span className='text-white' style={{ marginTop: 2 }}>{name.bet_status}</span>
                     </Span>                            
                 </div>
                 <div className='d-flex justify-content-between mt-2 p-1' clickcart="true">
@@ -422,8 +427,11 @@ const SettledHistory = ({ user_id }) => {
                                     className={`d-flex align-items-center text-center rounded text-warning fw-bold ${name.bet_status === 'Won' && 'text-white bg-success'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
                                     style={{ paddingRight: 12 }}
                                 >
-                                    <span style={{ marginRight: 8 }}>{name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}</span>
-                                    <span className='text-white'>{name.bet_status}</span>
+                                    <span style={{ marginRight: 8 }}>
+                                        {name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}
+                                        {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle text-white" ></i>}                                      
+                                    </span>
+                                    <span className='text-white' style={{ marginTop: 2 }}>{name.bet_status}</span>
                                 </Span>                            
                             </div>
                             <div clickcart='true' className='d-flex justify-content-between mt-2 p-1'>
@@ -636,14 +644,20 @@ const UnsettledHistory = ({ user_id }) => {
                                 <small>{name.cart_id}</small>
                             </div>
                             <div 
-                                className="mt-2 d-flex align-items-center justify-content-between bg-info p-2 rounded text-light"
-                            >   
-                                <span className='text-white'>Bet Status</span>
+                                className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Active' && 'bg-info'} ${name.bet_status === 'Pending' && 'bg-secondary'} shadow rounded-pill text-white`}
+                                >   
+                                <span style={{ paddingLeft: 12 }} className='text-white'>Bet Status</span>
                                 <Span 
-                                    className={` text-center rounded text-warning fw-bold ${name.bet_status === 'Active' && 'text-dark bg-light'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
-                                    style={{ width: 62 }}
+                                    className={` text-center rounded fw-bold ${name.bet_status === 'Active' && 'text-dark '} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
+                                    style={{ paddingRight: 12 }}
                                 >
-                                    {name.bet_status}
+                                     <span style={{ marginRight: 8 }}>
+                                        {name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}
+                                        {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle text-white" ></i>}
+                                        {name.bet_status === 'Pending' && <i className="bi bi-hourglass-split text-white" ></i>}
+                                        {name.bet_status === 'Active' && <i className="bi bi-bullseye text-white" ></i>}
+                                     </span>                            
+                                   <span style={{ marginTop: 2 }} className="text-white">{name.bet_status}</span>
                                 </Span>                            
                             </div>
                             <div className='d-sm-flex justify-content-between mt-2 p-1'>
