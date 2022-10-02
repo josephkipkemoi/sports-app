@@ -312,7 +312,7 @@ const AllTabHistory = ({ user_id }) => {
                     </div>
                     {data.data.map(BetHistoryElements) }
                 </div>
-                
+
                 <div>
                     {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
                 </div>
@@ -336,6 +336,8 @@ const AllTabHistory = ({ user_id }) => {
 const SettledHistory = ({ user_id }) => {
     const [pageNumber, setPageNumber] = useState(1)
     const { data, error, isLoading, refetch } = useGetSettledHistoryBetslipQuery({user_id, pageNumber})
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [cartId, setCartId] = useState('');
 
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
@@ -344,6 +346,21 @@ const SettledHistory = ({ user_id }) => {
         return <div className='d-flex justify-content-center'>
         <Spinner className='mt-5' animation="grow" size="lg"/>
     </div>
+    }
+
+    const closeModal = () => setIsModalOpen(false)
+
+    const removeSingleBetHistory = async (cart_id) => {     
+        const res = await axios.delete(`api/users/fixtures/carts/delete?user_id=${user_id}&cart_id=${cart_id}`)
+        if(res.status === 200) {
+            refetch()
+            closeModal()
+        }
+    }
+
+    const openDeleteModal = (cart_id) => {
+        setIsModalOpen(true)
+        setCartId(cart_id)
     }
 
     const openMoreMarkets = (i) => {
@@ -365,13 +382,15 @@ const SettledHistory = ({ user_id }) => {
                         className="card cursor-pointer border-0" 
                         style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}
                         onClick={() => openMoreMarkets(i)}
+                        clickcart='true'
                         >
                             <div 
                                 className="card p-3 border-0 bg-light shadow-sm"
                                 style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+                                clickcart='true'
                             >
-                            <div className='d-flex justify-content-between'>
-                                <div>
+                            <div className='d-flex justify-content-between' clickcart='true'>
+                                <div clickcart='true'>
                                 <Span className='text-secondary'>
                                     {new Date(name.created_at).getDate()}/
                                     {new Date(name.created_at).getMonth()}/
@@ -381,15 +400,22 @@ const SettledHistory = ({ user_id }) => {
                                     {new Date(name.created_at).getHours()}:
                                     {new Date(name.created_at).getMinutes()}
                                 </Span>
-                                </div>                                                            
-                           
+                                </div>     
+
+                                <div clickcart={0}>
+                                    <div className='btn' clickcart={0} onClick={() => openDeleteModal(name.cart_id)}>
+                                        <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} className="text-danger"/>
+                                    </div>
+                                </div>
+
                             </div>
-                            <div>
+                            <div clickcart='true'>
                                 <small>Bet ID: </small>
                                 <small>{name.cart_id}</small> 
                             </div>
                             <div 
                                 className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} shadow rounded-pill text-white`}
+                                clickcart='true'
                             >   
                                 <span style={{ paddingLeft: 12 }}>Bet Status</span>
                                 <Span 
@@ -400,12 +426,12 @@ const SettledHistory = ({ user_id }) => {
                                     <span className='text-white'>{name.bet_status}</span>
                                 </Span>                            
                             </div>
-                            <div className='d-flex justify-content-between mt-2 p-1'>
-                                <div>
+                            <div clickcart='true' className='d-flex justify-content-between mt-2 p-1'>
+                                <div clickcart='true'>
                                     <Span>Stake Amount: </Span>
                                     <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                                 </div>
-                                <div>
+                                <div clickcart='true'>
                                     <Span>Final Payout: </Span>
                                     <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
                                 </div>  
@@ -456,11 +482,19 @@ const SettledHistory = ({ user_id }) => {
                 <RefreshButton refetch={refetch}/>
             </div>
             <div className='mb-4'>
-            { data.data.map(SettledItems) }
+                { data.data.map(SettledItems) }
             </div>
+
             <div>
                 {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
             </div> 
+
+            <AlertModal 
+                    closeModal={closeModal} 
+                    isModalOpen={isModalOpen}
+                    removeSingleBetHistory={removeSingleBetHistory}
+                    cartId={cartId}
+            />
         </div> : 
         <NoBetslipHistory/>}
         </>
@@ -530,6 +564,8 @@ const UnsettledHistory = ({ user_id }) => {
 
     const [pageNumber, setPageNumber] = useState(1)
     const { data, error, isLoading, refetch } = useGetUnsettledHistoryBetslipQuery({user_id, pageNumber})
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [cartId, setCartId] = useState('');
 
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
@@ -540,6 +576,22 @@ const UnsettledHistory = ({ user_id }) => {
                     <Spinner className='mt-5' animation="grow" size="lg"/>
                 </div>
     }
+
+    const closeModal = () => setIsModalOpen(false)
+
+    const removeSingleBetHistory = async (cart_id) => {     
+        const res = await axios.delete(`api/users/fixtures/carts/delete?user_id=${user_id}&cart_id=${cart_id}`)
+        if(res.status === 200) {
+            refetch()
+            closeModal()
+        }
+    }
+
+    const openDeleteModal = (cart_id) => {
+        setIsModalOpen(true)
+        setCartId(cart_id)
+    }
+
     const openMoreMarkets = (i) => {
         const elements = document.getElementsByClassName('history-more-markets-unsettled')[i];
         
@@ -571,7 +623,13 @@ const UnsettledHistory = ({ user_id }) => {
                                         {new Date(name.created_at).getMinutes()}
                                     </Span>
                                 </div>
-                        
+
+                                <div clickcart={0}>
+                                    <div className='btn' clickcart={0} onClick={() => openDeleteModal(name.cart_id)}>
+                                        <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} className="text-danger"/>
+                                    </div>
+                                </div>
+                                
                             </div>
                             <div>
                                 <small>Bet ID:</small>
@@ -636,7 +694,7 @@ const UnsettledHistory = ({ user_id }) => {
             <div>
                 {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
             </div> 
-        {data.data.length > 0 ? 
+            {data.data.length > 0 ? 
                 <div className='bg-light rounded p-2'>
                      <div className='d-flex justify-content-center mb-2'>
                         <RefreshButton refetch={refetch}/>
@@ -646,7 +704,13 @@ const UnsettledHistory = ({ user_id }) => {
                     </div>
                     <div>
                         {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
-                    </div>                    
+                    </div>   
+                    <AlertModal 
+                        closeModal={closeModal} 
+                        isModalOpen={isModalOpen}
+                        removeSingleBetHistory={removeSingleBetHistory}
+                        cartId={cartId}
+                    />                 
                 </div> : 
         <NoBetslipHistory/>
         }
