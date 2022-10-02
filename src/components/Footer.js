@@ -10,6 +10,7 @@ const StyledFooter = styledComponents.div`
     background-color: #191970;
     color: #fff;
     width: 100%;
+    padding-left: 12px;
 `
 
 const StyledCopyright = styledComponents.span`
@@ -210,16 +211,22 @@ export default function Footer(){
     return (
     <StyledFooter>
         <div className="p-2 container">
-            <Row>
-                <Col lg={4} md={6} sm={6}>
+            <div className="d-flex">
+                <div className="w-100">
                     <StyledMenuHeader>
                         Help
                     </StyledMenuHeader>
                     <LinkFooter>
                         {helpLinks.map(HelpLinkItem)}
                     </LinkFooter>
-                </Col>
-                <Col lg={4} md={6} sm={6}>
+                    <StyledMenuHeader>
+                        Social
+                    </StyledMenuHeader>
+                    <LinkFooter>
+                        {socialLinks.map(SocialLinkItem)}
+                    </LinkFooter>
+                </div>
+                <div className="w-100">
                     <StyledMenuHeader>
                         Settings
                     </StyledMenuHeader>
@@ -248,24 +255,17 @@ export default function Footer(){
                             This forum is open only to persons over the age of 18 years. 
                             Gambling may have adverse effects if not taken in moderation.
                         </span>
-                    </LinkFooter>                    
-                </Col>
-                <Col lg={4} md={6} sm={6}>
-                    <StyledMenuHeader>
-                        Social
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        {socialLinks.map(SocialLinkItem)}
-                    </LinkFooter>
+                    </LinkFooter>              
                     
                     <StyledMenuHeader>
                         Promotions
                     </StyledMenuHeader>
                     <LinkFooter>
                         {promotionLinks.map(PromotionLinkItem)}
-                    </LinkFooter>
-                </Col>
-            </Row>
+                    </LinkFooter>                 
+                </div>
+
+            </div>
         </div>
         <StyledCopyright>      
            <span>Copyright &copy; 2022 - All Rights Reserved &reg;</span>
