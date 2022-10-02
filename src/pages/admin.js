@@ -561,7 +561,7 @@ const UsersProfileComponent = () => {
     if(isLoading) {
         return <Spinner animation="grow"/>
     }
-    console.log(data.notPlaced)
+ 
     const options =  data.users.map(n => {
         return {
             user_id: n.id,
@@ -580,6 +580,7 @@ const UsersProfileComponent = () => {
                 <Card.Body className="bg-light rounded">
                     <div className="d-flex flex-column">
                         <p>Registered Users: {data.users.length}</p>
+                        <p>Grand Total: {Number(data.grandTotal).toLocaleString(undefined, {})}</p>
                         <p>Total Amount Placed: {Number(data.wagers).toLocaleString(undefined, {})}</p>
                         <p>Avg.: {Number(data.avg).toLocaleString(undefined, {})}</p>
                         <p>Not placed: {Number(data.notPlaced).toLocaleString(undefined, {})} </p>
