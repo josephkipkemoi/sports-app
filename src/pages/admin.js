@@ -576,22 +576,37 @@ const UsersProfileComponent = () => {
     }
 
     return (
-        <Card className="mt-2 bg-danger">
-                <Card.Body className="bg-light rounded">
-                    <div className="d-flex flex-column">
-                        <p>Registered Users: {data.users.length}</p>
-                        <p>Grand Total: {Number(data.grandTotal).toLocaleString(undefined, {})}</p>
-                        <p>Total Amount Placed: {Number(data.wagers).toLocaleString(undefined, {})}</p>
-                        <p>Avg.: {Number(data.avg).toLocaleString(undefined, {})}</p>
-                        <p>Not placed: {Number(data.notPlaced).toLocaleString(undefined, {})} </p>
+        <Card className="mt-2 bg-danger ">
+                <Card.Body className="bg-light rounded ">
+                    <div className="d-sm-flex">
+                        <Card className="w-100 m-2 shadow border-0">
+                            <Card.Header className="bg-primary text-white">Users</Card.Header>
+                            <Card.Body><h4>{data.users.length}</h4></Card.Body>
+                        </Card>                    
+                        <Card className="w-100 m-2 shadow border-0">
+                            <Card.Header className="bg-success text-white">Average</Card.Header>
+                            <Card.Body><h4>{Number(data.avg).toLocaleString(undefined, {})}</h4></Card.Body>
+                        </Card>
+                        <Card className="w-100 m-2 shadow border-0">
+                            <Card.Header className="bg-dark text-white">Pending</Card.Header>
+                            <Card.Body><h4>{Number(data.notPlaced).toLocaleString(undefined, {})}</h4></Card.Body>
+                        </Card>
+                        <Card className="w-100 m-2 shadow border-0">
+                            <Card.Header className="bg-warning text-dark">Total Amount</Card.Header>
+                            <Card.Body><h4>{Number(data.wagers).toLocaleString(undefined, {})}</h4></Card.Body>
+                        </Card>
+                        <Card className="w-100 m-2 shadow border-0">
+                            <Card.Header className="bg-danger text-white">Grand Total</Card.Header>
+                            <Card.Body><h4>{Number(data.grandTotal).toLocaleString(undefined, {})}</h4></Card.Body>
+                        </Card>
                     </div>
-                    <Row>                        
-                        <Col sm="12" md="6" lg="6">                            
+                    <Row className="shadow m-2 p-2 rounded mx-auto">                        
+                        <Col sm="12" md="3" lg="3" className="p-3">               
+                            <button className="btn btn-primary m-2" onClick={refetch}>Reload</button>                                 
                             <h5 className="text-dark fw-bold">Select User</h5>
                             <Select options={options} className="text-dark" onChange={selectUser}/>    
-                            <button className="btn btn-primary m-2" onClick={refetch}>Refresh Users</button>                    
                         </Col>
-                        <Col sm="12" md="12" lg="12">
+                        <Col sm="12" md="9" lg="8" className="shadow m-2 p-3">
                             <UserProfileElement user_id={userId}/>
                         </Col>
                     </Row>
