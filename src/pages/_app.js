@@ -46,7 +46,11 @@ const GlobalStyles = createGlobalStyle`
     background: #191970;
     border-radius: 8px;
   }
- 
+  @media screen and (min-width: 920px) {
+    #main {
+        display: none;
+    }
+}
  @media screen and (max-width: 570px) {
     body {
         font-size: 12px;

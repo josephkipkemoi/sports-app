@@ -92,7 +92,7 @@ function App({ data }) {
  
   return (
     <ThemedBody>
-            <main>
+            <main id="main">
               <Row className='px-2'>
                   <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
                    <StyledMain>
