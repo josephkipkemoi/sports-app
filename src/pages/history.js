@@ -15,15 +15,13 @@ import {    useGetAllUserHistoryBetslipV1Query,
             useGetUnsettledHistoryBetslipQuery, 
         } from '../hooks/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRefresh, faTrash, faTimesCircle, faSignal } from '@fortawesome/free-solid-svg-icons';
+import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
-import JackpotComponent from '../components/JackpotComponent';
-import Pagination from '../components/Pagination';
 import AuthUser from '../hooks/AuthUser';
 import { withProtected } from '../hooks/RouteProtection';
 import MobileNavComponent from '../components/MobileNavComponent';
-import { RefreshButton } from '../components/HtmlElements';
 import axios from '../lib/axios';
+import HistoryComponent from '../components/HistoryComponent';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -40,7 +38,6 @@ const StyledHistory = styled.div`
 `
 
 function History(){
-
     return (
         <>
             <SportBetsHistoryProfile/>
@@ -50,7 +47,6 @@ function History(){
 }
 
 const SportBetsHistoryProfile = () => {
-
 
     const router = useRouter()
     const { tab , his_tab} = router.query
@@ -81,7 +77,8 @@ const SportBetsHistoryProfile = () => {
 }
 
 const AllJackpotHistory = ({ user_id }) => {
-    
+
+    const [pageNumber, setPageNumber] = useState(1)
     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'All'})
 
     if(isLoading) {
@@ -94,20 +91,20 @@ const AllJackpotHistory = ({ user_id }) => {
 
     return (
         <>
-           <div className='d-flex justify-content-center mb-2'>
-            <RefreshButton refetch={refetch}/>
-            </div>
-        
-        {data.data.length > 0 ? 
-            <div className='bg-dark p-2 rounded'>
-           <JackpotComponent data={data}/>
-           </div> 
-       : <NoBetslipHistory/>}
+           <HistoryComponent 
+                data={data}
+                setPageNumber={setPageNumber} 
+                pageNumber={pageNumber}
+                refetch={refetch}
+                user_id={user_id}
+            />   
        </>
     )
 }
 
 const MegaJackpotHistory = ({ user_id }) => {
+
+    const [pageNumber, setPageNumber] = useState(1)
     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Mega Jackpot'})
  
     if(isLoading) {
@@ -120,19 +117,20 @@ const MegaJackpotHistory = ({ user_id }) => {
 
     return (
         <>
-            <div className='d-flex justify-content-center mb-2'>
-                <RefreshButton refetch={refetch}/>
-            </div>
-        {data.data.length > 0 ? 
-           <div className='bg-dark p-2 rounded'>
-           <JackpotComponent data={data}/>
-       </div> 
-       : <NoBetslipHistory/>}
+            <HistoryComponent 
+                data={data}
+                setPageNumber={setPageNumber} 
+                pageNumber={pageNumber}
+                refetch={refetch}
+                user_id={user_id}
+            /> 
        </> 
     )
 }
 
 const FiveJackpotHistory = ({ user_id }) => {
+
+    const [pageNumber, setPageNumber] = useState(1)
     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Five Jackpot'})
  
     if(isLoading) {
@@ -144,17 +142,13 @@ const FiveJackpotHistory = ({ user_id }) => {
     }
  
     return (
-        <>
-          <div className='d-flex justify-content-center mb-2'>
-            <RefreshButton refetch={refetch}/>
-         </div>
-         {data.data.length > 0 ? 
-            <div className='bg-dark p-2 rounded'>
-          
-            <JackpotComponent data={data}/>
-        </div> 
-        : <NoBetslipHistory/>}
-        </>
+        <HistoryComponent 
+            data={data}
+            setPageNumber={setPageNumber} 
+            pageNumber={pageNumber}
+            refetch={refetch}
+            user_id={user_id}
+        /> 
     )
 }
 
@@ -162,9 +156,32 @@ const AllTabHistory = ({ user_id }) => {
 
     const [pageNumber, setPageNumber] = useState(1)
     const { data, error, isLoading, refetch } = useGetAllUserHistoryBetslipV1Query({user_id, pageNumber})
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [cartId, setCartId] = useState('');
+   
+    if(error) {
+        return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
+    }
 
+    if(isLoading) {
+        return  <div className='d-flex justify-content-center'>
+                    <Spinner className='mt-5' animation="grow" size="lg"/>
+                </div>
+    }
+ 
+    return (   
+            <HistoryComponent 
+                data={data}
+                setPageNumber={setPageNumber} 
+                pageNumber={pageNumber}
+                refetch={refetch}
+                user_id={user_id}
+            />     
+    )
+}
+
+const SettledHistory = ({ user_id }) => {
+    const [pageNumber, setPageNumber] = useState(1)
+    const { data, error, isLoading, refetch } = useGetSettledHistoryBetslipQuery({user_id, pageNumber})
+    
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
     }
@@ -175,343 +192,17 @@ const AllTabHistory = ({ user_id }) => {
                 </div>
     }
 
-    const closeModal = () => setIsModalOpen(false)
- 
-    const openMoreMarkets = (i,e) => {
-        const elements = document.getElementsByClassName('history-more-markets')[i];
-
-        if(Boolean(e.target.getAttribute('clickcart')) === true) {        
-            if( elements.style.display === 'none') {
-                elements.style.display = 'block'
-            } else {
-                elements.style.display = 'none'
-            }
-        }
-  
-    }
-
-    const removeSingleBetHistory = async (cart_id) => {     
-        const res = await axios.delete(`api/users/fixtures/carts/delete?user_id=${user_id}&cart_id=${cart_id}`)
-        if(res.status === 200) {
-            refetch()
-            closeModal()
-        }
-    }
-
-    const openDeleteModal = (cart_id) => {
-        setIsModalOpen(true)
-        setCartId(cart_id)
-    }
-
-    const BetHistoryElements = (name, i) => {
-        const historyData = JSON.parse(name.cart)
-   
-        return (
-            <div key={i} className="mb-2" clickcart="true">
-            <div 
-            className="card cursor-pointer border-0" 
-            style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}
-          
-            clickcart="true"
-            >
-                <div 
-                    className="card p-3 border-0 bg-light shadow-sm"
-                    style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
-                    onClick={(e) => openMoreMarkets(i,e)}
-                    clickcart="true"
-                >
-                <div className='d-flex justify-content-between' clickcart="true" onClick={(e) => openMoreMarkets(i,e)}>
-                    <div clickcart="true">
-                        <Span className='text-secondary'>
-                            {new Date(name.created_at).getDate()}/
-                            {new Date(name.created_at).getMonth()}/
-                            {new Date(name.created_at).getFullYear()}
-                        </Span>
-                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
-                            {new Date(name.created_at).getHours()}:
-                            {new Date(name.created_at).getMinutes()}
-                        </Span>
-                    </div>                                                            
-                    <div clickcart={0}>
-                        <div className='btn' clickcart={0} onClick={() => openDeleteModal(name.cart_id)}>
-                            <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} className="text-danger"/>
-                        </div>
-                    </div>
-                </div>
-                <div clickcart="true">
-                    <small>Bet ID:</small>
-                    <small className='fw-bold' style={{ textTransform: 'uppercase' }}>{name.cart_id}</small> 
-                </div>
-                <div 
-                    className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} ${name.bet_status === 'Active' && 'bg-info'} bg-secondary shadow rounded-pill text-white`}
-                    clickcart="true"
-               >   
-                    <span style={{ paddingLeft: 12 }}>Bet Status</span>
-                    <Span 
-                        className={`d-flex align-items-center text-center rounded text-warning fw-bold ${name.bet_status === 'Won' && 'text-white bg-success'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
-                        style={{ paddingRight: 12 }}
-                    >
-                        <span style={{ marginRight: 6 }}>
-                            {name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}
-                            {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle text-white" ></i>}
-                            {name.bet_status === 'Pending' && <i className="bi bi-hourglass-split text-white" ></i>}
-                            {name.bet_status === 'Active' && <i className="bi bi-bullseye text-white" ></i>}
-                        </span>
-                        <span className='text-white' style={{ marginTop: 2 }}>{name.bet_status}</span>
-                    </Span>                            
-                </div>
-                <div className='d-flex justify-content-between mt-2 p-1' clickcart="true">
-                    <div clickcart="true">
-                        <Span>Stake Amount: </Span>
-                        <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                    </div>
-                    <div clickcart="true">
-                        <Span>Final Payout: </Span>
-                        <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                    </div>  
-                </div>
-                           
-            </div>
-            </div>
-            <div 
-            className={`card p-1 border-0 history-more-markets shadow`}
-            style={{ 
-                borderTopRightRadius: 0, 
-                borderTopLeftRadius: 0, 
-                borderTop: 'none',
-                display:'none',
-                paddingTop: 0
-            }}
-            >
-                {historyData.map((d,i) => {       
-                    return (
-                        <div className='card p-3 border-0' key={i+d.fixture_id}>
-                            <div>
-                                <small>Game ID: {d.fixture_id}</small>
-                                <span className='d-block text-center bg-dark rounded text-light p-1 m-1'>{d.betslip_teams}</span>
-                            </div>                        
-                            <div className='d-flex justify-content-between'>
-                                <span>Market: {d.betslip_market}</span>
-                                <span>Odds: {d.betslip_odds}</span>
-                            </div>
-                            <div className='d-flex justify-content-between'>
-                                <span>Picked: {d.betslip_picked}</span>
-                            </div>
-                        </div>
-                    )
-                })}
-            </div>
-        </div>
-        )
-    }
-
- 
-
     return (
-        <>            
-            <div>
-                {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber} pageNumber={pageNumber}/>} 
-            </div>          
-          {data?.data.length > 0 ?
-          <>
-           <div className='bg-white rounded p-2'>
-                <div className='mb-4'>
-                    <div className='d-flex justify-content-center mb-2'>
-                        <RefreshButton refetch={refetch}/>
-                    </div>
-                    {data.data.map(BetHistoryElements) }
-                </div>
-
-                <div>
-                    {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
-                </div>
-
-                <AlertModal 
-                    closeModal={closeModal} 
-                    isModalOpen={isModalOpen}
-                    removeSingleBetHistory={removeSingleBetHistory}
-                    cartId={cartId}
-                />
-
-            </div>          
-          </>
-        : 
-          <NoBetslipHistory/>}  
-        </>
-       
+        <HistoryComponent 
+            data={data}
+            setPageNumber={setPageNumber} 
+            pageNumber={pageNumber}
+            refetch={refetch}
+            user_id={user_id}
+        />  
     )
 }
 
-const SettledHistory = ({ user_id }) => {
-    const [pageNumber, setPageNumber] = useState(1)
-    const { data, error, isLoading, refetch } = useGetSettledHistoryBetslipQuery({user_id, pageNumber})
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [cartId, setCartId] = useState('');
-
-    if(error) {
-        return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
-    }
-    if(isLoading) {
-        return <div className='d-flex justify-content-center'>
-        <Spinner className='mt-5' animation="grow" size="lg"/>
-    </div>
-    }
-
-    const closeModal = () => setIsModalOpen(false)
-
-    const removeSingleBetHistory = async (cart_id) => {     
-        const res = await axios.delete(`api/users/fixtures/carts/delete?user_id=${user_id}&cart_id=${cart_id}`)
-        if(res.status === 200) {
-            refetch()
-            closeModal()
-        }
-    }
-
-    const openDeleteModal = (cart_id) => {
-        setIsModalOpen(true)
-        setCartId(cart_id)
-    }
-
-    const openMoreMarkets = (i) => {
-        const elements = document.getElementsByClassName('history-more-markets')[i];
-        
-        if( elements.style.display === 'none') {
-            elements.style.display = 'block'
-        } else {
-            elements.style.display = 'none'
-        }
-    }
-
-    const SettledItems = (name , i) => {
-        const historyData = JSON.parse(name.cart)
-
-                return (
-                    <div key={i} className="mb-2 ">
-                        <div 
-                        className="card cursor-pointer border-0" 
-                        style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}
-                        onClick={() => openMoreMarkets(i)}
-                        clickcart='true'
-                        >
-                            <div 
-                                className="card p-3 border-0 bg-light shadow-sm"
-                                style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
-                                clickcart='true'
-                            >
-                            <div className='d-flex justify-content-between' clickcart='true'>
-                                <div clickcart='true'>
-                                <Span className='text-secondary'>
-                                    {new Date(name.created_at).getDate()}/
-                                    {new Date(name.created_at).getMonth()}/
-                                    {new Date(name.created_at).getFullYear()}
-                                </Span>
-                                <Span className='text-secondary' style={{ marginLeft: 5 }}>
-                                    {new Date(name.created_at).getHours()}:
-                                    {new Date(name.created_at).getMinutes()}
-                                </Span>
-                                </div>     
-
-                                <div clickcart={0}>
-                                    <div className='btn' clickcart={0} onClick={() => openDeleteModal(name.cart_id)}>
-                                        <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} className="text-danger"/>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div clickcart='true'>
-                                <small>Bet ID: </small>
-                                <small>{name.cart_id}</small> 
-                            </div>
-                            <div 
-                                className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} shadow rounded-pill text-white`}
-                                clickcart='true'
-                            >   
-                                <span style={{ paddingLeft: 12 }}>Bet Status</span>
-                                <Span 
-                                    className={`d-flex align-items-center text-center rounded text-warning fw-bold ${name.bet_status === 'Won' && 'text-white bg-success'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
-                                    style={{ paddingRight: 12 }}
-                                >
-                                    <span style={{ marginRight: 8 }}>
-                                        {name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}
-                                        {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle text-white" ></i>}                                      
-                                    </span>
-                                    <span className='text-white' style={{ marginTop: 2 }}>{name.bet_status}</span>
-                                </Span>                            
-                            </div>
-                            <div clickcart='true' className='d-flex justify-content-between mt-2 p-1'>
-                                <div clickcart='true'>
-                                    <Span>Stake Amount: </Span>
-                                    <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                                </div>
-                                <div clickcart='true'>
-                                    <Span>Final Payout: </Span>
-                                    <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                                </div>  
-                            </div>
-                                       
-                        </div>
-                        </div>
-                        <div 
-                        className={`card p-1 border-0 history-more-markets shadow`}
-                        style={{ 
-                            borderTopRightRadius: 0, 
-                            borderTopLeftRadius: 0, 
-                            borderTop: 'none',
-                            display:'none',
-                            paddingTop: 0
-                        }}
-                        >
-                            {historyData.map((d,i) => {       
-                                return (
-                                    <div className='card p-3 border-0' key={i+d.fixture_id}>
-                                        <div>
-                                            <small>Game ID: {d.fixture_id}</small>
-                                            <span className='d-block text-center bg-dark rounded text-light p-1 m-1'>{d.betslip_teams}</span>
-                                        </div>                        
-                                        <div className='d-flex justify-content-between'>
-                                            <span>Market: {d.betslip_market}</span>
-                                            <span>Odds: {d.betslip_odds}</span>
-                                        </div>
-                                        <div className='d-flex justify-content-between'>
-                                            <span>Picked: {d.betslip_picked}</span>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                )
-            }
-    
-    return (
-        <>
-            <div>
-                {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
-            </div> 
-        {data.data.length > 0 ? 
-          <div className='bg-white rounded p-2'>
-            <div className='d-flex justify-content-center mb-2'>
-                <RefreshButton refetch={refetch}/>
-            </div>
-            <div className='mb-4'>
-                { data.data.map(SettledItems) }
-            </div>
-
-            <div>
-                {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
-            </div> 
-
-            <AlertModal 
-                    closeModal={closeModal} 
-                    isModalOpen={isModalOpen}
-                    removeSingleBetHistory={removeSingleBetHistory}
-                    cartId={cartId}
-            />
-        </div> : 
-        <NoBetslipHistory/>}
-        </>
-    )
-}
 const SearchFilterResults = ({ user_id }) => {
     const router = useRouter()
     const { from, to } = router.query;
@@ -576,8 +267,6 @@ const UnsettledHistory = ({ user_id }) => {
 
     const [pageNumber, setPageNumber] = useState(1)
     const { data, error, isLoading, refetch } = useGetUnsettledHistoryBetslipQuery({user_id, pageNumber})
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [cartId, setCartId] = useState('');
 
     if(error) {
         return <span className='d-flex justify-content-center mt-5 text-danger fw-bold'>Error</span>
@@ -589,152 +278,14 @@ const UnsettledHistory = ({ user_id }) => {
                 </div>
     }
 
-    const closeModal = () => setIsModalOpen(false)
-
-    const removeSingleBetHistory = async (cart_id) => {     
-        const res = await axios.delete(`api/users/fixtures/carts/delete?user_id=${user_id}&cart_id=${cart_id}`)
-        if(res.status === 200) {
-            refetch()
-            closeModal()
-        }
-    }
-
-    const openDeleteModal = (cart_id) => {
-        setIsModalOpen(true)
-        setCartId(cart_id)
-    }
-
-    const openMoreMarkets = (i) => {
-        const elements = document.getElementsByClassName('history-more-markets-unsettled')[i];
-        
-        if( elements.style.display === 'none') {
-            elements.style.display = 'block'
-        } else {
-            elements.style.display = 'none'
-        }
-    }
-    const UnsettledItems = (name, i) => {
-        const historyData = JSON.parse(name.cart)
-        return (
-            <React.Fragment key={i} >
-                <div 
-                    className="card p-3 mt-1 cursor-pointer " 
-                    style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none' }}
-                    onClick={() => openMoreMarkets(i)}
-                    >
-                        <div className=" cursor-pointer">
-                            <div className='d-flex d-flex justify-content-between'>
-                                <div>
-                                    <Span className='text-secondary'>
-                                        {new Date(name.created_at).getDate()}/
-                                        {new Date(name.created_at).getMonth()}/
-                                        {new Date(name.created_at).getFullYear()}
-                                    </Span>
-                                    <Span className='text-secondary' style={{ marginLeft: 5 }}>
-                                        {new Date(name.created_at).getHours()}:
-                                        {new Date(name.created_at).getMinutes()}
-                                    </Span>
-                                </div>
-
-                                <div clickcart={0}>
-                                    <div className='btn' clickcart={0} onClick={() => openDeleteModal(name.cart_id)}>
-                                        <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} className="text-danger"/>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                            <div>
-                                <small>Bet ID:</small>
-                                <small>{name.cart_id}</small>
-                            </div>
-                            <div 
-                                className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Active' && 'bg-info'} ${name.bet_status === 'Pending' && 'bg-secondary'} shadow rounded-pill text-white`}
-                                >   
-                                <span style={{ paddingLeft: 12 }} className='text-white'>Bet Status</span>
-                                <Span 
-                                    className={` text-center rounded fw-bold ${name.bet_status === 'Active' && 'text-dark '} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
-                                    style={{ paddingRight: 12 }}
-                                >
-                                     <span style={{ marginRight: 8 }}>
-                                        {name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}
-                                        {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle text-white" ></i>}
-                                        {name.bet_status === 'Pending' && <i className="bi bi-hourglass-split text-white" ></i>}
-                                        {name.bet_status === 'Active' && <i className="bi bi-bullseye text-white" ></i>}
-                                     </span>                            
-                                   <span style={{ marginTop: 2 }} className="text-white">{name.bet_status}</span>
-                                </Span>                            
-                            </div>
-                            <div className='d-sm-flex justify-content-between mt-2 p-1'>
-                                <div>
-                                    <Span>Stake Amount: </Span>
-                                    <Span className="fw-bold">KES {name.bet_amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                                </div>
-                                <div>
-                                    <Span>Final Payout: </Span>
-                                    <Span className="fw-bold">KES {name.possible_payout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</Span>
-                                </div>  
-                            </div>                                    
-                        </div>
-                </div>
-                <div 
-                    className={`card p-3 mb-2 history-more-markets-unsettled`}
-                    style={{ 
-                        borderTopRightRadius: 0, 
-                        borderTopLeftRadius: 0, 
-                        borderTop: 'none',
-                        display:'none' 
-                    }}
-                    >
-                    {historyData.map((d,i) => {       
-                        return (
-                            <div className='card p-3 mb-2 shadow ' key={i+d.fixture_id}>
-                                <div>
-                                    <small>Game ID: {d.fixture_id}</small>
-                                    <span className='d-block text-center bg-success rounded text-light p-1 m-1'>{d.betslip_teams}</span>
-                                </div>                        
-                                <div className='d-flex justify-content-between'>
-                                    <span>Market: {d.betslip_market}</span>
-                                    <span>Odds: {d.betslip_odds}</span>
-                                </div>
-                                <div className='d-flex justify-content-between'>
-                                    <span>Picked: {d.betslip_picked}</span>
-                                </div>
-                            </div>
-                        )
-                    })}
-                    </div>            
-            </React.Fragment>
-        )
-    }
-
     return (
-        <>
-            <div>
-                {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
-            </div> 
-            {data.data.length > 0 ? 
-                <div className='bg-light rounded p-2'>
-                     <div className='d-flex justify-content-center mb-2'>
-                        <RefreshButton refetch={refetch}/>
-                    </div>
-                    <div className='mb-4'>
-                        {data.data.map(UnsettledItems)}
-                    </div>
-                    <div>
-                        {data?.data.length >= 5 && <Pagination data={data} setPageNumber={setPageNumber}/>} 
-                    </div>   
-                    <AlertModal 
-                        closeModal={closeModal} 
-                        isModalOpen={isModalOpen}
-                        removeSingleBetHistory={removeSingleBetHistory}
-                        cartId={cartId}
-                    />                 
-                </div> : 
-        <NoBetslipHistory/>
-        }
-           
-        </>
-     
+           <HistoryComponent 
+                data={data}
+                setPageNumber={setPageNumber} 
+                pageNumber={pageNumber}
+                refetch={refetch}
+                user_id={user_id}
+            />  
     )
 }
 
@@ -936,7 +487,7 @@ const HistoryFilter = () => {
     }, [])
 
     return (
-        <div className='history-header mb-3 card p-2 shadow border-0' style={{ backgroundColor: '#edebeb' }}>
+        <div className='history-header card p-2 shadow-sm border-0' style={{ backgroundColor: '#edebeb' }}>
             <div>
                 <StyleHeaderNav className='d-flex mb-2'>
                     <Link href="history?his_tab=sbets&tab=all">
@@ -973,7 +524,7 @@ const HistoryFilter = () => {
                 <StyleSearch >
                     <button 
                         type="search" 
-                        className='btn btn-primary d-flex justify-content-between float-end'
+                        className='btn btn-primary shadow d-flex justify-content-between float-end'
                         onClick={openModal}
                     >
                         <span>All Dates </span>    
@@ -1028,46 +579,6 @@ const HistoryFilter = () => {
                 </Modal.Body>                            
             </Modal>      
         </div>
-    )
-}
-
-const StyleAlertModal = styled.div`
-
-`
-
-const AlertModal = ({ closeModal, isModalOpen, removeSingleBetHistory, cartId }) => {
-    return (
-        <StyleAlertModal>
-            <Modal show={isModalOpen} centered className="p-3">
-                <Modal.Body>
-                    <div className="d-flex justify-content-end times">
-                        <FontAwesomeIcon icon={faTimesCircle} size="lg" onClick={closeModal}/>
-                    </div>
-                    <div className='mt-4'>
-                        <h4 className='fw-bold'>Are you sure you want to delete this Bet?</h4>
-                        <h6 className='text-secondary'>This action cannot be undone!</h6>
-                    </div>                  
-                    <div className="d-flex justify-content-end">
-                        <button className='btn btn-light' onClick={closeModal}>Cancel</button>
-                        <button className='btn btn-danger shadow' onClick={() => removeSingleBetHistory(cartId)}>Delete</button>
-                    </div>              
-                </Modal.Body>
-            </Modal>
-        </StyleAlertModal>       
-    )
-}
-
-const NoBetslipHistory = () => {
-    const router = useRouter()
-    const { his_tab } = router.query
-    return (
-        <>
-        <div className="text-center mt-5">
-            <Span className='text-dark'>
-                You do not have any {his_tab === 'sbets' ? 'Sportsbook' : 'Jackpot'} bets
-            </Span>
-        </div>
-        </>
     )
 }
 

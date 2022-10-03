@@ -15,25 +15,24 @@ export default function Pagination( data ) {
         }   
 
         return (
-           <React.Fragment key={i}>
+           <div key={i}>
                {name.label === 'pagination.previous' 
                 && <li className={`page-item ${name.active && 'active'} ${(name.label === 'pagination.previous' && name.url === null) && 'disabled'}`}>
-                <button onClick={handlePaginationNumber} className="page-link" tabIndex="-1">Previous</button>
+                <button onClick={handlePaginationNumber} className="page-link border-0 m-1 shadow-sm" tabIndex="-1" style={{ zIndex: '1' }}>Previous</button>
                 </li>}
                 {(name.label  !== 'pagination.next' && name.label !== 'pagination.previous') && 
-                <li className={`page-item ${name.active && 'active'}`}><button onClick={handlePaginationNumber} className="page-link">{name.label}</button></li>
+                <li className={`page-item ${name.active && 'active'}`}><button onClick={handlePaginationNumber} style={{ zIndex: '1' }} className="page-link shadow-sm border-0 m-1">{name.label}</button></li>
                 }
                 {name.label === 'pagination.next' 
                 && <li className={`page-item ${name.active && 'active'} ${(name.label === 'pagination.next' && name.url === null) && 'disabled'}`}>
-                <button onClick={handlePaginationNumber} className="page-link" tabIndex="-1">Next</button>
-                </li>}
-              
-           </React.Fragment>
+                <button onClick={handlePaginationNumber} className="page-link border-0 shadow-sm m-1" tabIndex="-1" style={{ zIndex: '1' }}>Next</button>
+                </li>}              
+           </div>
         )
     }
     return (
           <>
-           <nav aria-label="History page navigation" >
+           <nav aria-label="History page navigation">
             <ul className="pagination d-flex justify-content-center" >
                 {data.data.links.map(PaginationItems)}
                 </ul>
