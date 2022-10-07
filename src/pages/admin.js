@@ -666,7 +666,7 @@ const MessageComponent = () => {
     useEffect(() => {
         // setFormDetails(prev => ({...prev , user_id: uid, phone_number: uid}))
             
-        Pusher.logToConsole = true
+        // Pusher.logToConsole = true
     
         let pusher = new Pusher('b36bb776d85f37fdff66', {
             cluster: 'ap2'            
