@@ -222,7 +222,7 @@ const ChatBoxElement = ({ setCustomMsg }) => {
         const userId = JSON.parse(localStorage.getItem('uu_id')).uu_id.id
 
         window.addEventListener('load', (e) => {
-            // Pusher.logToConsole = true
+            Pusher.logToConsole = true
 
             let pusher = new Pusher('b36bb776d85f37fdff66', {
                 cluster: 'ap2'
@@ -236,7 +236,7 @@ const ChatBoxElement = ({ setCustomMsg }) => {
 
             channel1.bind(`message.new`, function (data) {
                 setChatMessage(prev => ([...prev, {message: data.message, sender: data.sender}]))
-          
+                console.log(data)
             }) 
         })
     }, [chatMessage, router.route])

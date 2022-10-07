@@ -666,7 +666,7 @@ const MessageComponent = () => {
     useEffect(() => {
         // setFormDetails(prev => ({...prev , user_id: uid, phone_number: uid}))
             
-        // Pusher.logToConsole = true
+        Pusher.logToConsole = true
     
         let pusher = new Pusher('b36bb776d85f37fdff66', {
             cluster: 'ap2'            
@@ -678,6 +678,7 @@ const MessageComponent = () => {
             setChatMessage((prev) =>  [...prev, data.message])
             setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
             setSender(data.sender)
+            console.log(data)
         })     
     
     }, [])   
