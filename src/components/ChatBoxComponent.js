@@ -229,10 +229,8 @@ const ChatBoxElement = ({ setCustomMsg }) => {
                 broadcaster: 'pusher',
                 wsHost: window.location.hostname,
                 key: 'b36bb776d85f37fdff66',
-                wsPort: 6001,
                 cluster: 'ap2',
                 forceTLS: true,
-                encrypted: true,
             })
 
             window.Echo.channel(`message-channel${userId}`)
