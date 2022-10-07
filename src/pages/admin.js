@@ -11,14 +11,23 @@ import  Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
 import Select from "react-select";
 import { InputNumber, Small } from "../components/Html";
-import { useGetAdminUserBalanceByIdQuery, useGetAllUsersQuery, useGetAllFixturesIdsQuery, useGetAllCustomerMessagesQuery, useGetJackpotFixturesQuery } from "../hooks/admin";
+import { 
+    useGetAdminUserBalanceByIdQuery, 
+    useGetAllUsersQuery, 
+    useGetAllFixturesIdsQuery, 
+    useGetJackpotFixturesQuery 
+} from "../hooks/admin";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
-import Collapse from "react-bootstrap/Collapse";
 import { PhoneSvgIcon } from "../components/Svg";
 import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 import { Modal } from "react-bootstrap";
 import { useGetFixtureIdsWhereOddsNullQuery } from "../hooks/fixture";
 import { ProgressBarElement } from "../components/HtmlElements";
+import {  
+    useGetAllUsersWhoMessagedAdminQuery, 
+    useGetUserMessageByIdQuery } from "../hooks/messages";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faHeadset } from "@fortawesome/free-solid-svg-icons";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -484,13 +493,19 @@ const UpdateJackpotPrize = () => {
 
 const CustomerFeedback = () => {
     const [message, setMessage] = useState('')
+    const [userId, setUserId] = useState(null)
+    const [messageBox, setMessageBox] = useState([])
+    const [times, setTimes] = useState([])
+    const timesArr = times.length > 0 && new Set(times)
+   
+    const {data, error, isLoading, refetch } = useGetUserMessageByIdQuery(711487151)
 
-    const {data, error, isLoading } = useGetAllCustomerMessagesQuery()
- 
     if(error) {
         return <span>Error</span>
     }
-
+    useEffect(() => {
+        // setUserId(JSON.parse(localStorage.getItem('uu_id')).uu_id.id)
+    }, [])
     if(isLoading) {
         return <Spinner animation="grow"/>
     }
@@ -499,23 +514,25 @@ const CustomerFeedback = () => {
         setMessage(e.target.value)
     }
 
-    const submitMessage = (originalMessage, phoneNumber) => {
+    const submitMessage = async (originalMessage, phoneNumber) => {
         const num = Number('254' + phoneNumber)
-         axios.post('api/admin/users/message', {
+        const res = await axios.post('api/admin/users/message', {
             message,
             phone_number: num,
-            original_message: originalMessage
+            original_message: originalMessage,
+            user_id: userId
         })
-        
+        // console.log(res)
     }
 
     const MessageItems = (link, i) => {
-
+ 
          return (
             <React.Fragment key={i}>
                 <div className=" m-1 d-flex flex-row">                    
                     <PhoneSvgIcon width="16" height="16"/>
-                        <small className="text-dark">
+                    <p>{link.message}</p>
+                        {/* <small className="text-dark">
                             {link.phone_number}
                         </small>
                                                    
@@ -530,20 +547,178 @@ const CustomerFeedback = () => {
                         <div>
                             <textarea className="form-control" onChange={handleInput}/>
                             <button className="btn btn-primary" onClick={() => submitMessage(link.message, link.phone_number)}>Reply</button>
-                        </div>
+                        </div> */}
                 </div>    
                 <hr/>        
             </React.Fragment>
         )
     }
+
+    // Pusher.logToConsole = true
+
+    // let pusher = new Pusher('b36bb776d85f37fdff66', {
+    //     cluster: 'ap2'
+    // })
+
+    // let channel1 = pusher.subscribe(`message-channel${4}`)
+    // admin-message-channel
+    // const res = channel1.bind(`message.new`, function (data,err) {
+    //     // sessionStorage.setItem(data.timestamp,data.message)
+    //     // setTimes((prev) => prev.concat(data.timestamp))   
+    //     refetch()
+    // //    alert(data)
+    // }) 
+
+    // sessionStorage.setItem('timestamps',JSON.stringify(Array.from(timesArr)))
+
+    // console.log(sessionStorage.getItem(Array.from(timesArr)) )
+    // Array.from(timesArr).map(MessageItems)
+    // console.log(data.messages.length)
     return (
         <Card className="mt-2"> 
             <Card.Header className="bg-primary text-light">
                 <h3 className="fw-bold">Feedback</h3>
             </Card.Header>
-            <Card.Body>                
-                {data.messages.map(MessageItems)}
+            <Card.Body>   
+                {/* <p>{messageBox}</p>   */}
+             
+                {/* {data.map(MessageItems)}
+                <textarea></textarea> */}
+                <Row>
+                    {/* <Col lg={2} md={2} sm={2}> */}
+                        <UsersContactCustomerCare/>
+                    {/* </Col> */}
+                    {/* <Col> */}
+
+                    {/* </Col> */}
+                </Row>
             </Card.Body>
+        </Card>
+    )
+}
+
+const UsersContactCustomerCare = () => {
+
+    const { data, isLoading, error, refetch } = useGetAllUsersWhoMessagedAdminQuery()
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+
+    if(isLoading) {
+        return <Spinner animation="grow" />
+    }
+
+
+    const UsersElements = (n, i) => {
+        return (
+            <div 
+                key={i} 
+                className={`d-flex justify-content-between align-items-center btn btn-light p-2 m-1 rounded-pill`}
+            >
+                <FontAwesomeIcon 
+                icon={faUser} 
+                className="text-white bg-info p-2 rounded-circle" 
+                size='lg'
+                style={{ marginRight: 6 }}
+                />
+                <span className="text-dark fw-bold">{n.phone_number}</span>
+            </div>
+        )
+    }
+    return (
+        <>
+            <div className="mb-3 mt-3">
+                <button className="btn btn-primary" onClick={refetch}>Refresh</button>         
+            </div>
+                <Col lg={3} md={4} sm={4}>                    
+                    <Card.Header><h4>Users</h4></Card.Header>
+                    <div className="bg-primary pt-2 pb-2">
+                        {data.data.map(UsersElements)}
+                    </div>
+                </Col>       
+                <Col lg={9} md={8} sm={8}>
+                    <MessageComponent />
+                </Col>
+        </>
+    )
+}
+
+const MessageComponent = () => {
+    const [chatMessage, setChatMessage] = useState([])
+    const [sender, setSender] = useState('')
+
+    const [formDetails, setFormDetails] = useState({
+        message: '',
+        user_id: '',
+        phone_number: ''
+    })
+
+    const handleText = (e) => {
+        setFormDetails(prev => ({...prev, message : e.target.value }))
+    }
+
+    const submitMessage = async () => {
+        const res = await axios.post('api/admin/users/message', formDetails)
+    }
+
+    useEffect(() => {
+        // setFormDetails(prev => ({...prev , user_id: uid, phone_number: uid}))
+            
+        Pusher.logToConsole = true
+    
+        let pusher = new Pusher('b36bb776d85f37fdff66', {
+            cluster: 'ap2'            
+        })
+        
+        let channel1 = pusher.subscribe(`admin-channel`)
+            
+        channel1.bind(`message.new`, function (data,err) {
+            setChatMessage((prev) =>  [...prev, data.message])
+            setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
+            setSender(data.sender)
+        })     
+    
+    }, [])   
+
+    return (
+        <Card>
+            <Card.Header><h4 className="text-dark">Inbox</h4></Card.Header>            
+            <div style={{ minHeight: 120 }}>
+                {chatMessage.length > 0 && chatMessage.map((d,i) => {
+                    return (
+                        <Card.Body key={i} style={{ margin: 0, padding: 0 }}>                        
+                                <div key={i} className="d-flex align-items-end mb-4">
+                                    {sender === 'CustomerCareAgent' ? <FontAwesomeIcon 
+                                            icon={faHeadset} 
+                                            className="text-white bg-info p-2 rounded-circle" 
+                                            size='lg'
+                                            style={{ marginRight: 8 }}
+                                        /> : 
+                                        <FontAwesomeIcon 
+                                            icon={faUser} 
+                                            className="text-white bg-info p-2 rounded-circle" 
+                                            size='lg'
+                                            style={{ marginRight: 8 }}
+                                        />}
+                                        
+                                        <div className="w-100  ">
+                                        <small className="text-secondary phone">Admin</small>
+                                        <div className="bg-info rounded p-3 shadow-sm">
+                                        <span className="text-white">{d}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                          
+                        </Card.Body>                    )
+                    }
+                    )}  
+            </div> 
+                    <Card.Footer>
+                        <textarea onChange={handleText}  placeholder="Write message here..." className="form-control"></textarea>
+                        <button className="btn btn-primary" onClick={submitMessage}>Reply</button>
+                    </Card.Footer>             
         </Card>
     )
 }

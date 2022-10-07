@@ -1,10 +1,12 @@
-import { faBan, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faBan, faCheckCircle, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import { Modal } from "react-bootstrap";
 import  Card  from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import styled from "styled-components";
+import ChatBoxComponent from "../components/ChatBoxComponent";
 import { InputNumber, Small, Span } from "../components/Html";
 import MobileNavComponent from "../components/MobileNavComponent";
 import { FacebookIconSvg, MailSvgIcon, SendSvgIcon, TelegramSvgIcon, TwitterSvgIcon, WhatsAppSvgIcon } from "../components/Svg";
@@ -15,7 +17,7 @@ const StyleContact = styled.div`
     overflow: scroll;
     background: #fff;
     textarea {
-        min-height: 120px;
+        min-height: 60px;
     }
     .icon-width {
         width: 48px;    
@@ -37,144 +39,46 @@ const StyleContact = styled.div`
 `
 
 export default function Contact() {
-   
-    const inputRef = useRef(null)
-    const [formDetails, setFormDetails] = useState({
-        name: '',
-        phone_number: '',
-        betId: '',
-        message: ''
-    });
+    // const [message, setMessage] = useState([])
+    // const msg = new Set(message)
 
-    const { name, phone_number, betId, message } = formDetails
+    // useEffect(() => {
+    //     const userId = JSON.parse(localStorage.getItem('uu_id')).uu_id.id
 
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    //     window.addEventListener('load', (e) => {
+    //         Pusher.logToConsole = true
 
-    const [errors, setErrors] = useState([])
-
-    const handleForm = (e) => setFormDetails((prev) => ({...prev, [e.target.name] : e.target.value}))
-
-    const submitMessage = async (e) => {
-        e.preventDefault()
-        try {
-            const res = await axios.post('api/support', formDetails)
-            if(res.status === 200) {
-                setIsModalOpen(true)  
-            }  
-        } catch (error) {
-           if(error.status !== 422) {
-            console.log(error)
-                setErrors(Object.values(error?.response?.data?.errors).flat())
-            }
-        }
-
-    }
-
-    const closeErrors = () => {
-        setErrors([])
-    }
-
-    useEffect(() => {
-        inputRef.current.focus()
-    }, [])
-
+    //         let pusher = new Pusher('b36bb776d85f37fdff66', {
+    //             cluster: 'ap2'
+    //         })
+        
+    //         let channel1 = pusher.subscribe(`message-channel${userId}`)
+        
+    //         channel1.bind(`message.new`, function (data) {
+    //             setMessage(prev => ([...prev, data.message]))
+    //         }) 
+    //     })
+       
+    // }, [message])
     return (
-        <StyleContact>
-            <div className="h2-touch">
-                <h2>Get in touch</h2>
-            </div>
-            <Container>
-                <Card className="mt-2 border-0 shadow-sm">
-                    <Card.Header className="bg-info">
-                        <h3 className="text-dark">Leave us a message</h3>
-                    </Card.Header>
-                 
-                    <Card.Body className="bg-light border-0">
-                    {errors.length > 0 ? 
-                          <div className="alert alert-warning mt-2" role="alert">
-                            <Span className="d-flex align-items-center">
-                                <div className="align-items-center icon-width">
-                                    <FontAwesomeIcon icon={faBan} size="2x"/>
-                                </div>
-                                <div className="align-items-center">
-                                    <h6 className="fw-bold">Support Contact Failed</h6>
-                                    {errors[0]}
-                                </div>     
-                                <Small className="close-btn fw-bold" onClick={closeErrors}>X</Small>                           
-                            </Span>
-                         </div>
-                        : ''}
-
-                        <label htmlFor="name" className="mb-2">Your Name *</label>
-                        <input id="name" ref={inputRef} type="text" value={name} name="name" className="form-control mb-3" onChange={handleForm}/>
-
-                        <label htmlFor="phone_number" className="mb-2">Mobile Number *</label>
-                        <InputNumber id="phone_number" value={phone_number} name="phone_number" className="form-control mb-3" onChange={handleForm}/>
-
-                        <label htmlFor="betId" className="mb-2">Bet ID *</label>
-                        <input id="betId" type="text" value={betId} name="betId" className="form-control mb-3" onChange={handleForm}/>
-
-                        <label htmlFor="message" className="mb-2">How can we help you? *</label>
-                        <textarea id="message" name="message" value={message} className="form-control mb-3" onChange={handleForm}/>
-
-                        <label htmlFor="attachments"><small>Attachments (optional)</small></label>
-                        <small className="d-block">
-                            <i>Accepted formats: <b className="fw-bold">jpg, jpeg, png, pdf</b></i>
-                        </small>
-                        <input type="file" className="form-control mt-3 mb-3" disabled/>
-
-                        <div className="text-center">
-                            <button className="btn btn-primary" onClick={submitMessage} disabled={isModalOpen}>
-                                <SendSvgIcon width="16" height="16" style={{marginRight:4}}/>
-                                Send Message
-                            </button>
-                        </div>                   
-                       
-                    </Card.Body>
-                </Card>
-            </Container>
-
-            <Container className="mt-3">
-                <Card className="border-0 shadow-sm bg-light">
-                    <Card.Header className="bg-primary text-white">
-                        Chat with us via Social Media
-                    </Card.Header>
-                    <Card.Body>
-                        <div className="d-sm-flex justify-content-between p-1">
-                            <button className="btn">
-                                <FacebookIconSvg width="32" height="32" />
-                            </button>
-                            <button className="btn">
-                                <TwitterSvgIcon width="32" height="32" />
-                            </button>
-                            <button className="btn">
-                                <WhatsAppSvgIcon width="32" height="32"/>
-                            </button>
-                            <button className="btn">
-                                <TelegramSvgIcon width="32" height="32" />
-                            </button>
-                            <button className="btn">
-                                <MailSvgIcon width="32" height="32"/>
-                            </button>
-                        </div>                      
-                    </Card.Body>
-                </Card>
-            </Container>
-
+        <>
+           
+            <ChatBoxComponent />
             <MobileNavComponent/>
 
-            <ModalContainer isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
+            {/* <ModalContainer isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/> */}
 
-        </StyleContact>
+        </>
     )
 }
 
+
 const ModalContainer = ({ isModalOpen, setIsModalOpen }) => {
+    const router = useRouter()
 
     const closeModal = () => {
         setIsModalOpen(false)
-        // To fix later, clear input fields once data is submiteed
-        window.location.reload()
+        router.push('/messages')
     }
 
     return (

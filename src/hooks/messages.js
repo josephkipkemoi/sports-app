@@ -14,10 +14,14 @@ export const MessageApi = createApi({
         getUserMessageById: builder.query({
             query: (id) => `api/users/messages/show?id=${id}`
         }),
+        getAllUsersWhoMessagedAdmin: builder.query({
+            query: () => `api/users/messages/index`
+        }),
     })
 })
 
 export const {
     useGetAdminMessagesQuery,
     useGetUserMessageByIdQuery,
+    useGetAllUsersWhoMessagedAdminQuery,
 } = MessageApi
