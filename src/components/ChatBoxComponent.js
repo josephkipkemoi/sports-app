@@ -231,7 +231,8 @@ const ChatBoxElement = ({ setCustomMsg }) => {
                 key: 'b36bb776d85f37fdff66',
                 wsPort: 6001,
                 cluster: 'ap2',
-                forceTLS: true
+                forceTLS: true,
+                encrypted: true,
             })
 
             window.Echo.channel(`message-channel${userId}`)
