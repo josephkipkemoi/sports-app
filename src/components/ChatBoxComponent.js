@@ -8,6 +8,7 @@ import styled from "styled-components";
 import { FacebookIconSvg, MailSvgIcon, SendSvgIcon, TelegramSvgIcon, TwitterSvgIcon, WhatsAppSvgIcon } from "../components/Svg";
 import axios from "../lib/axios";
 import { Small, Span } from "./Html";
+import Echo from "laravel-echo";
 
 const StyleContact = styled.div`
     height: 100vh;
@@ -222,22 +223,18 @@ const ChatBoxElement = ({ setCustomMsg }) => {
         const userId = JSON.parse(localStorage.getItem('uu_id')).uu_id.id
 
         window.addEventListener('load', (e) => {
-            Pusher.logToConsole = true
 
-            let pusher = new Pusher('b36bb776d85f37fdff66', {
+            window.Echo = new Echo({
+                broadcaster: 'pusher',
+                key: 'b36bb776d85f37fdff66',
                 cluster: 'ap2'
             })
-        
-            let channel1 = pusher.subscribe(`message-channel${userId}`)
-        
-            channel1.bind('pusher:subscription_succeeded', function(data) {
-                setCustomMsg('Online')
+
+            window.Echo.channel(`message-channel${userId}`)
+                        .listen('.message.new', function(e){
+                    setChatMessage(prev => ([...prev, {message: e.message, sender: e.sender}]))
             })
 
-            channel1.bind(`message.new`, function (data) {
-                setChatMessage(prev => ([...prev, {message: data.message, sender: data.sender}]))
-                console.log(data)
-            }) 
         })
     }, [chatMessage, router.route])
 

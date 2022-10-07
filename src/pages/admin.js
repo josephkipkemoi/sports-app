@@ -28,6 +28,7 @@ import {
     useGetUserMessageByIdQuery } from "../hooks/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faHeadset } from "@fortawesome/free-solid-svg-icons";
+import Echo from "laravel-echo";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -663,23 +664,20 @@ const MessageComponent = () => {
         const res = await axios.post('api/admin/users/message', formDetails)
     }
 
-    useEffect(() => {
-        // setFormDetails(prev => ({...prev , user_id: uid, phone_number: uid}))
-            
-        Pusher.logToConsole = true
-    
-        let pusher = new Pusher('b36bb776d85f37fdff66', {
-            cluster: 'ap2'            
-        })
+    useEffect(() => {   
         
-        let channel1 = pusher.subscribe(`admin-channel`)
-            
-        channel1.bind(`message.new`, function (data,err) {
-            setChatMessage((prev) =>  [...prev, data.message])
-            setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
-            setSender(data.sender)
-            console.log(data)
-        })     
+        window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: 'b36bb776d85f37fdff66',
+            cluster: 'ap2'
+        })
+
+        window.Echo.channel(`admin-channel`)
+                    .listen('.message.new', function(data){
+                        setChatMessage((prev) =>  [...prev, data.message])
+                            setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
+                            setSender(data.sender)
+        })
     
     }, [])   
 
