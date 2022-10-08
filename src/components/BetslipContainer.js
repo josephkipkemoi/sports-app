@@ -1,7 +1,9 @@
 import React, {useState, useRef ,useEffect} from "react";
 import  { 
     faSoccerBall,
-    faRefresh
+    faRefresh,
+    faTimesCircle,
+    faCheckCircle
   }  from "@fortawesome/free-solid-svg-icons";
 import Spinner  from 'react-bootstrap/Spinner';
 import useSocialShare from '../hooks/socialShare';
@@ -288,7 +290,7 @@ const BetslipCartHeader = ({ length }) => {
       return (
         <div 
         className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-        style={{ backgroundColor: '#001041', color: '#fff', borderTopLeftRadius: '6px', borderTopRightRadius: '6px', marginBottom: '8px'}} 
+        style={{ backgroundColor: '#001041', color: '#fff', borderTopLeftRadius: '6px', borderTopRightRadius: '6px'}} 
         onClick={openMobileBetslip}
         slip="active"
         >
@@ -389,7 +391,7 @@ const CartElements = (link, i) => {
       
         return (
           <React.Fragment key={i}>  
-            <div style={{ paddingTop: '7px', paddingRight: '14px', paddingLeft: '14px'}}>
+            <div style={{   paddingRight: '14px', paddingLeft: '14px'}}>
               <div className='d-flex align-items-center justify-content-between'>
                 <div className='pt-2'>
                     <FontAwesomeIcon className="text-dark" icon={faSoccerBall} style={{ marginRight: '5px' }}/>
@@ -522,7 +524,7 @@ const CartElements = (link, i) => {
         fiveJackpotGames={fiveJackpotGames}
       /> 
     <StyleBetCart 
-    className='betcart-mb card bg-light shadow' 
+    className='betcart-mb card bg-light shadow pb-2' 
     >
         <ShareContainer 
         isModalOpen={modalOpen} 
@@ -893,10 +895,20 @@ const BetCartFormElements = ({ betData }) => {
       betData.forEach(n => res = res * n.betslip_odds )
   
       const linkBarRef = useRef();
-      const possibleWin = res * betAmount
-  
+      let possibleWin = res * betAmount
+      const deductions = possibleWin * configData.DEDUCTIONS_RATE
+      possibleWin = possibleWin - deductions
       return (
-          <div style={{ paddingTop: 0, paddingRight: '14px', paddingLeft: '14px', background: '#ebeded', paddingBottom: '4px' }}>
+          <div 
+          style={{ 
+            marginTop: 4,
+            paddingTop: 12, 
+            paddingRight: '14px', 
+            paddingLeft: '14px', 
+            background: '#ebeded', 
+            paddingBottom: '4px' 
+            }}
+          >
           {betData?.length !== 0 &&
            <div className='d-flex align-items-center justify-content-between'>
                 <Small>Total Odds:</Small>
@@ -909,8 +921,8 @@ const BetCartFormElements = ({ betData }) => {
           <UserBalanceElement />
            {betData?.length !== 0 &&
            <>
-           <div className='d-flex align-items-center justify-content-between'>
-            <Small>Amount (Kshs)</Small>
+           <div className='d-flex align-items-center justify-content-between mb-1'>
+            <Small>Amount (Kes)</Small>
             <div className='d-flex'>
               <button className='custom-sm-btn fw-bold btn btn-secondary text-light' onClick={decrementBetAmount}>-</button>
               <InputNumber 
@@ -928,20 +940,37 @@ const BetCartFormElements = ({ betData }) => {
             </div>
            
           </div>
+          <div className='d-flex align-items-center justify-content-between'>
+            <Small>Deductions (Kes):</Small>
+            <Small className="fw-bold">
+              {Number(deductions).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+            </Small>
+          </div>
            <div className='d-flex align-items-center justify-content-between mb-3'>
-              <Small>Possible Payout (Kshs):</Small>
-              <Small className='fw-bold text-warning'>
+              <Small>Possible Payout (Kes):</Small>
+              <Small className='fw-bold text-dark'>
                 {Number(possibleWin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
               </Small>
           </div>
-            <div className="d-flex mb-2">
-              <button 
+            <div className="d-flex mb-2">           
+                <button 
+                  className='btn btn-danger shadow-sm m-1 text-light w-100 d-flex justify-content-center align-items-center' 
+                  id="close-btn"
+                  onClick={() => removeBetslipCart()}
+                  style={{ letterSpacing: 1 }}
+                >      
+                <FontAwesomeIcon icon={faTimesCircle} style={{ marginRight: 6 }}/>          
+                  Clear Slip
+                </button>
+
+                <button 
                 ref={linkBarRef}      
                 disabled={loading || !uu_id.id}
-                className='btn btn-light shadow m-1 text-dark w-100 '
+                className='btn btn-light shadow-sm m-1 text-dark w-100 d-flex justify-content-center align-items-center'
                 style={{ letterSpacing: 1 }}
                 onClick={() => postBetslipCart()}
                 >
+                  <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 6 }} className="text-success"/> 
                   {loading ? 
                   <Spinner
                   animation="grow"
@@ -951,15 +980,6 @@ const BetCartFormElements = ({ betData }) => {
                           :
                   ''}             
                 {loading ? 'Loading...' : 'Place Bet'}
-                </button>
-
-                <button 
-                  className='btn btn-danger shadow m-1 text-light w-100' 
-                  id="close-btn"
-                  onClick={() => removeBetslipCart()}
-                  style={{ letterSpacing: 1 }}
-                >                
-                  Remove All
                 </button>
             </div>
             
@@ -979,16 +999,22 @@ const BetCartFormElements = ({ betData }) => {
 const BalanceModal = ({ isModalOpen, closeMenu }) => {
     return (
       <Modal show={isModalOpen} className="mt-5 pt-5">
-        <Modal.Body modalId="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
-           <Span modalId="modal-ref" className='fw-bold p-2 d-block mb-2' onClick={closeMenu} style={{ cursor: 'pointer', width: 32 }}>X</Span>  
-           <div className='m-3' modalId="modal-ref">
-            <span className='fw-bold d-block mb-2' modalId="modal-ref">Insufficient Funds</span>    
-            <span modalId="modal-ref" className='alert alert-danger d-block' style={{ padding: 5 }} >
+        <Modal.Body modalid="modal-ref" className="p-4" style={{ background: '#e4e4e4' }}>
+           <Span 
+           modalid="modal-ref" 
+           className='fw-bold p-2 d-block mb-2 float-end' 
+           onClick={closeMenu} style={{ cursor: 'pointer', width: 32 }}
+           >
+            X
+          </Span>  
+           <div className='m-3' modalid="modal-ref">
+            <span className='fw-bold d-block mb-2' modalid="modal-ref">Insufficient Funds</span>    
+            <span modalid="modal-ref" className='alert alert-danger d-block' style={{ padding: 5 }} >
               Your current balance is too low to place this bet. Deposit now.              
             </span>
             <div className='alert alert-secondary'>
               <p>|--- GO TO LIPA NA MPESA</p>     
-              <p>|--- ENTER PAYBILL BUSINESS NO.: <b>123123</b></p>
+              <p>|--- ENTER PAYBILL BUSINESS NO.: <code className="fw-bold" style={{ fontSize: '1.2rem' }}>{configData.MPESA_PAYBILL_NUMBER}</code></p>
               <p>|--- ENTER ACCOUNT NO.: <b>07XX-XXX-XXX</b></p>
               <p>|--- ENTER AMOUNT & SEND</p>
               <p>|--- ONCE YOU RECEIVE MPESA NOTIFICATION, GO AHEAD AND PLACE YOUR BET</p>
@@ -1017,7 +1043,7 @@ const UserBalanceElement = () => {
         <>
          { !!uu_id.id ? 
           <div className='d-flex align-items-center justify-content-between mb-1'>
-            <Small>Balance:</Small>
+            <Small>Balance (Kes):</Small>
             <Small className='fw-bold'>
               <FontAwesomeIcon 
               icon={faRefresh} 
@@ -1028,7 +1054,7 @@ const UserBalanceElement = () => {
                 paddingLeft: 8,
               }}
               />
-              KES {amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+               {amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Small>
           </div>
           : ''
