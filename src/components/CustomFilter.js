@@ -1,13 +1,11 @@
 import React, {useState} from "react";
 import styled from "styled-components";
-import  Row  from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import  Spinner  from "react-bootstrap/Spinner";
 import axios from "../lib/axios";
-import { Small } from "./Html";
 import GameComponent from './GameComponent';
 import  { 
   faSoccerBall,
+  faBars,
 }  from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -64,7 +62,7 @@ position: static;
      display: none;
   }
   .header-three {
-    width: 30px;
+    width: 60px;
   }
 }
  h5 {
@@ -112,41 +110,17 @@ export default function CustomFilter({ heading }) {
               </button>
             </StyleButton> 
           </div>
-          <div className="header-three">
+          <div className="d-flex align-items-center">
             <SearchComponent 
               onsubmit={onsubmit} 
               onchange={onchange} 
               customClass="search-comp"
-            />   
+            />  
+            <FontAwesomeIcon icon={faBars} className="text-white" size="lg" style={{ marginLeft: 8 }}/> 
           </div>
         </StyleCustomFilter>
       </div>
-       {/* <Row className="d-flex flex-row align-items-center p-2 card shadow-sm mb-2" style={{ backgroundColor: '#424242' }}>
-        <StyleCustomFilter className="row">
-          <Col lg={4} >
-            <h5 className='text-white fw-bold' style={{ letterSpacing: 1, margin: 0 }}>{heading}</h5>
-          </Col>
-          <Col lg={4} className="d-flex justify-content-center">
-            <StyleButton className='d-flex align-items-center'>
-            <button className='btn' onClick={() => window.print()}>
-              <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>
-            </button>        
-            <button className='background-none' onClick={() => refetch()}>
-              <i className="bi bi-arrow-clockwise p-1" style={{ color: '#ffffff' }}></i>
-              <small style={{ color: '#ffffff', letterSpacing: '1px' }}>Refresh</small>
-            </button>
-            </StyleButton>      
-          </Col>
-          <Col lg={4} className='d-flex justify-content-end'>    
-              <SearchComponent 
-              onsubmit={onsubmit} 
-              onchange={onchange} 
-              customClass="search-comp"
-              />    
-          </Col>
-        </StyleCustomFilter>
-      </Row>  
-   */}
+    
        {isSearchLoading ? <Spinner animation='grow' /> :  <SearchResults data={searchResults}/>}
   
       </>

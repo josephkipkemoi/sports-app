@@ -6,7 +6,8 @@ import axios from '../lib/axios';
 import styled from "styled-components";
 import AuthUser from "../hooks/AuthUser";
 import { useRouter } from "next/router";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 const StyleFavorites = styled.i`
   i {
     opacity: .8;
@@ -133,7 +134,8 @@ export default function GameComponent({ data }) {
  
     const MoreFixtureMarket = (name, i) => {
 
-      const OddsMarket = (odds, ii) => {        
+      const OddsMarket = (odds, ii) => {     
+ 
         return (
           <React.Fragment key={ii+i+odds.odd}>         
                 <div className='d-sm-flex m-1 btn btn-light btn-sm' style={{ width: '30%', padding: 0, margin: 0}}>               
@@ -174,7 +176,11 @@ export default function GameComponent({ data }) {
                 <small className=' mt-1' style={{ marginLeft: 10, letterSpacing: 2 }}>{name.name}</small>
               </div>
               <div className='d-flex justify-content-between flex-wrap'>
-                {name.values.map(OddsMarket)}
+                {name.values.map(OddsMarket)}    
+                {name.values.length % 3 !== 0 &&  
+                <button disabled className="btn btn-light m-1" style={{ width: '30%', padding: 0, margin: 0}}>
+                  <FontAwesomeIcon icon={faLock} />
+                </button>}            
               </div>   
         </React.Fragment>
       )

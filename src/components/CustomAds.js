@@ -29,7 +29,7 @@ export default function CustomAds() {
 const CarouselComponent = () => {
 
     return (
-         <Carousel controls={false} indicators={false} className="m-2 rounded">
+         <Carousel controls={false} indicators={false} className="pt-3 rounded">
             <Carousel.Item 
                 interval={2000} 
                 className="card border-0 shadow p-1 d-flex align-items-center rounded" 
