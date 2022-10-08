@@ -992,7 +992,7 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
 
     const handleLost = async () => {
         const res = await axios.patch('api/fixtures/carts')
-        console.log(res)
+        
     }
 
     return (
