@@ -7,7 +7,7 @@ import BetslipContainer from '../components/BetslipContainer';
 import CustomerInfo from '../components/CustomerInfo';
 import TopNavBar from "../components/TopNavBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSoccerBall } from '@fortawesome/free-solid-svg-icons'
+import { faTrophy } from '@fortawesome/free-solid-svg-icons'
 import { useGetJackpotFixturesQuery } from "../hooks/admin";
 import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 
@@ -102,6 +102,8 @@ export default function Jackpot() {
                             jackpot_prize={fiveMarket?.jackpot_prize}
                             games_count={FiveCount}
                         /> 
+
+                        <NoJackpotAvailable/>
                     </StyleJackpotContainer>                   
                 </Col>
                 <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0, height: '100vh', overflowY: 'scroll', overflowX: 'hidden' }}>
@@ -121,8 +123,9 @@ export default function Jackpot() {
 
 const NoJackpotAvailable = () => {
     return (
-        <div className="text-center mt-5 text-dark p-5">
-            <span>Coming Soon!</span>
+        <div className="text-center mt-5 text-dark p-5 ">
+            <FontAwesomeIcon icon={faTrophy} size="10x" className="text-success"/>
+            <h4 className="mt-3">Coming Soon!</h4>
         </div>
     )
 }
@@ -231,7 +234,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
     }
     return (
         <>
-          {data.length > 0 ? 
+          {/* {data.length > 0 ? 
             <Row className="p-3" style={{ padding: 0, margin: 0 }}>              
             <div 
             className="d-flex align-items-center justify-content-between text-white p-3 bg-dark rounded shadow-sm mb-3"
@@ -260,7 +263,8 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
             </div>
             {data.map(JackpotItems)}
         </Row>
-          : <NoJackpotAvailable/>}
+          : <NoJackpotAvailable/>} */}
+    
         </>          
     )
 }
