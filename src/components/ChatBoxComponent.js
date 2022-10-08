@@ -224,7 +224,7 @@ const ChatBoxElement = ({ setCustomMsg }) => {
 
         window.addEventListener('load', (e) => {
 
-            // Pusher.logToConsole = true
+            Pusher.logToConsole = true
             window.Echo = new Echo({
                 broadcaster: 'pusher',
                 wsHost: window.location.hostname,
