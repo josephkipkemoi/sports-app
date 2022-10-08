@@ -990,8 +990,19 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
         }
     }
 
+    const handleLost = async () => {
+        const res = await axios.patch('api/fixtures/carts')
+        console.log(res)
+    }
+
     return (
         <div className="p-3 card mt-2 bg-danger shadow-lg">
+            <Card className="mb-2">
+                <Card.Body>
+                 <button className="btn btn-danger" onClick={handleLost}>Update Lost
+                    </button>
+                </Card.Body>
+            </Card>
             <FixturesElement 
             postFixtureIds={postFixtureIds}
             postFixtureOdds={postFixtureOdds}
