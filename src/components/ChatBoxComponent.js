@@ -233,7 +233,7 @@ const ChatBoxElement = ({ setCustomMsg }) => {
                 forceTLS: true,
                 encrypted: true,
                 enableTransports: ['ws', 'wss'],
-                disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming'],
+                // disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming'],
                 // wssPort: '' Https port
             })
 
