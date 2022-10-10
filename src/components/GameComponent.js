@@ -176,13 +176,13 @@ export default function GameComponent({ data }) {
                 <small className=' mt-1' style={{ marginLeft: 10, letterSpacing: 2 }}>{name.name}</small>
               </div>
               <div className='d-flex justify-content-between flex-wrap'>
-                {name.values.map(OddsMarket)}    
+                {name.values.map(OddsMarket)}   
                 {name.values.length % 3 !== 0 &&  
                 <button disabled className="btn btn-light m-1" style={{ width: '30%', padding: 0, margin: 0}}>
                   <FontAwesomeIcon icon={faLock} />
                 </button>}            
               </div>   
-        </React.Fragment>
+        </React.Fragment> 
       )
     }
 
@@ -231,7 +231,7 @@ export default function GameComponent({ data }) {
  
     return (
       <StyleGameComponent>
-         <Row className="custom-grid">  
+         <Row className="custom-grid">     
         {data.map((innerData,index) => {
           const oddsData = JSON.parse(innerData.odds)
  
@@ -280,7 +280,7 @@ export default function GameComponent({ data }) {
               </Row>                     
             </Col>
             <Col lg={4} sm={4} className="card d-flex flex-row active-btn" style={{ background: '#fff', borderLeft: '0px', border: 'none' }}>
-                
+               
               {oddsData?.map((odd) => {         
    
                 return odd.id === 1 && odd.values.map((val, i) => {
@@ -299,6 +299,7 @@ export default function GameComponent({ data }) {
                             picked={val.value}
                             fixtureid={innerData.fixture_id}
                             onClick={sendBetslip}  
+                            disabled={!innerData.fixture_active}
                           >
                             {val.odd}                  
                           </button>   

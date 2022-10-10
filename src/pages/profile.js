@@ -1,6 +1,6 @@
 import Link from "next/link"
 import React, { useEffect, useRef, useState } from "react"
-import { Button, Container, Spinner } from "react-bootstrap"
+import { Button, Card, Container, Spinner } from "react-bootstrap"
 import styled from "styled-components"
 import useAuth from "../hooks/auth"
 import { useGetBalanceByUserIdQuery } from "../hooks/balance"
@@ -22,6 +22,7 @@ import { withProtected } from "../hooks/RouteProtection"
 import MobileNavComponent from "../components/MobileNavComponent"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faRefresh } from "@fortawesome/free-solid-svg-icons"
+import Image from "next/image"
 
 const StyleProfile = styled.div`
     background-color: #fff;
@@ -197,6 +198,109 @@ const BalanceComponent = () => {
 
 const DepositComponent = () => {
 
+    return (
+        <div className="shadow-sm p-4 mb-4 bg-light">
+            <h5>Deposit</h5>        
+            <DepositOptionsComponent/>
+        </div>
+    )
+}
+
+const DepositOptionsComponent = () => {
+
+    const [depositContainer, setDepositContainer] = useState(config.MPESA_DEPOSIT_OPTION)
+
+    const handleClick = (e) => {
+        setDepositContainer(e.target.textContent)
+    }
+
+    return (
+        <>
+            <nav className="d-sm-flex">
+                <button 
+                className=
+                {` btn  ${depositContainer === config.MPESA_DEPOSIT_OPTION ? 'rounded-pill btn-success shadow' : 'rounded btn-primary'} m-1`} 
+                onClick={handleClick}
+                >                   
+                    {config.MPESA_DEPOSIT_OPTION}
+                </button>
+                <button 
+                className=
+                {`btn  ${depositContainer === config.AIRTEL_DEPOSIT_OPTION ? 'rounded-pill btn-secondary shadow' : 'rounded btn-primary'} m-1`} 
+                onClick={handleClick}
+                >
+                    {config.AIRTEL_DEPOSIT_OPTION}
+                </button>
+                <button 
+                className=
+                {`btn  ${depositContainer === config.PAYPALL_DEPOSIT_OPTION ? 'rounded-pill btn-success shadow' : 'rounded btn-primary'} m-1`} 
+                onClick={handleClick}
+                >
+                    {config.PAYPALL_DEPOSIT_OPTION}
+                </button>
+                <button 
+                className=
+                {`btn  ${depositContainer === config.BITCOIN_DEPOSIT_OPTION ? 'rounded-pill btn-warning shadow' : 'rounded btn-primary'} m-1`} 
+                onClick={handleClick}
+                >
+                    {config.BITCOIN_DEPOSIT_OPTION}
+                </button>
+                <button 
+                className=
+                {`btn  ${depositContainer === config.BEYONIC_DEPOSIT_OPTION ? 'rounded-pill btn-dark shadow' : 'rounded btn-primary'} m-1`} 
+                onClick={handleClick}
+                >
+                    {config.BEYONIC_DEPOSIT_OPTION}
+                </button>
+            </nav>
+            {depositContainer === config.MPESA_DEPOSIT_OPTION ?  <MpesaDeposit/> : <ComingSoonPaymentsComponent option={depositContainer} />}
+           
+        </>
+    )
+}
+
+const ComingSoonPaymentsComponent = ({ option }) => {
+    return (
+        <Card className="border-0 shadow mt-3 rounded ">
+            <Card.Header 
+            className=
+            { `${option === config.AIRTEL_DEPOSIT_OPTION && 'bg-danger text-white'}
+            ${option === config.PAYPALL_DEPOSIT_OPTION && 'bg-success text-white'}
+            ${option === config.BITCOIN_DEPOSIT_OPTION && 'bg-warning text-dark'}
+            ${option === config.BEYONIC_DEPOSIT_OPTION && 'bg-dark text-white'}
+                text-center`}
+            >
+                <h1 style={{ margin: 0, padding: 0 }}>{option}</h1>
+            </Card.Header>
+            <Card.Body className="d-flex justify-content-center flex-column align-items-center">
+            <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="64" 
+            height="64" 
+            fill="currentColor" 
+            className="bi bi-hourglass-bottom" 
+            viewBox="0 0 16 16"
+            >
+                <path d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5zm2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702s.18.149.5.149.5-.15.5-.15v-.7c0-.701.478-1.236 1.011-1.492A3.5 3.5 0 0 0 11.5 3V2h-7z"/>
+            </svg>
+               
+            </Card.Body>
+            <Card.Footer 
+            className=
+            { `
+            ${option === config.AIRTEL_DEPOSIT_OPTION && 'bg-danger text-white'} 
+            ${option === config.PAYPALL_DEPOSIT_OPTION && 'bg-success text-white'}
+            ${option === config.BITCOIN_DEPOSIT_OPTION && 'bg-warning text-dark'}
+            ${option === config.BEYONIC_DEPOSIT_OPTION && 'bg-dark text-white'}
+            text-center`}
+            >
+                <h2>COMING SOON</h2>
+            </Card.Footer>
+        </Card>
+    )
+}
+
+const MpesaDeposit = () => {
     const [authToken, setAuthToken] = useState('')
 
     const { uu_id } = AuthUser()
@@ -252,14 +356,10 @@ const DepositComponent = () => {
             setTimeout(() => {
                 setDepositLoading(false)
             }, 3000)
-          
-
            }
         }
     
     }
-
-    const enableDepositButton = () => setDepositLoading(false)
 
     const mpesaAuth = async () => {
         const res = await axios.get('api/mpesa/auth')
@@ -270,70 +370,80 @@ const DepositComponent = () => {
         return res
     }
 
+    const enableDepositButton = () => setDepositLoading(false)
+
     useEffect(() => {
-        mpesaAuth()        
- 
+        mpesaAuth()         
     }, [])
 
+
     return (
-        <div className="shadow-sm p-4 mb-4 bg-light">
-            <h5>Deposit</h5>
-            <Span className="d-block">Send money into your {APP_NAME} account</Span>
-            <button 
-            inc={configData.INCREMENT_DEPOSIT_100} 
-            onClick={incrementDepositAmount} modalid="modal-ref" 
-            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
-            >
-              + {configData.INCREMENT_DEPOSIT_100}
-            </button>       
-            <button 
-            inc={configData.INCREMENT_DEPOSIT_250} 
-            modalid="modal-ref" 
-            onClick={incrementDepositAmount} 
-            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
-            >
-              + {configData.INCREMENT_DEPOSIT_250}
-            </button>       
-            <button 
-            inc={configData.INCREMENT_DEPOSIT_500} 
-            modalid="modal-ref" 
-            onClick={incrementDepositAmount} 
-            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
-            >
-              + {configData.INCREMENT_DEPOSIT_500}
-            </button>       
-            <button 
-            inc={configData.INCREMENT_DEPOSIT_1000} 
-            modalid="modal-ref" 
-            onClick={incrementDepositAmount} 
-            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
-            >
-              + {configData.INCREMENT_DEPOSIT_1000}
-            </button>      
-            <button 
-            inc={configData.INCREMENT_DEPOSIT_5000} 
-            modalid="modal-ref" onClick={incrementDepositAmount} 
-            className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
-            >
-              + {configData.INCREMENT_DEPOSIT_5000}
-            </button>   
-            {depositLoading ? <Small className="d-block text-danger">
-                Check Mpesa prompt and proceed
-            </Small> : ''}  
+        <Card className="border-0 shadow mt-3 rounded">
+            <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
+                <Image src="https://www.pinaclebet.com/mpesa.jpeg" width={72} height={72} />
+            </Card.Header>
+            <Card.Body style={{ paddingTop: 0 }}>
+                <Span className="d-block">Send money into your {APP_NAME} account</Span>
+                <button 
+                inc={configData.INCREMENT_DEPOSIT_100} 
+                onClick={incrementDepositAmount} modalid="modal-ref" 
+                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                >
+                + {configData.INCREMENT_DEPOSIT_100}
+                </button>       
+                <button 
+                inc={configData.INCREMENT_DEPOSIT_250} 
+                modalid="modal-ref" 
+                onClick={incrementDepositAmount} 
+                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                >
+                + {configData.INCREMENT_DEPOSIT_250}
+                </button>       
+                <button 
+                inc={configData.INCREMENT_DEPOSIT_500} 
+                modalid="modal-ref" 
+                onClick={incrementDepositAmount} 
+                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                >
+                + {configData.INCREMENT_DEPOSIT_500}
+                </button>       
+                <button 
+                inc={configData.INCREMENT_DEPOSIT_1000} 
+                modalid="modal-ref" 
+                onClick={incrementDepositAmount} 
+                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                >
+                + {configData.INCREMENT_DEPOSIT_1000}
+                </button>      
+                <button 
+                inc={configData.INCREMENT_DEPOSIT_5000} 
+                modalid="modal-ref" onClick={incrementDepositAmount} 
+                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                >
+                + {configData.INCREMENT_DEPOSIT_5000}
+                </button>   
+                {depositLoading ? <Small className="d-block text-danger">
+                    Check Mpesa prompt and proceed
+                </Small> : ''}  
+            
+                <InputNumber 
+                    className="d-block form-control p-3" 
+                    placeholder={depositAmount}
+                    onChange={updateDepositAmount}
+                />
+                <Small className="d-block text-danger">
+                    Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                </Small>
           
-            <InputNumber 
-            className="d-block form-control p-3" 
-            placeholder={depositAmount}
-            onChange={updateDepositAmount}
-            />
-            <Small className="d-block text-danger">
-                Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </Small>
-      
-            <Button variant="warning" onClick={deposit} disabled={depositLoading || true}>
-                { depositLoading ? 'Loading...' : 'Deposit'}
-            </Button>
-        </div>
+            </Card.Body>
+            <Card.Footer>
+                <div className="text-center">
+                    <Button variant="warning" onClick={deposit} disabled={depositLoading || true}>
+                        { depositLoading ? 'Loading...' : 'Deposit'}
+                    </Button>
+                </div>
+            </Card.Footer>
+        </Card>
     )
 }
 
