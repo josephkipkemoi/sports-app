@@ -959,7 +959,7 @@ const BetCartFormElements = ({ betData }) => {
                   onClick={() => removeBetslipCart()}
                   style={{ letterSpacing: 1 }}
                 >      
-                <FontAwesomeIcon icon={faTimesCircle} style={{ marginRight: 6 }}/>          
+                <FontAwesomeIcon size="xl" icon={faTimesCircle} style={{ marginRight: 6 }}/>          
                   Clear Slip
                 </button>
 
@@ -970,7 +970,7 @@ const BetCartFormElements = ({ betData }) => {
                 style={{ letterSpacing: 1 }}
                 onClick={() => postBetslipCart()}
                 >
-                  <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 6 }} className="text-success"/> 
+                  <FontAwesomeIcon icon={faCheckCircle} size="xl" style={{ marginRight: 6 }} className="text-success"/> 
                   {loading ? 
                   <Spinner
                   animation="grow"

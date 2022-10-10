@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRefresh,faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faRefresh,faTimesCircle, faCancel } from '@fortawesome/free-solid-svg-icons';
 import  ProgressBar  from 'react-bootstrap/ProgressBar';
 import  Modal  from 'react-bootstrap/Modal';
 
@@ -39,5 +39,19 @@ export const AlertModalElement = ({ closeModal, isModalOpen, action, cartId, pri
                 </div>              
             </Modal.Body>
         </Modal>
+    )
+}
+
+export const ErrorElement = ({ message }) => {
+    return (
+        <div className='text-center bg-danger p-3 rounded shadow-sm text-white'>
+            <FontAwesomeIcon icon={faCancel} size="5x" />
+            <h2 className='m-3'>
+                Error
+            </h2>
+            <h3>
+                {message}
+            </h3>
+        </div>
     )
 }

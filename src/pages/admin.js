@@ -22,12 +22,12 @@ import { PhoneSvgIcon } from "../components/Svg";
 import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 import { Modal } from "react-bootstrap";
 import { useGetFixtureIdsWhereOddsNullQuery } from "../hooks/fixture";
-import { ProgressBarElement } from "../components/HtmlElements";
+import { AlertModalElement, ErrorElement, ProgressBarElement } from "../components/HtmlElements";
 import {  
     useGetAllUsersWhoMessagedAdminQuery, 
     useGetUserMessageByIdQuery } from "../hooks/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHeadset } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faHeadset, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import Echo from "laravel-echo";
 
 const StyledAdmin = styled.div`
@@ -126,7 +126,7 @@ export default function Admin() {
                 {adminLinks.map(AdminLinkItems)}
             </nav>}
        
-
+            <div style={{ height: '100vh' }}>
             {tab === 'fixtures' && 
              <FixturesComponent 
              postFixtureIds={postFixtureIds}
@@ -141,6 +141,8 @@ export default function Admin() {
             {tab === 'feedback' && <CustomerFeedback/>}
             {tab === 'jackpot' && <JackpotComponent/>}
             {tab === 'live' && <LiveGamesComponent/>}
+            </div>
+         
         </StyledAdmin>
     )
 }
@@ -796,40 +798,55 @@ const UsersProfileComponent = () => {
         const user_id = e.user_id
         setUserId(user_id)
     }
-
+ 
     return (
-        <Card className="mt-2 bg-danger ">
-                <Card.Body className="bg-light rounded ">
+        <Card className="mt-2 bg-danger">
+                <Card.Body className="bg-light rounded">
                     <div className="d-sm-flex">
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-primary text-white">Users</Card.Header>
-                            <Card.Body><h4>{data.users.length}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 rounded bg-primary">
+                            <Card.Header className="bg-primary text-white rounded border-0 m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Users</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-primary text-white rounded"><h1>{data.users.length}</h1></Card.Body>
                         </Card>                    
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-success text-white">Average</Card.Header>
-                            <Card.Body><h4>{Number(data.avg).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-success rounded">
+                            <Card.Header className="bg-success text-white m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Average</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-success text-white rounded"><h1>Kes {Number(data.avg).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-dark text-white">Pending</Card.Header>
-                            <Card.Body><h4>{Number(data.notPlaced).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-dark">
+                            <Card.Header className="bg-dark text-white  m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Pending</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-dark text-white rounded"><h1>Kes {Number(data.notPlaced).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-warning text-dark">Total Amount</Card.Header>
-                            <Card.Body><h4>{Number(data.wagers).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-warning">
+                            <Card.Header className="bg-warning text-white  m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Total Amount</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-warning text-white rounded"><h1>Kes {Number(data.wagers).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-danger text-white">Grand Total</Card.Header>
-                            <Card.Body><h4>{Number(data.grandTotal).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-danger">
+                            <Card.Header className="bg-danger text-white  m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Grand Total</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-danger text-white rounded"><h1>Kes {Number(data.grandTotal).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
                     </div>
-                    <Row className="shadow m-2 p-2 rounded mx-auto">                        
+                    <Row className="shadow-sm m-2 p-2 rounded mx-auto">                        
                         <Col sm="12" md="3" lg="3" className="p-3">               
                             <button className="btn btn-primary m-2" onClick={refetch}>Reload</button>                                 
                             <h5 className="text-dark fw-bold">Select User</h5>
                             <Select options={options} className="text-dark" onChange={selectUser}/>    
                         </Col>
                         <Col sm="12" md="9" lg="8" className="shadow m-2 p-3">
-                            <UserProfileElement user_id={userId}/>
+                            <UserProfileElement user_id={userId} refetchData={refetch}/>
                         </Col>
                     </Row>
                 </Card.Body> 
@@ -918,36 +935,54 @@ const UserBetHistoryElement = ({ data }) => {
         )
     }
     return (
-        <>
-            <h4 className="text-dark fw-bold mb-3">Bet History</h4>
-            <table className="table ">
-                <thead className="thead-dark">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Odds</th>
-                        <th scope="col">Payout</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Change Status</th>
-                        <th scope="col">Update Status</th>
-                        <th scope="col">Outcome</th>
-                        <th scope="col">Update Outcome</th>
-                    </tr>
-                </thead>
-                <tbody >
-                    {data.map(BetHistoryElements)}
-                </tbody>
-            </table>
-        </>
+        <Card className="border-0">
+            <Card.Header className="bg-dark text-white">
+                <h4 className="fw-bold">Bet History</h4>
+            </Card.Header>
+            <Card.Body>
+                <table className="table bg-primary rounded shadow text-white">
+                    <thead className="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Odds</th>
+                            <th scope="col">Payout</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Change Status</th>
+                            <th scope="col">Update Status</th>
+                            <th scope="col">Outcome</th>
+                            <th scope="col">Update Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        {data.map(BetHistoryElements)}
+                    </tbody>
+                </table>
+            </Card.Body>         
+        </Card>
     )
 }
 
-const UserProfileElement = ({ user_id }) => {
+const StyleUserElement = styled.div`
+    h4 {
+        margin: 0;
+        padding: 0;
+    }
+    h5 {
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        font-weight: bold; 
+    }
+`
 
-        const { data, error, isLoading } = useGetAdminUserBalanceByIdQuery(user_id)
+const UserProfileElement = ({ user_id, refetchData }) => {
+  
+        const { data, error, isLoading, refetch } = useGetAdminUserBalanceByIdQuery(user_id)
         const userBalance = useGetBalanceByUserIdQuery(user_id)
         const [newUserBalance, setNewUserBalance] = useState(0)
         const [isBalanceUpdated, setIsBalanceUpdated] = useState(false)
+        const [isModalOpen, setIsModalOpen] = useState(false)
         // const [newNum, setNewNum] = useState('')
 
         if(isLoading) { 
@@ -955,7 +990,7 @@ const UserProfileElement = ({ user_id }) => {
         }
     
         if(error) {
-            return <span>Error</span>
+            return <ErrorElement message="Select User to Continue"/>
         }
  
         const { user_profile, history_profile } = data
@@ -970,6 +1005,12 @@ const UserProfileElement = ({ user_id }) => {
 
             if(res.status === 200) {
                 setIsBalanceUpdated(true)
+                userBalance.refetch()
+                setNewUserBalance(0)
+                setTimeout(() => {
+                    setIsBalanceUpdated(false)
+                }, 1000)
+             
             }
         }
 
@@ -984,45 +1025,100 @@ const UserProfileElement = ({ user_id }) => {
         //     })
         //     console.log(res)
         // }
+        const handleRemove = () => {
+            setIsModalOpen(true)
+        }
 
+        const closeModal = () => {
+            setIsModalOpen(false)
+        }
+
+        const removeUser = async (i) => {
+           const res = await axios.delete(`api/admin/users/delete?id=${i}`)
+ 
+           if(res.status === 200) {
+            refetchData()
+            closeModal()
+           }
+        }
+
+     
         return (
-            <>
-            <h4 className="text-dark fw-bold mb-3">User Profile</h4>
+            <StyleUserElement className="card border-0">
+                <Card.Header className="pb-0 mb-0 bg-dark">
+                    <h4 className="text-white fw-bold mb-3" style={{ margin: 0, padding: 0 }}>User Profile</h4>
+                </Card.Header>
+                <Card.Body className="row gy-2 gx-2">
+                    <Col lg={6} md={6} sm={12} className="bg-secondary p-3 rounded shadow">
+                        <div className="d-flex flex-column align-items-center justify-content-between">
                             <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="32" 
-                            height="32" 
-                            fill="currentColor" 
-                            className="bi bi-person-circle text-dark mb-3" 
-                            viewBox="0 0 16 16"
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="64" 
+                                height="64" 
+                                fill="currentColor" 
+                                className="bi bi-person-circle text-white mb-3" 
+                                viewBox="0 0 16 16"
                             >
                                 <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                                 <path fillRule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                             </svg> 
-                            <div className="text-dark d-flex flex-column ">
-                                <span className="mb-3">Residence: {country_residence}</span>
-                                <span className="mb-3">Number: {phone_number}</span>
-                                {/* <div>
-                                    <InputNumber onChange={(e) => setNewNum(e.target.value)} className="form-control" placeholder="New Number" />
-                                    <button className="btn btn-primary" onClick={handleUserUpdate}>Update</button>
-                                </div>                              */}
-                                <span className="mb-3">Email: {email}</span>
-                                <div className="d-flex align-items-center mb-3">
-                                    <label htmlFor="balance">Balance: </label>
-                                    <InputNumber 
+                            <h5 className="m-1">Number: {phone_number}</h5>
+                            <h5 className="m-1">Current Balance Kes: {userBalance?.data?.amount}</h5>
+                            <h5 className="m-1">
+                                Total Kes: {Number(data.total_donation).toLocaleString(undefined)}
+                            </h5>
+                        </div>
+                    </Col>
+                    <Col lg={6} md={6} sm={12} className="bg-light">
+                    <div className="bg-dark p-3 rounded shadow d-flex flex-column">
+                        <div className="text-center bg-dark rounded">
+                            <button className="btn btn-danger m-2" onClick={handleRemove}>
+                                <FontAwesomeIcon icon={faBan} style={{ marginRight: 8 }}/>
+                                Remove User
+                            </button>
+                            <button className="btn btn-danger m-2" onClick={() => refetch()}>
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
+                                Update History
+                            </button>
+                        </div> 
+                    <hr className="text-light"/>
+                        <div className="text-dark d-flex flex-column align-items-center">
+                            <label htmlFor="balance" className="text-white">Balance: </label>
+                            <div className="d-flex align-items-center mb-3">
+                                <InputNumber 
                                     id="balance" 
-                                    className="form-control" 
-                                    placeholder={userBalance?.data?.amount} 
+                                    className="form-control d-block w-100" 
+                                    placeholder={0} 
                                     style={{ maxWidth: 120 }}
                                     onChange={changeBalance}
-                                    />
-                                    <button className="btn btn-danger" onClick={updateBalance}>
-                                      {isBalanceUpdated ? 'Updated' : 'Update'}  
-                                    </button>
-                                </div>                         
-                            </div>   
-                            <UserBetHistoryElement data={history_profile}/>
-            </>
+                                    value={newUserBalance}
+                                />                                 
+                            </div>
+                            <button className="btn btn-light" onClick={updateBalance}>
+                                {isBalanceUpdated ?  
+                                <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 8 }}/> :
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
+                               
+                                {isBalanceUpdated ? 'Balance Updated' : 'Update Balance'}  
+                            </button>                     
+                        </div>  
+                     </div>
+                    </Col>
+                </Card.Body>
+               
+                <UserBetHistoryElement data={history_profile}/>                            
+                
+                <AlertModalElement
+                    isModalOpen={isModalOpen}
+                    closeModal={closeModal}
+                    primaryMessage="Are you sure you want to delete this user"
+                    secondaryMessage="This action CANNOT be undone!"
+                    submitBtnText="Delete"
+                    cancelBtnText="Cancel"
+                    cartId={user_id}
+                    action={removeUser}
+                />
+            </StyleUserElement>
         )
 }
 
