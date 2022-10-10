@@ -504,12 +504,14 @@ const CustomerFeedback = () => {
     if(error) {
         return <span>Error</span>
     }
-    useEffect(() => {
-        // setUserId(JSON.parse(localStorage.getItem('uu_id')).uu_id.id)
-    }, [])
+
     if(isLoading) {
         return <Spinner animation="grow"/>
     }
+    // useEffect(() => {
+        // setUserId(JSON.parse(localStorage.getItem('uu_id')).uu_id.id)
+    // }, [])
+   
 
     const handleInput = (e) => {
         setMessage(e.target.value)
@@ -532,8 +534,7 @@ const CustomerFeedback = () => {
             <React.Fragment key={i}>
                 <div className=" m-1 d-flex flex-row">                    
                     <PhoneSvgIcon width="16" height="16"/>
-                    <p>{link.message}</p>
-                        {/* <small className="text-dark">
+                        <small className="text-dark">
                             {link.phone_number}
                         </small>
                                                    
@@ -548,7 +549,7 @@ const CustomerFeedback = () => {
                         <div>
                             <textarea className="form-control" onChange={handleInput}/>
                             <button className="btn btn-primary" onClick={() => submitMessage(link.message, link.phone_number)}>Reply</button>
-                        </div> */}
+                        </div>
                 </div>    
                 <hr/>        
             </React.Fragment>
@@ -592,6 +593,7 @@ const CustomerFeedback = () => {
                     {/* <Col> */}
 
                     {/* </Col> */}
+                    {/* {data.map(MessageItems)} */}
                 </Row>
             </Card.Body>
         </Card>
@@ -599,6 +601,9 @@ const CustomerFeedback = () => {
 }
 
 const UsersContactCustomerCare = () => {
+
+    const [userNum, setUserNum] = useState(null)
+    const [userId, setUserId] = useState(null)
 
     const { data, isLoading, error, refetch } = useGetAllUsersWhoMessagedAdminQuery()
 
@@ -617,6 +622,10 @@ const UsersContactCustomerCare = () => {
             <div 
                 key={i} 
                 className={`d-flex justify-content-between align-items-center btn btn-light p-2 m-1 rounded-pill`}
+                onClick={() => {
+                    setUserNum(n.phone_number)
+                    setUserId(n.id)
+                }}
             >
                 <FontAwesomeIcon 
                 icon={faUser} 
@@ -639,56 +648,95 @@ const UsersContactCustomerCare = () => {
                         {data.data.map(UsersElements)}
                     </div>
                 </Col>       
-                <Col lg={9} md={8} sm={8}>
-                    <MessageComponent />
+                <Col lg={9} md={8} sm={8}>  
+                    <MessageComponent user={userNum} id={userId}/>
                 </Col>
         </>
     )
 }
 
-const MessageComponent = () => {
+const MessageComponent = ({ user, id }) => {
     const [chatMessage, setChatMessage] = useState([])
     const [sender, setSender] = useState('')
 
     const [formDetails, setFormDetails] = useState({
         message: '',
-        user_id: '',
-        phone_number: ''
+        user_id: user,
+        phone_number: user
     })
 
+    const {data, error, isLoading, refetch } = useGetUserMessageByIdQuery(user)
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+   
     const handleText = (e) => {
-        setFormDetails(prev => ({...prev, message : e.target.value }))
+        setFormDetails(prev => ({...prev, message : e.target.value, user_id: id, phone_number: user }))
     }
 
     const submitMessage = async () => {
+        console.log(formDetails)
         const res = await axios.post('api/admin/users/message', formDetails)
     }
 
-    useEffect(() => {   
+    const MessageItems = (link, i) => {
+ 
+        return (
+           <React.Fragment key={i}>
+               <div className=" m-1 d-flex flex-row">                    
+                   <PhoneSvgIcon width="16" height="16"/>
+                       <small className="text-dark">
+                           {link.phone_number}
+                       </small>
+                                                  
+                      <div id="example-collapse-text" className="card p-2 shadow" style={{ marginLeft: 15 }}>
+                           <span>
+                               {link.name} | {link.email}
+                           </span> 
+                           <p>
+                               {link.message}
+                           </p> 
+                       </div>
+                       {/* <div>
+                           <textarea className="form-control" onChange={'handleInput'}/>
+                           <button className="btn btn-primary" onClick={() => submitMessage(link.message, link.phone_number)}>Reply</button>
+                       </div> */}
+               </div>    
+               <hr/>        
+           </React.Fragment>
+       )
+   }
+
+    // useEffect(() => {   
         
-        window.Echo = new Echo({
-            broadcaster: 'pusher',
-            key: 'b36bb776d85f37fdff66',
-            cluster: 'ap2'
-        })
+    //     window.Echo = new Echo({
+    //         broadcaster: 'pusher',
+    //         key: 'b36bb776d85f37fdff66',
+    //         cluster: 'ap2'
+    //     })
 
-        window.Echo.channel(`admin-channel`)
-                    .listen('.message.new', function(data){
-                        setChatMessage((prev) =>  [...prev, data.message])
-                            setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
-                            setSender(data.sender)
-        })
+    //     window.Echo.channel(`admin-channel`)
+    //                 .listen('.message.new', function(data){
+    //                     setChatMessage((prev) =>  [...prev, data.message])
+    //                         setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
+    //                         setSender(data.sender)
+    //     })
+    // setFormDetails(prev => ({...prev, phone_number: user }))
+    // }, [])   
+
+    if(isLoading) {
+        return <Spinner animation="grow"/>
+    }
     
-    }, [])   
-
     return (
         <Card>
             <Card.Header><h4 className="text-dark">Inbox</h4></Card.Header>            
             <div style={{ minHeight: 120 }}>
-                {chatMessage.length > 0 && chatMessage.map((d,i) => {
-                    return (
-                        <Card.Body key={i} style={{ margin: 0, padding: 0 }}>                        
-                                <div key={i} className="d-flex align-items-end mb-4">
+       
+                        <Card.Body  style={{ margin: 0, padding: 0 }}>                        
+                                {/* <div key={i} className="d-flex align-items-end mb-4">
                                     {sender === 'CustomerCareAgent' ? <FontAwesomeIcon 
                                             icon={faHeadset} 
                                             className="text-white bg-info p-2 rounded-circle" 
@@ -708,11 +756,11 @@ const MessageComponent = () => {
                                         <span className="text-white">{d}</span>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
+                                {data.map(MessageItems)}
                           
-                        </Card.Body>                    )
-                    }
-                    )}  
+                        </Card.Body>                    
+            
             </div> 
                     <Card.Footer>
                         <textarea onChange={handleText}  placeholder="Write message here..." className="form-control"></textarea>
