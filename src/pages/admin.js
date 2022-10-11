@@ -1124,6 +1124,15 @@ const UserProfileElement = ({ user_id, refetchData }) => {
 
 const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fixtureLoaded, fixtureOddsLoaded, fixtureOddsLoading }) => {
     const [startUpdate, setStartUpdate] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [clicked, setClicked] = useState('')
+    const [historyUpdated, setHistoryUpdated] = useState(false)
+    const [primaryMessage, setPrimaryMessage] = useState('')
+    const [secondaryMessage, setSecondaryMessage] = useState('')
+    const [submitBtnText, setSubmitBtnText] = useState('')
+    const [fixtureRemoved, setFixtureRemoved] = useState(false)
+
+    const closeModal = () => setIsModalOpen(false)
 
     const handleUpdate = (e) => {
         if(e.target.innerText === 'Start') {
@@ -1137,14 +1146,81 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
     const handleLost = async () => {
         const res = await axios.patch('api/fixtures/carts')
         
+        if(res.status === 200) {
+            setHistoryUpdated(true)
+            closeModal()
+            setTimeout(() => {
+                setHistoryUpdated(false)
+            }, 1500)
+        }
+    }
+
+    const removeFixtures = async (e) => {
+      const res = await axios.delete('api/admin/fixtures/remove')
+
+      if(res.status === 200) {
+        setFixtureRemoved(true)
+        closeModal()
+        setTimeout(() => {
+            setFixtureRemoved(false)
+        }, 1500)
+      }
+    }
+
+    const openModal = (i) => {
+        if(i === 'history') {
+            setPrimaryMessage('Are you sure you want to update all history to LOST')
+            setSecondaryMessage('This action cannot be undone!')
+            setIsModalOpen(true)
+            setClicked(i)
+            setSubmitBtnText('Update')
+        }
+        if(i === 'fixture') {
+            setPrimaryMessage('Are you sure you want to remove all fixtures')
+            setSecondaryMessage('This action cannot be undone!')
+            setIsModalOpen(true)
+            setClicked(i)
+            setSubmitBtnText('Delete')
+        }
     }
 
     return (
         <div className="p-3 card mt-2 bg-danger shadow-lg">
             <Card className="mb-2">
-                <Card.Body>
-                 <button className="btn btn-danger" onClick={handleLost}>Update Lost
-                    </button>
+                <Card.Body className="row">
+                    <Col lg={6} md={6} sm={12} className="text-center">
+                        <p>This action will update all bet history to LOST status</p>
+                        <button className="btn btn-danger" onClick={() => openModal('history')}>
+                            {historyUpdated ? 'Update Complete' : 'Update Lost'}  
+                        </button>
+                    </Col>
+                    <Col lg={6} md={6} sm={12} className="text-center">
+                        <p>This action will Delete all current fixtures/games</p>
+                        <Button variant="primary" type="submit" onClick={() => openModal('fixture')}>
+                              {fixtureRemoved ? 'Fixtures Deleted!' : 'Remove All'} 
+                        </Button>
+                    </Col>
+                    {clicked === 'history' ?
+                    <AlertModalElement
+                        primaryMessage={primaryMessage}
+                        secondaryMessage={secondaryMessage}
+                        isModalOpen={isModalOpen}
+                        closeModal={closeModal}
+                        submitBtnText={submitBtnText}
+                        cancelBtnText="Cancel"
+                        action={handleLost}
+                    /> :
+                        <AlertModalElement
+                            primaryMessage={primaryMessage}
+                            secondaryMessage={secondaryMessage}
+                            isModalOpen={isModalOpen}
+                            closeModal={closeModal}
+                            submitBtnText={submitBtnText}
+                            cancelBtnText="Cancel"
+                            action={removeFixtures}
+                        />
+                    }
+                        
                 </Card.Body>
             </Card>
             <FixturesElement 
@@ -1262,11 +1338,7 @@ const CustomFixture = () => {
 
     const onselect = (e) => setFixtureDetails(prev => ({...prev, fixture_id: e.value})) 
 
-    const removeFixtures = async (e) => {
-        e.preventDefault()
-       await axios.delete('api/admin/fixtures/remove')
-
-    }
+   
     return (
         <Card className="mt-4 border-0 bg-danger shadow">
             <Card.Header className="bg-primary">
@@ -1338,9 +1410,7 @@ const CustomFixture = () => {
                         </Col>
                       
                         <div className="d-flex justify-content-center">
-                            <Button variant="primary" type="submit" onClick={removeFixtures}>
-                               Remove All
-                            </Button>
+                           
                             <Button variant="primary" type="submit" onClick={submitFixture}>
                               {isUpdated  ? 'Added' : ' Add Fixture'} 
                             </Button>
