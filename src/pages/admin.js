@@ -1131,6 +1131,7 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
     const [secondaryMessage, setSecondaryMessage] = useState('')
     const [submitBtnText, setSubmitBtnText] = useState('')
     const [fixtureRemoved, setFixtureRemoved] = useState(false)
+    const [gamesUpdated, setGamesUpdated] = useState(false)
 
     const closeModal = () => setIsModalOpen(false)
 
@@ -1182,11 +1183,38 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
             setClicked(i)
             setSubmitBtnText('Delete')
         }
+        if(i === 'games') {
+            setPrimaryMessage('Are you sure you want to update all fixtures')
+            setSecondaryMessage('This action cannot be undone!')
+            setIsModalOpen(true)
+            setClicked(i)
+            setSubmitBtnText('Update')
+        }
+    }
+
+    const updateGame = async () => {
+        const res = await axios.post('api/admin/update/fixtures/odds');
+        
+        if(res.status === 200) {
+            setGamesUpdated(true)
+            closeModal()
+            setTimeout(() => {
+                setGamesUpdated(false)
+            }, 1500)
+        }
     }
 
     return (
         <div className="p-3 card mt-2 bg-danger shadow-lg">
             <Card className="mb-2">
+                <Card.Body>
+                    <Col lg={12} md={12} sm={12}>
+                        <h3>Post Games</h3>
+                        <button className="btn btn-primary" onClick={() => openModal('games')}> 
+                           {gamesUpdated ? 'Games Updated' : 'Update Games'} 
+                        </button>
+                    </Col>
+                </Card.Body>
                 <Card.Body className="row">
                     <Col lg={6} md={6} sm={12} className="text-center">
                         <p>This action will update all bet history to LOST status</p>
@@ -1200,8 +1228,7 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
                               {fixtureRemoved ? 'Fixtures Deleted!' : 'Remove All'} 
                         </Button>
                     </Col>
-                    {clicked === 'history' ?
-                    <AlertModalElement
+                    {clicked === 'history' && <AlertModalElement
                         primaryMessage={primaryMessage}
                         secondaryMessage={secondaryMessage}
                         isModalOpen={isModalOpen}
@@ -1209,15 +1236,24 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
                         submitBtnText={submitBtnText}
                         cancelBtnText="Cancel"
                         action={handleLost}
-                    /> :
-                        <AlertModalElement
+                    />}
+                    {clicked === 'fixture' && <AlertModalElement
+                        primaryMessage={primaryMessage}
+                        secondaryMessage={secondaryMessage}
+                        isModalOpen={isModalOpen}
+                        closeModal={closeModal}
+                        submitBtnText={submitBtnText}
+                        cancelBtnText="Cancel"
+                        action={removeFixtures}
+                    />}
+                    {clicked === 'games' && <AlertModalElement
                             primaryMessage={primaryMessage}
                             secondaryMessage={secondaryMessage}
                             isModalOpen={isModalOpen}
                             closeModal={closeModal}
                             submitBtnText={submitBtnText}
                             cancelBtnText="Cancel"
-                            action={removeFixtures}
+                            action={updateGame}
                         />
                     }
                         
