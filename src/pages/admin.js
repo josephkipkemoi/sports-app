@@ -1542,7 +1542,6 @@ const FixtureOdds = ({ setStartUpdate }) => {
  
     function update(sessionFixtureId, homeOdds, drawOdds, awayOdds) {
 
-
         if(Boolean(sessionFixtureId) === false) {
             alert('Update complete')
             setStartUpdate(false)
@@ -1561,18 +1560,8 @@ const FixtureOdds = ({ setStartUpdate }) => {
         const drawOdds = sessionStorage.getItem('update_draw')
         const awayOdds = sessionStorage.getItem('update_away')
 
-        const time = setTimeout(() => {
-            update(sessionFixtureId, homeOdds, drawOdds, awayOdds)
-        }, 350)
+        update(sessionFixtureId, homeOdds, drawOdds, awayOdds)
 
-        if(Number(dataLength) === Number(progress)) {
-            sessionStorage.removeItem('data_length')
-            sessionStorage.removeItem('progress')
-            setIsUpdateComplete(true)
-            return clearTimeout(time)
-        }
-         return () => clearTimeout(time)        
-    
     }, [updated])
 
     if(isLoading) {
@@ -1591,9 +1580,13 @@ const FixtureOdds = ({ setStartUpdate }) => {
 
     return (
         <Card>    
-            <Card.Body>
-                <h6>{maxLength}</h6>
-             {isUpdateComplete ? <h5>update complete!</h5> : <ProgressBarElement now={progress} max={maxLength}/>}
+            <Card.Body className="bg-dark text-center">
+                <h1>
+                    {updated ? 
+                        <i className="bi bi-eye-slash text-danger"></i> : 
+                        <i className="bi bi-eye-fill text-warning"></i>
+                    }
+                </h1>
             </Card.Body>
         </Card>
     )
