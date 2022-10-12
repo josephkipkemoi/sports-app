@@ -83,7 +83,7 @@ function App({ data }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(false)
     const currentSession = sessionStorage.getItem('session_id')
 
     if(!!currentSession === false) {
