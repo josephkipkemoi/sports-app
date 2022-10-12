@@ -83,7 +83,7 @@ function App({ data }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(false)
+    setLoading(true)
     const currentSession = sessionStorage.getItem('session_id')
 
     if(!!currentSession === false) {
@@ -96,7 +96,7 @@ function App({ data }) {
     <>
     {loading ?
     <div className='bg-light d-flex justify-content-center' style={{ height: '100vh' }}>    
-      <Spinner animation="border text-dark mt-5 pt-5"/>
+      <Spinner style={{ position: 'absolute', top: '50%', width: '4rem', height: '4rem' }} animation="border"/>
     </div> :
      <ThemedBody>
      <main id="main">
