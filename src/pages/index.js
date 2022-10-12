@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from '../lib/axios';
 import styled from 'styled-components';
 import Row  from 'react-bootstrap/Row';
@@ -12,6 +12,7 @@ import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
 import CustomAds from '../components/CustomAds';
+import { Spinner } from 'react-bootstrap';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -79,9 +80,10 @@ background: #424242;
 `
 
 function App({ data }) {
-   
-  useEffect(() => {
+  const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    setLoading(false)
     const currentSession = sessionStorage.getItem('session_id')
 
     if(!!currentSession === false) {
@@ -91,48 +93,57 @@ function App({ data }) {
   },[])
  
   return (
-    <ThemedBody>
-            <main id="main">
-              <Row className='px-2'>
-                  <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
-                   <StyledMain>
-                   <TopNavBar/>
-                   <CustomAds/>
-                   <CustomFilter heading="Highlights"/>
+    <>
+    {loading ?
+    <div className='bg-light d-flex justify-content-center' style={{ height: '100vh' }}>    
+      <Spinner animation="border text-dark mt-5 pt-5"/>
+    </div> :
+     <ThemedBody>
+     <main id="main">
+       <Row className='px-2'>
+           <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
+            <StyledMain>
+            <TopNavBar/>
+            <CustomAds/>
+            <CustomFilter heading="Highlights"/>
 
-                   <StyleGameData>
-                 
-                     <div style={{ position:  'relative' }}>
-                      <Tooltip 
-                        message="To view all available markets for each game Click here"
-                        number={1}
-                        top={0}
-                        right={50}
-                        caret_position="right"
-                      /> 
+            <StyleGameData>
+          
+              <div style={{ position:  'relative' }}>
+               <Tooltip 
+                 message="To view all available markets for each game Click here"
+                 number={1}
+                 top={0}
+                 right={50}
+                 caret_position="right"
+               /> 
 
-                      <GameComponent data={data} />
+               <GameComponent data={data} />
 
-                     </div>
-                     
-                   </StyleGameData>   
-                   </StyledMain>  
-                                                                                                                                      
-                  </Col>
-                  
-                  <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>    
-                   
-                    <BetslipContainer />
-                    <CustomerInfo />
-
-                  </Col>
-
-              </Row>
-            </main>
+              </div>
+              
+            </StyleGameData>   
+            </StyledMain>  
+                                                                                                                               
+           </Col>
+           
+           <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>    
             
-            <Support/>  
+             <BetslipContainer />
+             <CustomerInfo />
 
-    </ThemedBody>
+           </Col>
+
+       </Row>
+     </main>
+     
+     <Support/>  
+
+</ThemedBody>
+    }
+   
+    </>
+    
   );
 }
 
