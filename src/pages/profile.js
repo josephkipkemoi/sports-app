@@ -305,7 +305,7 @@ const PayPalDeposit = () => {
     return (
         <Card className="border-0 shadow mt-3 rounded">
         <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
-            <Image src="https://www.pinaclebet.com/paypallogo.png" width={72} height={24} />
+            <Image src="https://www.pinaclebet.com/paypallogo.png" width={200} height={56} />
         </Card.Header>
         <Card.Body style={{ paddingTop: 0 }}>
             <hr className="text-secondary"/>
