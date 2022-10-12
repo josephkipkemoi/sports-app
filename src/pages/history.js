@@ -392,6 +392,11 @@ const BalanceElement = () => {
 }
 
 const StyleFilterBtn = styled.div`
+    a {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     button {
         width: 92px;
         margin: 2px;
@@ -443,7 +448,7 @@ const HistoryFilter = () => {
 
     const SportBetsLinks = () => {
         return (
-            <StyleFilterBtn className="d-sm-flex justify-content-between align-items-center">
+            <StyleFilterBtn className="d-flex justify-content-between align-items-center">
                 <Link 
                     href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=all' : 'history?his_tab=jbets&tab=j_all'}`}
                 >
@@ -516,11 +521,11 @@ const HistoryFilter = () => {
                     </Link>
                 </StyleHeaderNav>          
             </div>
-            <div className='d-flex justify-content-between'>
-            <div>
+            <div className='d-sm-flex justify-content-between'>
+            <div className='m-1'>
                 <SportBetsLinks />          
             </div>
-            <div className='d-flex justify-content-end'>
+            <div className='d-flex justify-content-end m-1'>
                 <StyleSearch >
                     <button 
                         type="search" 
