@@ -448,7 +448,7 @@ const HistoryFilter = () => {
 
     const SportBetsLinks = () => {
         return (
-            <StyleFilterBtn className="d-flex justify-content-between align-items-center">
+            <StyleFilterBtn className="d-flex justify-content-start align-items-center">
                 <Link 
                     href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=all' : 'history?his_tab=jbets&tab=j_all'}`}
                 >
