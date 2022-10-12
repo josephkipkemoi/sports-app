@@ -253,8 +253,9 @@ const DepositOptionsComponent = () => {
                     {config.BEYONIC_DEPOSIT_OPTION}
                 </button>
             </nav>
-            {depositContainer === config.MPESA_DEPOSIT_OPTION ?  <MpesaDeposit/> : <ComingSoonPaymentsComponent option={depositContainer} />}
-           
+            {depositContainer === config.MPESA_DEPOSIT_OPTION &&  <MpesaDeposit/> }
+            {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PayPalDeposit/> }
+            
         </>
     )
 }
@@ -297,6 +298,31 @@ const ComingSoonPaymentsComponent = ({ option }) => {
                 <h2>COMING SOON</h2>
             </Card.Footer>
         </Card>
+    )
+}
+
+const PayPalDeposit = () => {
+    return (
+        <Card className="border-0 shadow mt-3 rounded">
+        <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
+            <Image src="https://www.pinaclebet.com/paypallogo.png" width={72} height={24} />
+        </Card.Header>
+        <Card.Body style={{ paddingTop: 0 }}>
+            <hr className="text-secondary"/>
+            <div className="text-center m-3 fw-bold">
+                <p>Make payment to address and wait at least 2 minutes before reloading your balance</p>
+                <h5 className="text-center" style={{ letterSpacing: '2px' }}>
+                    <input style={{ fontSize: '2rem' }} className="text-center form-control" type="text" disabled value=" cynkemltd@gmail.com" />                   
+                </h5>
+            </div>
+
+            <Small className="d-block text-danger text-center fw-bold">
+                Minimum USD 10.00
+            </Small>
+      
+        </Card.Body>
+    
+    </Card>
     )
 }
 
