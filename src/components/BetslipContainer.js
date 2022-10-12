@@ -243,7 +243,7 @@ const BetslipCartHeader = ({ length }) => {
       return (
         <div 
         className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-        style={{ backgroundColor: '#001041', color: '#fff', borderTopLeftRadius: '6px', borderTopRightRadius: '6px'}} 
+        style={{ backgroundColor: '#001041', color: '#fff', borderTopLeftRadius: '0px', borderTopRightRadius: '0px'}} 
         onClick={openMobileBetslip}
         slip="active"
         >
@@ -271,9 +271,9 @@ const BetslipCartHeader = ({ length }) => {
         
         </div>
           }
-            <div className='btn btn-light btn-sm text-dark shadow-sm' share_code="share_code"  onClick={toggleShareBtn}>
+            <div className='btn btn-sm rounded-pill text-white shadow-sm' share_code="share_code"  onClick={toggleShareBtn}>
               <FontAwesomeIcon icon={faShare} style={{ marginRight: '5px' }} share_code="share_code"/>
-              <small className='text-dark fw-bold share-btn' share_code="share_code" >Share</small>
+              <small className='text-white fw-bold share-btn' share_code="share_code" >Share</small>
             </div>  
         </div>
       )
@@ -907,7 +907,7 @@ const BetCartFormElements = ({ betData }) => {
           </div>
             <div className="d-flex mb-2">           
                 <button 
-                  className='btn btn-danger shadow-sm m-1 text-light w-100 d-flex justify-content-center align-items-center' 
+                  className='btn btn-danger rounded-pill shadow-sm m-1 text-light w-100 d-flex justify-content-center align-items-center' 
                   id="close-btn"
                   onClick={() => removeBetslipCart()}
                   style={{ letterSpacing: 1 }}
@@ -919,7 +919,7 @@ const BetCartFormElements = ({ betData }) => {
                 <button 
                 ref={linkBarRef}      
                 disabled={loading || !uu_id.id}
-                className='btn btn-light shadow-sm m-1 text-dark w-100 d-flex justify-content-center align-items-center'
+                className='btn btn-light rounded-pill shadow-sm m-1 text-dark w-100 d-flex justify-content-center align-items-center'
                 style={{ letterSpacing: 1 }}
                 onClick={() => postBetslipCart()}
                 >
