@@ -5,12 +5,12 @@ import NavBar from './NavBar';
 import Footer from './Footer';
 
 const PageStyles = styled('div')`
-background: #444;
+background: #191970;
 height: 100vh;
 `
 
 const ContentStyled = styled('div')`
-background: #444;
+background: #191970;
 height: auto;
 font-style: normal;
 font-weight: 200;

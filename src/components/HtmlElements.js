@@ -142,7 +142,7 @@ export const CongratulationModal = ({ isModalOpen, closeModal, historyRoute, mar
                     <StyleCongratulationsModal className='congrat rounded-pill bg-white p-3' >
                         <Card className='congrat rounded-pill p-2 bg-light border-0' >                       
                             <div style={{ zIndex: 4 }}>
-                                <FontAwesomeIcon onClick={closeModal} className='float-end cursor-pointer' size="xl" icon={faTimesCircle} />
+                                <FontAwesomeIcon style={{ zIndex: 4 }} onClick={closeModal} className='float-end cursor-pointer' size="xl" icon={faTimesCircle} />
                             </div>                          
                             <Card.Body className='mb-2 text-center' style={{ zIndex: 5, marginTop: '-25px' }}>
                                 <FontAwesomeIcon className='text-danger shadow-lg rounded-circle' icon={faCheckCircle} size="10x"/>
@@ -174,7 +174,7 @@ export const CongratulationModal = ({ isModalOpen, closeModal, historyRoute, mar
                             </Card.Footer>
                         </Card>
                     </StyleCongratulationsModal>   
-                    <div style={{ position: 'absolute', zIndex: 1 }}>
+                    <div style={{ position: 'absolute'}}>
                         <Confetti/> 
                     </div> 
                             

@@ -2,11 +2,13 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 
 const StyleConfetti = styled.div`
+z-index: 1;
 canvas {
     overflow-y: hidden;
     overflow-x: hidden;
     width: 100%;
     margin: 0;
+    max-height: 100vh;
   }
 `
 export default function Confetti () {
