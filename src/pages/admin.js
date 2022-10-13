@@ -20,7 +20,7 @@ import {
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 import { PhoneSvgIcon } from "../components/Svg";
 import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
-import { Modal } from "react-bootstrap";
+import { Container, Modal, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { useGetFixtureIdsWhereOddsNullQuery } from "../hooks/fixture";
 import { AlertModalElement, ErrorElement, ProgressBarElement } from "../components/HtmlElements";
 import {  
@@ -33,19 +33,24 @@ import Echo from "laravel-echo";
 const StyledAdmin = styled.div`
     height: 100vh;
     overflow-y: scroll;
+    h1 {
+        letter-spacing: 2px;
+        margin: 0;
+        padding: 0;
+    }
 `
 
 const adminLinks = [
     {
-        name: 'User Profiles',
+        name: 'Users',
         path: 'admin?tab=users'
     },
     {
-        name: 'Fixtures & Odds',
+        name: 'Fixtures',
         path: 'admin?tab=fixtures'
     },
     {
-        name: 'Customer Feedback',
+        name: 'Feedback',
         path: 'admin?tab=feedback'
     },
     {
@@ -53,7 +58,7 @@ const adminLinks = [
         path: 'admin?tab=jackpot'
     },
     {
-        name: 'Live Games',
+        name: 'Live',
         path: 'admin?tab=live'
     }
 ]
@@ -65,9 +70,8 @@ export default function Admin() {
     const [fixtureLoaded, setFixtureLoaded] = useState(false)
     const [fixtureOddsLoading, setFixtureOddsLoading] = useState(false)
     const [fixtureOddsLoaded, setFixtureOddsLoaded] = useState(false)
-    const [auth, setAuth] = useState('')
     const [hideAdmin, setHideAdmin] = useState(true)
-
+  
     const postFixtureIds = async () => {
         setFixtureIdLoading(true)
         const res = await axios.post('api/custom_fixture/post');
@@ -90,41 +94,59 @@ export default function Admin() {
 
     const AdminLinkItems = (link, i) => {
         return (
-            <Link href={link.path} key={i}>
-                <a
-                    itemProp="url"
-                    className="text-decoration-none text-dark p-3 btn"
-                >
-                    {link.name}
-                </a>
-            </Link>
+            <div>
+                <Link href={link.path} key={i}>
+                    <a
+                        itemProp="url"
+                        className="text-decoration-none text-dark btn"
+                    >
+                        {link.name}
+                    </a>
+                </Link>
+            </div>
+           
         )
     }
- 
-    const authuser = (e) => {
-        setAuth(e.target.value)
-    }
 
-    const submitauth = () => {
-        if(auth === '32959035') {
+
+
+    const getUser = async () => {
+        const user = await axios.get('api/user')
+        console.log(user?.data?.phone_number)
+        if(user?.data?.phone_number === 254700545727 || process.env.NODE_ENV === 'development') {
             setHideAdmin(false)
         }
     }
+
+    useEffect(() => {
+       getUser()
+    }, [])
     
     return (
-        <StyledAdmin className="p-3 container bg-danger">
-            <div className="text-center p-2">
-                <h1>
-                    <i className="bi bi-headset" style={{ marginRight: 5 }}></i>
-                    Command Center
-                </h1>
-                <input type="text" className="bg-secondary" onChange={authuser}/>
-                <button onClick={submitauth}>Auth</button>
-            </div>
+        <StyledAdmin className="p-3 container bg-primary">
 
-            {hideAdmin ? '' :  <nav className="bg-light p-3 shadow-lg rounded">
-                {adminLinks.map(AdminLinkItems)}
-            </nav>}
+            {hideAdmin ? '' :  
+            <>
+            <div className="text-center p-2 bg-light rounded-pill shadow-lg mb-3">
+                <h1 className="fw-bold text-dark d-flex justify-content-center align-items-center">
+                    <i className="bi bi-headset" style={{ marginRight: 5}}></i>
+                     Welcome
+                    <i className="bi bi-emoji-sunglasses" style={{ marginLeft: 5 }}></i>
+                </h1> 
+            </div>
+           <Navbar bg="light" expand="lg" className="rounded">
+                <Container>
+                    <Navbar.Brand href="#home">Tabs</Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        {adminLinks.map(AdminLinkItems)}
+                    </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+            </>
+           }
        
             <div style={{ height: '100vh' }}>
             {tab === 'fixtures' && 
