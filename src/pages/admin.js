@@ -29,6 +29,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faHeadset, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import Echo from "laravel-echo";
+import Pagination from '../components/Pagination';
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -107,8 +108,6 @@ export default function Admin() {
            
         )
     }
-
-
 
     const getUser = () => {
         const user = JSON.parse(localStorage.getItem('uu_id'))
@@ -797,8 +796,9 @@ const MessageComponent = ({ user, id }) => {
 const UsersProfileComponent = () => {
 
     const [userId, setUserId] = useState(null)
+    const [pageNumber, setPageNumber] = useState(1)
 
-    const { data, isLoading, error, refetch } = useGetAllUsersQuery()
+    const { data, isLoading, error, refetch } = useGetAllUsersQuery(pageNumber)
 
     if(error) {
         return <span>Error...</span>
@@ -807,8 +807,8 @@ const UsersProfileComponent = () => {
     if(isLoading) {
         return <Spinner animation="grow"/>
     }
- 
-    const options =  data.users.map(n => {
+
+    const options =  data.data.data.map(n => {
         return {
             user_id: n.id,
             value: n.phone_number,
@@ -817,10 +817,18 @@ const UsersProfileComponent = () => {
     })
 
     const selectUser = (e) => {
-        const user_id = e.user_id
+        const user_id = (e?.user_id || e?.target?.getAttribute('ui'))
         setUserId(user_id)
     }
  
+    const UserNumElements = (l,i) => {
+        return (
+            <div className="d-flex align-items-center">
+                {i+1}
+                <button className="btn btn-primary w-100 m-1" onClick={selectUser} ui={l.id} style={{ letterSpacing: '2px' }}>{l.phone_number}</button>
+            </div>           
+        )
+    }
     return (
         <Card className="mt-2 bg-danger">
                 <Card.Body className="bg-light rounded">
@@ -830,7 +838,7 @@ const UsersProfileComponent = () => {
                                 <h3 style={{ margin: 0, padding: 0 }}>Users</h3>
                             </Card.Header>
                             <hr className="m-0 p-0 text-light" />
-                            <Card.Body className="text-center bg-primary text-white rounded"><h1>{data.users.length}</h1></Card.Body>
+                            <Card.Body className="text-center bg-primary text-white rounded"><h1>{data.count}</h1></Card.Body>
                         </Card>                    
                         <Card className="w-100 m-2 shadow border-0 bg-success rounded">
                             <Card.Header className="bg-success text-white m-0 text-center">
@@ -863,9 +871,18 @@ const UsersProfileComponent = () => {
                     </div>
                     <Row className="shadow-sm m-2 p-2 rounded mx-auto">                        
                         <Col sm="12" md="3" lg="3" className="p-3">               
-                            <button className="btn btn-primary m-2" onClick={refetch}>Reload</button>                                 
+                                                        
                             <h5 className="text-dark fw-bold">Select User</h5>
                             <Select options={options} className="text-dark" onChange={selectUser}/>    
+
+                            {data.data.data.map(UserNumElements)}
+                             <div className="d-flex mt-3" style={{ overflow: 'scroll' }}>
+                                <Pagination 
+                                    data={data.data} 
+                                    setPageNumber={setPageNumber}
+                                />
+                             </div>
+                            
                         </Col>
                         <Col sm="12" md="9" lg="8" className="shadow m-2 p-3">
                             <UserProfileElement user_id={userId} refetchData={refetch}/>
@@ -1067,8 +1084,14 @@ const UserProfileElement = ({ user_id, refetchData }) => {
      
         return (
             <StyleUserElement className="card border-0">
-                <Card.Header className="pb-0 mb-0 bg-dark">
-                    <h4 className="text-white fw-bold mb-3" style={{ margin: 0, padding: 0 }}>User Profile</h4>
+                <Card.Header className=" bg-dark d-flex justify-content-between align-items-center">
+                    <h4 className="text-white fw-bold " style={{ margin: 0, padding: 0 }}>
+                        User Profile
+                    </h4>
+                    <button className="btn btn-danger m-2" onClick={handleRemove}>
+                        <FontAwesomeIcon icon={faBan} style={{ marginRight: 8 }}/>
+                        Remove User
+                    </button>
                 </Card.Header>
                 <Card.Body className="row gy-2 gx-2">
                     <Col lg={6} md={6} sm={12} className="bg-secondary p-3 rounded shadow">
@@ -1094,10 +1117,10 @@ const UserProfileElement = ({ user_id, refetchData }) => {
                     <Col lg={6} md={6} sm={12} className="bg-light">
                     <div className="bg-dark p-3 rounded shadow d-flex flex-column">
                         <div className="text-center bg-dark rounded">
-                            <button className="btn btn-danger m-2" onClick={handleRemove}>
-                                <FontAwesomeIcon icon={faBan} style={{ marginRight: 8 }}/>
-                                Remove User
-                            </button>
+                            <button className="btn btn-primary m-2" onClick={refetch}>
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
+                                Reload
+                            </button>    
                             <button className="btn btn-danger m-2" onClick={() => refetch()}>
                                 <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
                                 Update History
