@@ -344,14 +344,16 @@ const ComingSoonPaymentsComponent = ({ option }) => {
 const BitCoinDeposit = () => {
     return (
         <Card>
-            <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
+            <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem' }}>
                 <Image src="https://www.pinaclebet.com/bitcoin.png" width={72} height={72} />
             </Card.Header>
             <hr className="text-secondary"/>
-            <div className="p-1">
+            <div className="p-1 text-center">
             <p>Make payment to Bitcoin address and wait at least 2 minutes before reloading your balance</p>
+            <h6>Scan QR Code</h6>
+            <Image src="https://www.pinaclebet.com/bitcoinQR.png" width={102} height={102} />
             <span className="text-center" style={{ letterSpacing: '2px' }}>
-                    <label htmlFor="bitcoin" className="mb-3 fw-bold">{configData.BITCOIN_DEPOSIT_ADDRESS}</label>
+                    <label htmlFor="bitcoin" className="mb-3 fw-bold text-center">{configData.BITCOIN_DEPOSIT_ADDRESS}</label>
                     <input 
                         id="bitcoin"
                         style={{ fontSize: '1.4rem' }} 
