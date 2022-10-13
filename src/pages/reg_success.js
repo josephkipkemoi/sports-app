@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Card from "react-bootstrap/Card";
 import styled from "styled-components";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
@@ -19,10 +19,17 @@ const StyleRegSuccess = styled.div`
     }
 `
 export default function Reg_Success() {
+    
+    const regRef = useRef(null)
+
+    useEffect(() => {
+        regRef.current.focus()
+    }, [])
+
     return (
         <StyleRegSuccess>                              
                 <Card className="shadow-lg mt-5 border-0 m-3" style={{ zIndex: 1 }}>                 
-                    <Card.Header className="bg-warning text-white text-center border-0 pt-4" style={{ zIndex: 1 }}>
+                    <Card.Header ref={regRef} tabIndex="-1" className="bg-warning text-white text-center border-0 pt-4" style={{ zIndex: 1 }}>
                         <FontAwesomeIcon icon={faCheckCircle} size="8x" className="text-white"/>
                         <h1 className="mt-3 fw-bold">SUCCESS</h1>
                     </Card.Header>
