@@ -112,7 +112,7 @@ export default function Admin() {
 
     const getUser = async () => {
         const user = await axios.get('api/user')
-        console.log(user?.data?.phone_number)
+ 
         if(user?.data?.phone_number === 254700545727 || process.env.NODE_ENV === 'development') {
             setHideAdmin(false)
         }
