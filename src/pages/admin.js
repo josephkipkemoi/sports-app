@@ -871,7 +871,10 @@ const UsersProfileComponent = () => {
                     </div>
                     <Row className="shadow-sm m-2 p-2 rounded mx-auto">                        
                         <Col sm="12" md="3" lg="3" className="p-3">               
-                                                        
+                            <button className="btn btn-dark m-2 w-100" onClick={refetch}>
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
+                                Reload
+                            </button>                 
                             <h5 className="text-dark fw-bold">Select User</h5>
                             <Select options={options} className="text-dark" onChange={selectUser}/>    
 
@@ -975,8 +978,12 @@ const UserBetHistoryElement = ({ data }) => {
     }
     return (
         <Card className="border-0">
-            <Card.Header className="bg-dark text-white">
+            <Card.Header className="bg-dark text-white d-flex align-items-center justify-content-between">
                 <h4 className="fw-bold">Bet History</h4>
+                <button className="btn btn-light m-2" onClick={() => refetch()}>
+                    <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
+                    Update History
+                </button>
             </Card.Header>
             <Card.Body>
                 <table className="table bg-primary rounded shadow text-white">
@@ -1116,15 +1123,8 @@ const UserProfileElement = ({ user_id, refetchData }) => {
                     </Col>
                     <Col lg={6} md={6} sm={12} className="bg-light">
                     <div className="bg-dark p-3 rounded shadow d-flex flex-column">
-                        <div className="text-center bg-dark rounded">
-                            <button className="btn btn-primary m-2" onClick={refetch}>
-                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
-                                Reload
-                            </button>    
-                            <button className="btn btn-danger m-2" onClick={() => refetch()}>
-                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
-                                Update History
-                            </button>
+                        <div className="text-center bg-dark rounded">                             
+                           <h3 className="text-white">Update Balance</h3>
                         </div> 
                     <hr className="text-light"/>
                         <div className="text-dark d-flex flex-column align-items-center">

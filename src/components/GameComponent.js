@@ -8,6 +8,10 @@ import AuthUser from "../hooks/AuthUser";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
+import  Spinner  from "react-bootstrap/Spinner";
+import { useGetV1CustomFixtureQuery } from "../hooks/fixture";
+import { CustomSpinner } from "./HtmlElements";
+
 const StyleFavorites = styled.i`
   i {
     opacity: .8;
@@ -35,12 +39,12 @@ const StyleGameComponent = styled.div`
   }
  
 `
-export default function GameComponent({ data }) {
+export default function GameComponent() {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
     const { uu_id } = AuthUser()
     const router = useRouter()
-
+   
     const sendBetslip = (e)  => {
   
       const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
@@ -224,17 +228,27 @@ export default function GameComponent({ data }) {
       btn[i].classList.add('active')
     }
 
+    const { data, isLoading, error } = useGetV1CustomFixtureQuery()
+
+    if(error) {
+      return <span>Error</span>
+    }
     
     useEffect(() => {
       updateFixtureIds()
     }, [])
+
+    if(isLoading) {       
+      return <div className="d-flex justify-content-center mt-5 pt-5 mb-5 pb-5">
+        <CustomSpinner/>
+      </div> 
+    }
  
     return (
-      <StyleGameComponent>
-         <Row className="custom-grid">     
-        {data.map((innerData,index) => {
-          const oddsData = JSON.parse(innerData.odds)
- 
+      <StyleGameComponent className="bg-light">
+         <Row className="custom-grid bg-light">   
+        {data.data.map((innerData,index) => {
+          const oddsData = JSON.parse(innerData.odds) 
           return (
             <React.Fragment key={index + innerData.fixture_date}>
             <Col 
@@ -340,7 +354,8 @@ export default function GameComponent({ data }) {
           
         })}
       </Row>
-      </StyleGameComponent>
-     
+      </StyleGameComponent>     
     )
 }
+
+ 

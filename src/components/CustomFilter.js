@@ -154,7 +154,7 @@ const SearchResults = ({ data }) => {
 
     return (
       <>
-         <GameComponent data={data}/>
+         {/* <GameComponent data={data}/> */}
       </>
     )
   }

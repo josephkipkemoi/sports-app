@@ -79,7 +79,8 @@ const StyledMain = styled.div`
 background: #424242;
 `
 
-function App({ data }) {
+function App() {
+
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -99,7 +100,7 @@ function App({ data }) {
       <Spinner style={{ position: 'absolute', top: '50%', width: '4rem', height: '4rem' }} animation="border"/>
     </div> :
      <ThemedBody>
-     <main id="main">
+     <main id="main" className='bg-light'>
        <Row className='px-2'>
            <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
             <StyledMain>
@@ -118,7 +119,7 @@ function App({ data }) {
                  caret_position="right"
                /> 
 
-               <GameComponent data={data} />
+               <GameComponent />
 
               </div>
               
@@ -145,16 +146,6 @@ function App({ data }) {
     </>
     
   );
-}
-
-export async function getServerSideProps(context) {
-  const data = await axios.get('api/custom_fixture')
-
-  return {
-    props: {
-      data: data.data.fixtures
-    }, // will be passed to the page component as props
-  }
 }
 
 export default App;

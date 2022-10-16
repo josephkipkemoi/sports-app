@@ -13,7 +13,7 @@ import {
     H5, InputNumber, Small, Span, 
  } from '../components/Html';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import  { faShare }  from "@fortawesome/free-solid-svg-icons";
+import  { faShare, faCertificate }  from "@fortawesome/free-solid-svg-icons";
 import Link from 'next/link';
 import configData from '../../config.json';
 import  Modal  from 'react-bootstrap/Modal';
@@ -28,6 +28,7 @@ import useAuth from "../hooks/auth";
 import AuthUser from "../hooks/AuthUser";
 import { randomString } from "../hooks/generateRandomId";
 import { CongratulationModal } from "./HtmlElements";
+import UserBalance from "./UserBalance";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -619,7 +620,7 @@ const JackpotCart = ({ market, jackpotGames, length, setMegaJackpotId, setFiveJa
     }
 
   }
- 
+  const { uu_id } = AuthUser()   
   return (
     <StyleJackpotCart className={`bg-${market === 'Mega Jackpot' ? 'dark' : 'dark'} mt-1 rounded shadow mb-2`}>
       <div className="d-flex justify-content-between align-items-center mb-3 bg-secondary p-1 mg-header" style={{ margin: 0, padding: 0 }}>
@@ -870,8 +871,21 @@ const BetCartFormElements = ({ betData }) => {
                 </Small>
            </div>
           }
-         
-          <UserBalanceElement />
+          <div>
+              <div className="d-flex align-items-center justify-content-between">
+                <Small>Balance</Small>
+                <UserBalance user_id={uu_id?.id} type="regular" />
+              </div>
+              <div className="d-flex align-items-center justify-content-between">
+                <Small>Bonus</Small>
+
+                <div className="d-flex align-items-center">
+                  <FontAwesomeIcon icon={faCertificate} className="text-danger"/>
+                  <UserBalance user_id={uu_id?.id} type="bonus" />
+                </div>
+              </div>
+          </div>
+  
            {betData?.length !== 0 &&
            <>
            <div className='d-flex align-items-center justify-content-between mb-1'>

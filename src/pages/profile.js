@@ -23,6 +23,7 @@ import MobileNavComponent from "../components/MobileNavComponent"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faRefresh } from "@fortawesome/free-solid-svg-icons"
 import Image from "next/image"
+import UserBalance from "../components/UserBalance"
 
 const StyleProfile = styled.div`
     background-color: #fff;
@@ -127,65 +128,36 @@ const AuthUserProfile = () => {
 
 const BalanceComponent = () => {
 
-    const BalanceElement = () => {
-            const { uu_id } = AuthUser()
-            const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(uu_id.id)
+    const { uu_id } = AuthUser()
 
-            const insertTransaction = () => {
-                refetch()
-            }
-
-            if(error) {
-                return <span className="d-block fw-bold text-danger mt-1">Error</span>
-            }
-        
-            if(isLoading) {
-                return <Spinner className="d-block mt-2 pb-3" animation="grow" size="sm"/>
-            }
-            return (
-                <Span className="fw-bold d-flex align-items-center justify-content-start" style={{ width: 124 }}>
-                    <div className="refresh btn btn-sm" onClick={insertTransaction}>
-                        <FontAwesomeIcon  icon={faRefresh} />
-                    </div>
-                    <span className="text-dark amount">
-                        Kes {data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}    
-                    </span>        
-                </Span>
-            )
-    
-    
-    }
-    
     return (
         <div className="d-sm-flex justify-content-between shadow-sm p-4 mb-4 bg-light rounded ">
             <div >
                 <div className="row align-items-center ">
-                    <div className="col" style={{ width: 32 }}>
+                    <div className="col" style={{ maxWidth: '30%' }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-wallet2" viewBox="0 0 16 16">
                             <path d="M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
                         </svg>                      
                     </div>
                     <div className="col d-flex flex-column">
                         <Span className="d-block">Balance</Span>
-                        <BalanceElement />
+
+                        <UserBalance user_id={uu_id?.id} type="regular" />
                     </div>
                 </div>
             </div>
             <div>
                 <div className="row align-items-center">
-                    <div className="col" style={{ width: 32 }}>
+                    <div className="col" style={{maxWidth: '30%' }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-gift" viewBox="0 0 16 16">
                             <path d="M3 2.5a2.5 2.5 0 0 1 5 0 2.5 2.5 0 0 1 5 0v.006c0 .07 0 .27-.038.494H15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 14.5V7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h2.038A2.968 2.968 0 0 1 3 2.506V2.5zm1.068.5H7v-.5a1.5 1.5 0 1 0-3 0c0 .085.002.274.045.43a.522.522 0 0 0 .023.07zM9 3h2.932a.56.56 0 0 0 .023-.07c.043-.156.045-.345.045-.43a1.5 1.5 0 0 0-3 0V3zM1 4v2h6V4H1zm8 0v2h6V4H9zm5 3H9v8h4.5a.5.5 0 0 0 .5-.5V7zm-7 8V7H2v7.5a.5.5 0 0 0 .5.5H7z"/>
                         </svg>
                     </div>
                     <div className="col d-flex flex-column">
-                        <Span className="d-block">Balance</Span>
+                        <Span className="d-block">Bonus</Span>
                         <Span className="fw-bold d-flex align-items-center justify-content-start" style={{ width: 124 }}>
-                            <div className="refresh btn btn-sm" >
-                                <FontAwesomeIcon  icon={faRefresh} />
-                            </div>
                             <span className="text-dark amount">
-                                Kes 0.00
+                                <UserBalance user_id={uu_id?.id} type="bonus" />
                             </span>  
                         </Span>                    
                     </div>

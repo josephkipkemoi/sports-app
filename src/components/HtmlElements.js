@@ -181,54 +181,97 @@ export const CongratulationModal = ({ isModalOpen, closeModal, historyRoute, mar
                 </Modal>         
     )
 }
+
+const StyleCustomSpinner = styled.div`
+.lds-default {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+  }
+  .lds-default div {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #191970;
+    border-radius: 50%;
+    animation: lds-default 1.2s linear infinite;
+  }
+  .lds-default div:nth-child(1) {
+    animation-delay: 0s;
+    top: 37px;
+    left: 66px;
+  }
+  .lds-default div:nth-child(2) {
+    animation-delay: -0.1s;
+    top: 22px;
+    left: 62px;
+  }
+  .lds-default div:nth-child(3) {
+    animation-delay: -0.2s;
+    top: 11px;
+    left: 52px;
+  }
+  .lds-default div:nth-child(4) {
+    animation-delay: -0.3s;
+    top: 7px;
+    left: 37px;
+  }
+  .lds-default div:nth-child(5) {
+    animation-delay: -0.4s;
+    top: 11px;
+    left: 22px;
+  }
+  .lds-default div:nth-child(6) {
+    animation-delay: -0.5s;
+    top: 22px;
+    left: 11px;
+  }
+  .lds-default div:nth-child(7) {
+    animation-delay: -0.6s;
+    top: 37px;
+    left: 7px;
+  }
+  .lds-default div:nth-child(8) {
+    animation-delay: -0.7s;
+    top: 52px;
+    left: 11px;
+  }
+  .lds-default div:nth-child(9) {
+    animation-delay: -0.8s;
+    top: 62px;
+    left: 22px;
+  }
+  .lds-default div:nth-child(10) {
+    animation-delay: -0.9s;
+    top: 66px;
+    left: 37px;
+  }
+  .lds-default div:nth-child(11) {
+    animation-delay: -1s;
+    top: 62px;
+    left: 52px;
+  }
+  .lds-default div:nth-child(12) {
+    animation-delay: -1.1s;
+    top: 52px;
+    left: 62px;
+  }
+  @keyframes lds-default {
+    0%, 20%, 80%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.5);
+    }
+  }
+  
+`
  
- {/* <Span 
-                            modalid="modal-ref" 
-                            className='fw-bold p-2 d-block mb-2 float-end' 
-                            onClick={closeModal} 
-                            style={{ cursor: 'pointer', width: 32 }}
-                            >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-x-circle-fill text-light" viewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
-                            </svg>
-                            </Span>  
-                            <StyleStars>
-                            <Stars/>
-                            </StyleStars>
-                            <div className='d-flex justify-content-center mt-5 pt-4 w-100' style={{ zIndex: 2 }}>
-                                <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                width="104" height="104" 
-                                fill="currentColor" 
-                                className="bi bi-trophy-fill text-warning " 
-                                viewBox="0 0 16 16">
-                                <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935z"/>
-                                </svg>
-                            </div>
-                            <StyleCongratulationsModalMidMenu className='text-center mt-3 mb-3'>
-                            <h1 modalid="modal-ref" className='fw-bold text-light'>Congratulations!</h1>
-                            <h3 className='mt-2 mb-4 text-light'>
-                                {market} placed successfully!
-                            </h3>
-                            <div className='d-flex'>
-                                <Link href='#'>
-                                <a
-                                    itemProp='url'
-                                    className='btn btn-light w-100 mt-2 m-1 shadow-lg d-flex justify-content-center'
-                                >
-                                    <i className="bi bi-share" style={{ marginRight: 5 }}></i>
-                                    <small className='small-position'>Share</small>
-                                </a>
-                                </Link>
-                                <Link href={historyRoute}>
-                                <a
-                                    itemProp='url'
-                                    className='btn btn-warning w-100 mt-2 m-1 shadow-lg d-flex justify-content-center'
-                                >
-                                    <i className="bi bi-card-list" style={{ marginRight: 5 }}></i>
-                                    <small className='small-position'>View Bet</small>               
-                                </a>
-                            </Link>
-                            </div>
-                            
-                            </StyleCongratulationsModalMidMenu> */}
+export const CustomSpinner = ({ color }) => {
+    return (
+        <StyleCustomSpinner>
+           <div className="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+        </StyleCustomSpinner>
+    )
+}
