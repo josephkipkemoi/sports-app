@@ -11,6 +11,7 @@ import { faLock } from "@fortawesome/free-solid-svg-icons";
 import  Spinner  from "react-bootstrap/Spinner";
 import { useGetV1CustomFixtureQuery } from "../hooks/fixture";
 import { CustomSpinner } from "./HtmlElements";
+import Pagination from '../components/Pagination';
 
 const StyleFavorites = styled.i`
   i {
@@ -228,7 +229,8 @@ export default function GameComponent() {
       btn[i].classList.add('active')
     }
 
-    const { data, isLoading, error } = useGetV1CustomFixtureQuery()
+    const [pageNumber, setPageNumber] = useState(1)
+    const { data, isLoading, error } = useGetV1CustomFixtureQuery(pageNumber)
 
     if(error) {
       return <span>Error</span>
@@ -353,6 +355,12 @@ export default function GameComponent() {
           )
           
         })}
+        
+        <Pagination 
+          data={data}
+          setPageNumber={setPageNumber}
+         />
+
       </Row>
       </StyleGameComponent>     
     )
