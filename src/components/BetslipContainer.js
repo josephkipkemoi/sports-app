@@ -29,6 +29,7 @@ import AuthUser from "../hooks/AuthUser";
 import { randomString } from "../hooks/generateRandomId";
 import { CongratulationModal } from "./HtmlElements";
 import UserBalance from "./UserBalance";
+import OffersModal from "./OffersModal";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -767,10 +768,12 @@ const BetCartFormElements = ({ betData }) => {
     const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false)
     const [loading, setLoading] = useState(null)
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false)
+    const [isOfferModalOpen, setIsOfferModalOpen] = useState(false)
     const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
     const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
     const closeMenu = () => setIsBalanceModalOpen(false)
-  
+    const closeOffer = () => setIsOfferModalOpen(false)
+
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
     
     const { uu_id } = AuthUser()
@@ -880,12 +883,18 @@ const BetCartFormElements = ({ betData }) => {
                 <Small>Bonus</Small>
 
                 <div className="d-flex align-items-center">
-                  <FontAwesomeIcon icon={faCertificate} className="text-danger"/>
+                  <FontAwesomeIcon 
+                    icon={faCertificate} 
+                    className="text-danger" 
+                    size="lg" 
+                    style={{ marginRight: 3, cursor: 'pointer' }}
+                    onClick={() => setIsOfferModalOpen(true)}
+                  />
                   <UserBalance user_id={uu_id?.id} type="bonus" />
                 </div>
               </div>
           </div>
-  
+          
            {betData?.length !== 0 &&
            <>
            <div className='d-flex align-items-center justify-content-between mb-1'>
@@ -959,7 +968,8 @@ const BetCartFormElements = ({ betData }) => {
             market="Bet"
           />
           <BalanceModal isModalOpen={isBalanceModalOpen} closeMenu={closeMenu}/>
-          </div>
+          <OffersModal isModalOpen={isOfferModalOpen} closeMenu={closeOffer} />
+        </div>
       )
 }
 
