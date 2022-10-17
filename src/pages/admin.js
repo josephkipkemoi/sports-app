@@ -1027,6 +1027,7 @@ const UserProfileElement = ({ user_id, refetchData }) => {
         const { data, error, isLoading, refetch } = useGetAdminUserBalanceByIdQuery(user_id)
         const userBalance = useGetBalanceByUserIdQuery(user_id)
         const [newUserBalance, setNewUserBalance] = useState(0)
+        const [bonus, setBonus] = useState(0)
         const [isBalanceUpdated, setIsBalanceUpdated] = useState(false)
         const [isModalOpen, setIsModalOpen] = useState(false)
         // const [newNum, setNewNum] = useState('')
@@ -1088,7 +1089,16 @@ const UserProfileElement = ({ user_id, refetchData }) => {
            }
         }
 
-     
+        const updateBonus = async () => {
+            const newBonus = Number(bonus)
+            const res = await axios.patch(`api/admin/users/${user_id}/bonus`, {
+                bonus: newBonus,
+            });
+        }
+
+        const handleBonus = (e) => {
+            setBonus(e.target.value)
+        }
         return (
             <StyleUserElement className="card border-0">
                 <Card.Header className=" bg-dark d-flex justify-content-between align-items-center">
@@ -1116,6 +1126,7 @@ const UserProfileElement = ({ user_id, refetchData }) => {
                             </svg> 
                             <h5 className="m-1">Number: {phone_number}</h5>
                             <h5 className="m-1">Current Balance Kes: {userBalance?.data?.amount}</h5>
+                            <h5 className="m-1">Bonus Balance Kes: {userBalance?.data?.bonus}</h5>
                             <h5 className="m-1">
                                 Total Kes: {Number(data.total_donation).toLocaleString(undefined)}
                             </h5>
@@ -1123,9 +1134,24 @@ const UserProfileElement = ({ user_id, refetchData }) => {
                     </Col>
                     <Col lg={6} md={6} sm={12} className="bg-light">
                     <div className="bg-dark p-3 rounded shadow d-flex flex-column">
-                        <div className="text-center bg-dark rounded">                             
-                           <h3 className="text-white">Update Balance</h3>
-                        </div> 
+                        <label htmlFor="bonus" className="text-white">Bonus: </label>
+                            <div className="d-flex align-items-center mb-3">
+                                <InputNumber 
+                                    id="bonus" 
+                                    className="form-control d-block w-100" 
+                                    placeholder={0} 
+                                    style={{ maxWidth: 120 }}
+                                    onChange={handleBonus}
+                                    value={bonus}
+                                />                                 
+                            </div>
+                            <button className="btn btn-light" onClick={updateBonus}>
+                                {isBalanceUpdated ?  
+                                <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 8 }}/> :
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
+                               
+                                {isBalanceUpdated ? 'Bonus Updated' : 'Update Bonus'}  
+                            </button>  
                     <hr className="text-light"/>
                         <div className="text-dark d-flex flex-column align-items-center">
                             <label htmlFor="balance" className="text-white">Balance: </label>

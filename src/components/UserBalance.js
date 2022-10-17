@@ -1,11 +1,11 @@
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 
 export default function UserBalance({ user_id, type }) {
-
+    
     const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(user_id)
 
     if(error) {
@@ -15,7 +15,7 @@ export default function UserBalance({ user_id, type }) {
     if(isLoading) {
         return <Spinner className="d-block mt-2 pb-3" animation="grow" size="sm"/>
     }
-
+    
     return (
         <div className="d-flex align-items-center">
             <FontAwesomeIcon  
