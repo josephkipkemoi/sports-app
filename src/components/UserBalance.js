@@ -5,7 +5,7 @@ import { Spinner } from "react-bootstrap";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 
 export default function UserBalance({ user_id, type }) {
-    
+
     const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(user_id)
 
     if(error) {
@@ -15,7 +15,7 @@ export default function UserBalance({ user_id, type }) {
     if(isLoading) {
         return <Spinner className="d-block mt-2 pb-3" animation="grow" size="sm"/>
     }
-    
+ 
     return (
         <div className="d-flex align-items-center">
             <FontAwesomeIcon  
@@ -25,7 +25,7 @@ export default function UserBalance({ user_id, type }) {
                 onClick={refetch}
             />
             <span className="text-dark amount fw-bold">
-                Kes {type === 'regular' && data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }                 
+                {data.currency} {type === 'regular' && data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }                 
                 {type === 'bonus' && data?.bonus.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }                 
             </span> 
         </div>
