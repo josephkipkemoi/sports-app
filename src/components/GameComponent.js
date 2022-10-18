@@ -46,38 +46,7 @@ export default function GameComponent() {
     const { uu_id } = AuthUser()
     const router = useRouter()
    
-    const sendBetslip = (e)  => {
-  
-      const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
-      const awayTeam =  e.target.getAttribute('away_team') || localStorage.getItem('away_team');
-      const odds = e.target.getAttribute('odds');
-      const picked = e.target.getAttribute('picked');
-      const fixtureId = Number(e.target.getAttribute('fixtureid')) || Number(localStorage.getItem('fixture_id'));
-      const session_id = sessionStorage.getItem('session_id')
-      const market_id = e.target.getAttribute('market_id')
-      
-      if(market_id) {
-        const fixture = data.filter(g => g.fixture_id == fixtureId)
-        let more_market = JSON.parse(fixture[0].odds)[market_id].name
-        localStorage.setItem('more_market', more_market)
-      }   
-
-      const market = e.target.getAttribute('market') || localStorage.getItem('more_market'); 
-
-      const cart = {
-        fixture_id: fixtureId,
-        session_id: session_id,
-        betslip_teams: homeTeam + ' v ' + awayTeam,
-        betslip_market: market,
-        betslip_picked: picked,
-        betslip_odds: odds 
-      }
-      
-      sessionStorage.setItem(fixtureId, JSON.stringify(cart))
-
-      setId(prev => prev.concat(fixtureId))
-
-    }
+   
 
     const fetchSharedFixtureIds =  () => {
       const shareCode = sessionStorage.getItem('share_code')
@@ -246,6 +215,39 @@ export default function GameComponent() {
       </div> 
     }
  
+    const sendBetslip = (e)  => {
+  
+      const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
+      const awayTeam =  e.target.getAttribute('away_team') || localStorage.getItem('away_team');
+      const odds = e.target.getAttribute('odds');
+      const picked = e.target.getAttribute('picked');
+      const fixtureId = Number(e.target.getAttribute('fixtureid')) || Number(localStorage.getItem('fixture_id'));
+      const session_id = sessionStorage.getItem('session_id')
+      const market_id = e.target.getAttribute('market_id')
+      
+      if(market_id) {
+        const fixture = data.data.filter(g => g.fixture_id == fixtureId)
+        let more_market = JSON.parse(fixture[0].odds)[market_id].name
+        localStorage.setItem('more_market', more_market)
+      }   
+
+      const market = e.target.getAttribute('market') || localStorage.getItem('more_market'); 
+
+      const cart = {
+        fixture_id: fixtureId,
+        session_id: session_id,
+        betslip_teams: homeTeam + ' v ' + awayTeam,
+        betslip_market: market,
+        betslip_picked: picked,
+        betslip_odds: odds 
+      }
+      
+      sessionStorage.setItem(fixtureId, JSON.stringify(cart))
+
+      setId(prev => prev.concat(fixtureId))
+
+    }
+
     return (
       <StyleGameComponent className="bg-light">
          <Row className="custom-grid bg-light">   
