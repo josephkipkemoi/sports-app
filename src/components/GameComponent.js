@@ -112,7 +112,7 @@ export default function GameComponent() {
  
         return (
           <React.Fragment key={ii+i+odds.odd}>         
-                <div className='d-sm-flex m-1 btn btn-light btn-sm' style={{ width: '30%', padding: 0, margin: 0}}>               
+                <div className='d-sm-flex m-1 btn btn-info btn-sm text-white' style={{ width: '30%', padding: 0, margin: 0}}>               
                   <button 
                     className=' text-white w-100 flex-wrap p-2'   
                     id="fix-btn"
@@ -125,7 +125,7 @@ export default function GameComponent() {
                     {odds.value}                 
                   </button>
                   <button 
-                     className=' text-white w-100 flex-wrap p-2'   
+                     className='text-white w-100 flex-wrap p-2'   
                      id="fix-btn"
                      odds={odds.odd} 
                      market_id={i} 
