@@ -100,11 +100,12 @@ function App() {
       <Spinner style={{ position: 'absolute', top: '50%', width: '4rem', height: '4rem' }} animation="border"/>
     </div> :
      <ThemedBody>
+     <TopNavBar/>
      <main id="main" className='bg-light'>
-       <Row className='px-2'>
+       <Row>
            <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
             <StyledMain>
-            <TopNavBar/>
+        
             <CustomAds/>
             <CustomFilter heading="Highlights"/>
 

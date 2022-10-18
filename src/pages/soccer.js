@@ -18,7 +18,7 @@ const StyleSoccer = styled.div`
     background-color: #ebeded;
 `
 
-export default function Soccer({ data }) { 
+export default function Soccer() { 
     
     return (
         <StyleSoccer>
@@ -26,7 +26,7 @@ export default function Soccer({ data }) {
                 <Col lg={9} md={12} sm={12}>
                     <TopNavBar  />
                     <CustomFilter heading="Soccer" />
-                    <GameComponent data={data} />
+                    <GameComponent />
                 </Col>
                 <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>
                     <BetslipContainer/>
@@ -36,13 +36,4 @@ export default function Soccer({ data }) {
         </StyleSoccer>
     )
 }
-
-export async function getServerSideProps(context) {
-    const data = await axios.get('api/custom_fixture')
-  
-    return {
-      props: {
-        data: data.data.fixtures
-      }, // will be passed to the page component as props
-    }
-  }
+ 
