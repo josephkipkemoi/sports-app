@@ -2,26 +2,42 @@ import React from "react";
 import { Card, Carousel } from "react-bootstrap";
 import styled from "styled-components";
 import Image from "next/image";
+import config from '../../config.json';
 
 const StyleCustomAds = styled.div`
-    background-color: #edebeb;
+    background-color: #002244;
+    padding-left: 1rem;
+    padding-right: 1rem;
     h4 {
         padding: 0;
         margin: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        letter-spacing: 1px;
+        font-size: 1.3rem;
     }
-
+.custom-card {
+    max-width: 70%;
+    height: 100px;
+    align-items: center;
+    background: linear-gradient(-45deg, rgba(0,0,0,0.22), rgba(255,255,255,0.25));
+    box-shadow: 
+    8px 8px 12px 0 rgba(0, 0, 0, 0.25),
+    -2px -2px 4px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    display: flex;  
+    justify-content: center; 
+}
+.custom-row {
+    background: #5dbb63;
+    padding: 1rem;
+}
 `
 export default function CustomAds() {
     return (
-        <StyleCustomAds className="d-flex bg-light">
-            <Card className="w-100 border-0 bg-light m-1 rounded">
-                <Card.Body className="rounded" style={{ paddingBottom: 0, paddingTop: 0, paddingLeft: 0, paddingRight: 0 }}>
-                   <CarouselComponent/>
-                </Card.Body>
-            </Card>
+        <StyleCustomAds className="d-flex p-2 ">
+            <CarouselComponent/>
         </StyleCustomAds>
     )
 }
@@ -29,29 +45,46 @@ export default function CustomAds() {
 const CarouselComponent = () => {
 
     return (
-         <Carousel controls={false} indicators={false} className="pt-3 rounded">
+         <Carousel controls={false} indicators={false} className="rounded w-100">
             <Carousel.Item 
                 interval={2000} 
-                className="card border-0 shadow p-1 d-flex align-items-center rounded" 
-                style={{ backgroundColor: '#fff' }}
+                className="border-0 shadow p-1 rounded " 
+                style={{ backgroundColor: '#191970' }}            
             >
-                <Image width={75} height={75} src="https://www.pinaclebet.com/mpesa.jpeg" />
-                {/* <h4 className="text-center fw-bold" style={{ fontSize: '24px', color: '#fff' }}>
-                    MPESA PAYBILL
-                </h4> */}
-                <h4 className="text-center fw-bold p-2 m-1 w-100 rounded" style={{ fontSize: '16px', color: '#fff', backgroundColor: 'green' }}>
-                   Account No 07-XXX-XXX
-                </h4>
+                <div className="row align-items-center custom-row">
+                    <div className="col d-flex justify-content-center p-3" style={{ maxWidth: '30%', height: '100px' }}>
+                        <Image width={75} height={75} src="https://www.pinaclebet.com/mpesa.png" />
+                    </div>
+                    <div 
+                    className=
+                    "col m-2 rounded-pill d-flex align-items-center flex-column justify-content-center custom-card text-white p-3" 
+                    >
+                        <h4 className="text-center fw-bold mb-2">PAYBILL: {config.MPESA_PAYBILL_NUMBER}</h4>
+                        <h4 className="text-center fw-bold w-100 rounded">
+                            ACCT. NO: 07-XXX-XXX
+                        </h4>
+                    </div>
+                </div>              
             </Carousel.Item>    
             <Carousel.Item 
-                interval={1500} 
-                className="card border-0 shadow p-1 d-flex align-items-center rounded" 
+                interval={2000} 
+                className="border-0 shadow p-1 rounded " 
+                style={{ backgroundColor: '#191970' }}            
             >
-                <Image width={75} height={75} src="https://www.pinaclebet.com/mpesa.jpeg" />
-                <h4 className="text-center fw-bold p-2 m-1 w-100 rounded" style={{ fontSize: '16px', color: '#fff', backgroundColor: 'green' }}>                  
-                   Paybill 4075207
-                </h4>
-            </Carousel.Item>
+                <div className="row align-items-center custom-row">
+                    <div className="col d-flex justify-content-center p-3" style={{ maxWidth: '30%', height: '100px' }}>
+                        <Image width={75} height={75} src="https://www.pinaclebet.com/mpesa.png" />
+                    </div>
+                    <div 
+                    className=
+                    "col m-2 rounded-pill d-flex align-items-center flex-column justify-content-center custom-card text-white p-3" 
+                    >
+                        <h1 className="text-center fw-bold mb-2">
+                            Instant Cash Out!
+                        </h1>                             
+                    </div>
+                </div>              
+            </Carousel.Item>  
          </Carousel>
     )
 }
