@@ -134,7 +134,7 @@ export default function TopNavBar() {
             >
               <FontAwesomeIcon 
                 icon={link.icon} 
-                className={`fa-2x mb-2 mt-2 ${link.path === pathname ? 'text-warning' : 'text-white'} `}
+                className={`fa-2x mb-2 mt-2 fw-bold ${link.path === pathname ? 'text-warning' : 'text-white'} `}
               />
  
               <small 
