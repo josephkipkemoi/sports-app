@@ -259,7 +259,7 @@ const BetslipCartHeader = ({ length }) => {
             <i className="bi bi-chevron-double-up mobile-down" slip="active" id="cart-header-su" style={{ marginRight: 5 }}></i> :   
             <i className="bi bi-chevron-double-down mobile-down" id="cart-header-sd" style={{ marginRight: 5 }}></i>
             }
-            <p className='fw-bold' id="cart-header-multi" slip="active" style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({length})</p>
+            <h6 className='fw-bold' id="cart-header-multi" slip="active" style={{ margin: 0, letterSpacing: '1px', padding: 0 }}>  Multi Bet ({length})</h6>
           </div>
           :
           <div className='d-flex align-items-center' slip="active">      
@@ -267,7 +267,7 @@ const BetslipCartHeader = ({ length }) => {
             <i className="bi bi-chevron-double-up mobile-down"  slip="active" id="cart-header-mu" style={{ marginRight: 5 }}></i> :   
             <i className="bi bi-chevron-double-down mobile-down"  slip="active" id="cart-header-md" style={{ marginRight: 5 }}></i>
             }
-            <p className='fw-bold' id="cart-header-single"  slip="active" style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({length})</p> 
+            <h6 className='fw-bold' id="cart-header-single"  slip="active" style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({length})</h6> 
           </div>
           } 
         

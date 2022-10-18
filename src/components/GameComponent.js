@@ -35,10 +35,17 @@ const StyleGameComponent = styled.div`
     color: #001041;
   }
   button {
-    background: #e3f1fd;
-    color: #001041 !important;
+    color: #191970 !important;
+    align-items: center;
+    background: linear-gradient(-45deg, #00FFFF, #F0F8FF);
+    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.15),
+    -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    border: 0;
+    display: flex;  
+    justify-content: center; 
+    letter-spacing: 1px;
   }
- 
 `
 export default function GameComponent() {
     const [id, setId] = useState([])
@@ -112,9 +119,9 @@ export default function GameComponent() {
  
         return (
           <React.Fragment key={ii+i+odds.odd}>         
-                <div className='d-sm-flex m-1 btn btn-info btn-sm text-white' style={{ width: '30%', padding: 0, margin: 0}}>               
-                  <button 
-                    className=' text-white w-100 flex-wrap p-2'   
+                <div className='d-sm-flex m-1 mt-3 mb-3 btn-sm text-white text-center' style={{ width: '30%', padding: 0, margin: 0}}>               
+                  <span 
+                    className='text-dark w-100 flex-wrap p-2'   
                     id="fix-btn"
                     odds={odds.odd} 
                     market_id={i} 
@@ -123,7 +130,7 @@ export default function GameComponent() {
                     style={{ background: 'none', border: 'none' }}
                   >
                     {odds.value}                 
-                  </button>
+                  </span>
                   <button 
                      className='text-white w-100 flex-wrap p-2'   
                      id="fix-btn"
@@ -249,8 +256,8 @@ export default function GameComponent() {
     }
 
     return (
-      <StyleGameComponent className="bg-light">
-         <Row className="custom-grid bg-light">   
+      <StyleGameComponent >
+         <Row className="custom-grid ">   
         {data.data.map((innerData,index) => {
           const oddsData = JSON.parse(innerData.odds) 
           return (
@@ -258,8 +265,8 @@ export default function GameComponent() {
             <Col 
             lg={8} 
             sm={8} 
-            className="card custom-grid-box-main p-2" 
-            style={{ borderRight: '0px', border: 'none', background: 'none' }}
+            className="card p-2" 
+            style={{ borderRight: '0px', border: 'none' }}
             >  
       
               <Row style={{ marginLeft: 2 }} className="d-flex align-items-center">
@@ -297,14 +304,19 @@ export default function GameComponent() {
                   </Row>                 
               </Row>                     
             </Col>
-            <Col lg={4} sm={4} className="card d-flex flex-row active-btn" style={{ background: '#fff', borderLeft: '0px', border: 'none' }}>
+            <Col 
+              lg={4} 
+              sm={4} 
+              className="card d-flex flex-row active-btn" 
+              style={{ background: '#F0F8FF', borderLeft: '0px', border: 'none' }}
+            >
                
               {oddsData?.map((odd) => {         
    
                 return odd.id === 1 && odd.values.map((val, i) => {
                   return (
                      <div key={i} className='text-center mb-3 w-100 m-1'>
-                        <small className='header text-center'>{val.value}</small>  
+                        <small className=' text-center'>{val.value}</small>  
                         <div onClick={() => activatBtn(index,i)}>                        
                           <button 
                             odds={val.odd} 
