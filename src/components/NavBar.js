@@ -51,29 +51,35 @@ nav a:hover, a:active {
     text-decoration: none;
     text-transform: uppercase;
     font-size: 14px;
+    margin-top: .25rem;
+    margin-bottom: .5rem;
 }
 .nav-links-mobile a:nth-child(1) {
     color: #001041;
-    padding: 10px 15px;
+    margin-right: 1rem;
+}
+.log-out {
+   margin-top: .35rem;
+   margin-bottom: .4rem;
 }
 button {
-    color: #001041;
-    padding: 10px 15px;
-    font-size: 14px;
-    border: none;
-    border-radius: 6px;
-    margin-right: 1px;  
     background-color: #ebeded;
+    box-shadow: 
+      3px 3px 4px 0 rgba(0, 0, 0, 0.25),
+      -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    border: none;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    color: #000;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
-.nav-links-mobile a:nth-child(2) {
-    padding: 10px 15px;
-    background-color: #1affff;
-    border-radius: 20px;
-    font-weight: 700;
-    margin-left: 12px;
-}
+
 .mobile-join {
-    margin-left: 6px;
+    margin-left: 8px;
 }
 @media screen and (max-width: 992px) {
     .right-nav-link a{
@@ -89,15 +95,9 @@ button {
     }
     .nav-links-mobile a:nth-child(1) {
         color: #001041;
-        padding: 10px 15px;
+        // padding: 10px 15px;
     }
-    .nav-links-mobile a:nth-child(2) {
-        padding: 10px 15px;
-        background-color: #1affff;
-        border-radius: 20px;
-        font-weight: 700;
-        margin-left: 4px;
-    }
+ 
     nav {
         background-color: #fff;
         border-bottom: none;
@@ -215,9 +215,9 @@ export default function NavBar({ login }) {
 
     const AuthenticatedLinks = () => {
         return (
-                <div className="nav-links-mobile d-flex align-items-center">
+                <div className=" d-flex align-items-center log-out">
                         <button
-                            className="d-flex align-items-center shadow-sm"
+                            className="d-flex align-items-center"
                             onClick={logout}
                         >
                           <i className="bi bi-box-arrow-left"></i>
@@ -235,8 +235,10 @@ export default function NavBar({ login }) {
                             itemProp="url"
                             className="d-flex align-items-center"
                         >
-                            <i className="bi bi-arrow-right-circle"></i>
-                            <span className="mobile-join">Login</span>                                        
+                            <button className="bg-white">
+                                <i className="bi bi-arrow-right-circle"></i>
+                                <span className="mobile-join">Login</span> 
+                            </button>                                                                  
                         </a>
                     </Link>
                     <Link href="/register">
@@ -244,8 +246,10 @@ export default function NavBar({ login }) {
                             itemProp="url"
                             className="d-flex align-items-center"
                         >
-                            <i className="bi bi-person-plus"></i>
-                            <span className="mobile-join">Join</span>
+                            <button className="bg-info text-dark">
+                                <i className="bi bi-person-plus"></i>
+                                <span className="mobile-join">Join</span>
+                            </button>                            
                         </a>
                     </Link>
             </div>
@@ -255,7 +259,7 @@ export default function NavBar({ login }) {
         <>
         <StyledTopRightNav className="shadow-lg">
             <nav id="main-nav">
-                    <div className="d-flex justify-content-between align-items-center p-2">
+                    <div className="d-flex justify-content-between align-items-center p-2 ">
                         <div className="col-mobile">
                             <Link href="/">
                                 <a className="navbar-brand" itemProp="url">
