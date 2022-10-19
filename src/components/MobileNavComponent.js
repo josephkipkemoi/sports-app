@@ -100,7 +100,7 @@ export default function MobileNavComponent ({ length, openSlip }) {
                     }
                     <span className="mt-2">Slip</span>
                 </div>
-                <div className={`w-100 ${pathname === '/history' ? 'active-icon' : ''} custom-icon`}>
+                <div className={`w-100 custom-icon`}>
                     <Link href="/history?his_tab=sbets&tab=all">
                         <a
                             itemProp="url"
