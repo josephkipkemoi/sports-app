@@ -479,7 +479,7 @@ const CartElements = (link, i) => {
         fiveJackpotGames={fiveJackpotGames}
       /> 
     <StyleBetCart 
-    className='betcart-mb card bg-light shadow pb-2' 
+    className='betcart-mb card bg-light shadow pb-4' 
     >
         <ShareContainer 
         isModalOpen={modalOpen} 
