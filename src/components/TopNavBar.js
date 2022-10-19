@@ -25,7 +25,7 @@ overflow-y: hidden;
 padding-top: .25rem;
 padding-bottom: .25rem;
 ::-webkit-scrollbar {
-  height: 8px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
   background: #191850;
