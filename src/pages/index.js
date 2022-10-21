@@ -64,7 +64,8 @@ background-color: #ebeded;
   .custom-grid {
     display: flex;
     flex-wrap: wrap;
-    padding: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
  
   .custom-grid-hide {

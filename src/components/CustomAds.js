@@ -5,9 +5,7 @@ import Image from "next/image";
 import config from '../../config.json';
 
 const StyleCustomAds = styled.div`
-    background-color: #002244;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    background-color: #fff;  
     h4 {
         padding: 0;
         margin: 0;
@@ -36,7 +34,7 @@ const StyleCustomAds = styled.div`
 `
 export default function CustomAds() {
     return (
-        <StyleCustomAds className="d-flex p-2 ">
+        <StyleCustomAds className="d-flex">
             <CarouselComponent/>
         </StyleCustomAds>
     )
@@ -49,7 +47,7 @@ const CarouselComponent = () => {
             <Carousel.Item 
                 interval={2000} 
                 className="border-0 shadow p-1 rounded " 
-                style={{ backgroundColor: '#191970' }}            
+                style={{ backgroundColor: '#5dbb63' }}            
             >
                 <div className="row align-items-center custom-row">
                     <div className="col d-flex justify-content-center p-3" style={{ maxWidth: '30%', height: '100px' }}>
@@ -68,8 +66,8 @@ const CarouselComponent = () => {
             </Carousel.Item>    
             <Carousel.Item 
                 interval={2000} 
-                className="border-0 shadow p-1 rounded " 
-                style={{ backgroundColor: '#191970' }}            
+                className="border-0 shadow p-1 rounded" 
+                style={{ backgroundColor: '#5dbb63' }}            
             >
                 <div className="row align-items-center custom-row">
                     <div className="col d-flex justify-content-center p-3" style={{ maxWidth: '30%', height: '100px' }}>

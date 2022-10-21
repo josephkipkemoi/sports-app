@@ -117,6 +117,9 @@ button {
 `
 
 const StyleBottomNavBar = styledComponents.div`
+padding-right: .25rem;
+padding-left: .25rem;
+background-color: #191970;
    .join {
        background-color: #ffdf1b;
        padding: 6px;
@@ -279,18 +282,6 @@ export default function NavBar({ login }) {
     )
 }
 
-const midnavLinks = [
-    {
-        name: 'Sports',
-        path: '/soccer',
-        class: 'sports'
-    },
-    {
-        name: 'Live Games',
-        path: '/live?fixture=all',
-        class: 'live-games'
-    },
-]
 
 const unauthLinks = [
     {
@@ -520,9 +511,6 @@ export const BottomNavBar = ({ login, user }) => {
         >
             <CurrentTime/>
          
-            <div>
-                {midnavLinks.map(MidNavLinkItems)}
-            </div>
             <NotificationComponent user={user}/>
         </nav>
     

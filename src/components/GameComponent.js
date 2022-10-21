@@ -257,7 +257,7 @@ export default function GameComponent() {
 
     return (
       <StyleGameComponent >
-         <Row className="custom-grid ">   
+         <Row className="custom-grid" style={{ margin: 0 }}>   
         {data.data.map((innerData,index) => {
           const oddsData = JSON.parse(innerData.odds) 
           return (
@@ -266,10 +266,10 @@ export default function GameComponent() {
             lg={8} 
             sm={8} 
             className="card p-2" 
-            style={{ borderRight: '0px', border: 'none' }}
+            style={{ borderRight: '0px', border: 'none', marginTop: 0, paddingTop: 0, marginBottom: 0 }}
             >  
       
-              <Row style={{ marginLeft: 2 }} className="d-flex align-items-center">
+              <Row style={{ marginLeft: 2, margin: 0   }} className="d-flex align-items-center">
               <h6 className=' text-mute' style={{ letterSpacing: '1px' }}> 
                 {innerData.flag ?
                     <img 
@@ -356,15 +356,12 @@ export default function GameComponent() {
                
             </Col>
             <div className='more-market' style={{ display: 'none' }}>
-              <hr className='text-secondary'/>
+              <hr className='text-light'/>
               <div className='fw-bold text-center bg-light p-2 rounded' style={{ letterSpacing: 2 }}>
                 <span className="text-dark">More Markets</span>
               </div>
               {oddsData?.map(MoreFixtureMarket)}
-            </div>
-
-            <hr className='text-secondary'/>
-            
+            </div>            
           </React.Fragment>
           )
           
