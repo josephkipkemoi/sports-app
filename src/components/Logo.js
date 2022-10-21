@@ -2,14 +2,19 @@ import React from "react";
 import styled from "styled-components";
 
 const StyleIcon = styled.div`
+
 svg {
-  position: absolute;
-  left: -1px;
-  top: 12px;
+ max-width: 155px;
+ height: 40px;
+ border-radius: 16px;
+ padding-top: 4px;
+ margin-left: -8px;
+ margin-bottom: -4px;
+ margin-top: 4px;
 }
 svg text {
     font-family: Roboto Condensed,Arial Narrow,sans-serif;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     stroke: #001041;
     font-size: 28px;
     font-weight: 700;
@@ -34,7 +39,7 @@ svg text {
 export default function Logo() {
     return (
         <StyleIcon>
-            <svg width="170" height="40">
+            <svg className="d-flex align-items-center">
                 <text x="50%" y="60%"  textAnchor="middle"  >
                     Pinaclebet
                 </text>

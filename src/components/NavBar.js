@@ -58,11 +58,11 @@ nav a:hover, a:active {
     color: #001041;
     margin-right: 1rem;
 }
-.log-out {
-   margin-top: .35rem;
-   margin-bottom: .4rem;
+.custom-btn:nth-child(1) {
+    background-color: #191970;
+    color: #fff;
 }
-button {
+.custom-btn {
     background-color: #ebeded;
     box-shadow: 
       3px 3px 4px 0 rgba(0, 0, 0, 0.25),
@@ -114,6 +114,7 @@ button {
         display: none;
     }
 }
+ 
 `
 
 const StyleBottomNavBar = styledComponents.div`
@@ -147,7 +148,11 @@ background-color: #191970;
     .nav-link  {
         margin-left: 24px;
     }
- 
+    @media screen and (max-width: 280px) {
+        .col-mobile {
+            display: grid;
+        }
+    } 
     @media screen and (max-width: 576px) {      
        .time {
           width: 30%;
@@ -218,7 +223,7 @@ export default function NavBar({ login }) {
 
     const AuthenticatedLinks = () => {
         return (
-                <div className=" d-flex align-items-center log-out">
+                <div className="d-flex align-items-center log-out">
                         <button
                             className="d-flex align-items-center"
                             onClick={logout}
@@ -232,27 +237,23 @@ export default function NavBar({ login }) {
 
     const UnAuthenticatedLinks = () => {
         return (
-            <div className="nav-links-mobile d-flex align-items-center">                
-                <Link href="/login">
-                        <a
-                            itemProp="url"
-                            className="d-flex align-items-center"
-                        >
-                            <button className="bg-white">
-                                <i className="bi bi-arrow-right-circle"></i>
-                                <span className="mobile-join">Login</span> 
-                            </button>                                                                  
-                        </a>
-                    </Link>
+            <div className="nav-links-mobile d-flex ">  
                     <Link href="/register">
                         <a
                             itemProp="url"
-                            className="d-flex align-items-center"
+                            className="d-flex align-items-center btn btn-info custom-btn text-white"
                         >
-                            <button className="bg-info text-dark">
                                 <i className="bi bi-person-plus"></i>
                                 <span className="mobile-join">Join</span>
-                            </button>                            
+                        </a>
+                    </Link>
+                    <Link href="/login">
+                        <a
+                            itemProp="url"
+                            className="d-flex align-items-center btn custom-btn"
+                        >
+                            <i className="bi bi-arrow-right-circle"></i>
+                            <span className="mobile-join">Login</span> 
                         </a>
                     </Link>
             </div>
@@ -261,20 +262,23 @@ export default function NavBar({ login }) {
     return (
         <>
         <StyledTopRightNav className="shadow-lg">
+
             <nav id="main-nav">
                     <div className="d-flex justify-content-between align-items-center p-2 ">
-                        <div className="col-mobile">
+                        <div className="">
                             <Link href="/">
                                 <a className="navbar-brand" itemProp="url">
                                     <Logo/>
                                 </a>
                             </Link>
                         </div>
-            
-                        {Boolean(user?.uu_id) ? <AuthenticatedLinks/> : <UnAuthenticatedLinks/>}
 
+                        <div className="col-mobile">
+                            {Boolean(user?.uu_id) ? <AuthenticatedLinks/> : <UnAuthenticatedLinks/>}
+                        </div>                        
                     </div>
             </nav>
+
             <BottomNavBar logout={logout} login={login} user={user}/>
 
         </StyledTopRightNav>
