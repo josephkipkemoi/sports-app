@@ -10,7 +10,40 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AlertModalElement, RefreshButtonElement } from '../components/HtmlElements';
 import Pagination from "./Pagination";
 import { Span } from '../components/Html';
+import styled, { withTheme } from "styled-components";
 
+const StyleHistoryElements = styled.div`
+background: linear-gradient(-45deg, rgba(0,0,0,0.22), rgba(255,255,255,0.25));
+box-shadow: 
+6px 6px 8px 0 rgba(0, 0, 0, 0.25),
+-2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+border-radius: 16px;
+ .icon-status {
+    background: linear-gradient(-45deg, rgba(0,0,0,0.22), rgba(255,255,255,0.25));
+    box-shadow: 
+    4px 4px 6px 0 rgba(0, 0, 0, 0.25),
+    -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+ }
+ .custom-card {
+    border-radius: 16px;
+ }
+ .card-child {
+    margin-top: -5px;
+    padding-top: 6px;
+    padding-left: .5rem;
+    padding-right: .5rem;
+ }
+ .card-child:first-child {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+ }
+ .card-child:last-child {
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+ }
+
+`
 
 export default function HistoryComponent ({ data, setPageNumber, pageNumber, refetch, user_id }) {
     
@@ -49,33 +82,52 @@ export default function HistoryComponent ({ data, setPageNumber, pageNumber, ref
         const historyData = JSON.parse(name.cart)
    
         return (
-            <div key={i} className="mb-3" clickcart="true">
+            <StyleHistoryElements 
+                key={i} 
+                className="mb-3" 
+                clickcart="true"   
+            >
             <div 
-            className="card cursor-pointer border-0" 
-            style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0, borderBottom: 'none', paddingBottom: 0, marginBottom: 0 }}          
-            clickcart="true"
+                className="card cursor-pointer border-0 shadow custom-card"          
+                clickcart="true"
             >
                 <div 
-                    className="card p-3 border-0 bg-light shadow-sm"
-                    style={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+                    className=
+                    {`card p-3 border-0 
+                    ${name.bet_status === 'Active' && 'bg-info text-dark'}  
+                    ${name.bet_status === 'Lost' && 'bg-danger text-white'}  
+                    ${name.bet_status === 'Pending' && 'bg-secondary text-white'}  
+                    ${name.bet_status === 'Won' && 'bg-success text-white'}  
+                    shadow-sm`}
+                    style={{ 
+                        borderTopRightRadius: 16,
+                        borderTopLeftRadius: 16,
+                        borderBottomRightRadius: 16, 
+                        borderBottomLeftRadius: 16 
+                    }}
                     onClick={(e) => openMoreMarkets(i,e)}
                     clickcart="true"
                 >
                 <div className='d-flex justify-content-between' clickcart="true" onClick={(e) => openMoreMarkets(i,e)}>
                     <div clickcart="true">
-                        <Span className='text-secondary'>
+                        <Span className=''>
                             {new Date(name.created_at).getDate()}/
                             {new Date(name.created_at).getMonth()}/
                             {new Date(name.created_at).getFullYear()}
                         </Span>
-                        <Span className='text-secondary' style={{ marginLeft: 5 }}>
+                        <Span className='' style={{ marginLeft: 5 }}>
                             {new Date(name.created_at).getHours()}:
                             {new Date(name.created_at).getMinutes()}
                         </Span>
                     </div>                                                            
                     <div clickcart={0}>
-                        <div className='btn' clickcart={0} onClick={() => openDeleteModal(name.cart_id)}>
-                            <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} className="text-danger"/>
+                        <div 
+                            className='btn' 
+                            clickcart={0} 
+                            onClick={() => openDeleteModal(name.cart_id)}
+                            style={{ color: '#fff' }}
+                        >
+                            <FontAwesomeIcon onClick={() => openDeleteModal(name.cart_id)} icon={faTrash} />
                         </div>
                     </div>
                 </div>
@@ -84,21 +136,25 @@ export default function HistoryComponent ({ data, setPageNumber, pageNumber, ref
                     <small clickcart="true" className='fw-bold' style={{ textTransform: 'uppercase' }}>{name.cart_id}</small> 
                 </div>
                 <div 
-                    className={`mt-2 d-flex align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} ${name.bet_status === 'Active' && 'bg-info'} bg-secondary shadow rounded-pill text-white`}
+                    className={`mt-2 d-flex icon-status align-items-center justify-content-between p-2 ${name.bet_status === 'Won' && 'bg-success'} ${name.bet_status === 'Lost' && 'bg-danger'} ${name.bet_status === 'Active' && 'bg-info'}`}
                     clickcart="true"
                >   
                     <span style={{ paddingLeft: 12 }}>Bet Status</span>
                     <Span 
-                        className={`d-flex align-items-center text-center rounded text-warning fw-bold ${name.bet_status === 'Won' && 'text-white bg-success'} ${name.bet_status === 'Lost' && 'text-white bg-danger'}`}
+                        className=
+                        {`d-flex align-items-center text-center 
+                        rounded fw-bold 
+                        ${name.bet_status === 'Won' && 'text-white'} 
+                        ${name.bet_status === 'Lost' && 'text-white'}`}
                         style={{ paddingRight: 12 }}
                     >
                         <span style={{ marginRight: 6 }}>
                             {name.bet_status === 'Won' && <i className="bi bi-trophy-fill" ></i>}
-                            {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle text-white" ></i>}
-                            {name.bet_status === 'Pending' && <i className="bi bi-hourglass-split text-white" ></i>}
-                            {name.bet_status === 'Active' && <i className="bi bi-bullseye text-white" ></i>}
+                            {name.bet_status === 'Lost' && <i className="bi bi-exclamation-circle" ></i>}
+                            {name.bet_status === 'Pending' && <i className="bi bi-hourglass-split" ></i>}
+                            {name.bet_status === 'Active' && <i className="bi bi-bullseye" ></i>}
                         </span>
-                        <span className='text-white' style={{ marginTop: 2 }}>{name.bet_status}</span>
+                        <span style={{ marginTop: 2 }}>{name.bet_status}</span>
                     </Span>                            
                 </div>
                 <div className='d-flex justify-content-between mt-2 p-1' clickcart="true">
@@ -115,21 +171,39 @@ export default function HistoryComponent ({ data, setPageNumber, pageNumber, ref
             </div>
             </div>
             <div 
-            className={`card p-1 border-0 history-more-markets shadow`}
+            className={`card p-1 border-0
+            ${name.bet_status === 'Active' && 'bg-info text-dark'}  
+            ${name.bet_status === 'Lost' && 'bg-danger text-white'}  
+            ${name.bet_status === 'Pending' && 'bg-secondary text-white'}  
+            ${name.bet_status === 'Won' && 'bg-success text-white'}  
+            history-more-markets shadow`}
             style={{ 
                 borderTopRightRadius: 0, 
                 borderTopLeftRadius: 0, 
                 borderTop: 'none',
                 display:'none',
-                paddingTop: 0
+                paddingTop: 0,
+                borderBottomRightRadius: 16, 
+                borderBottomLeftRadius: 16 ,
+                marginTop: '-12px'
             }}
             >
                 {historyData.map((d,i) => {       
                     return (
-                        <div className='card p-3 border-0' key={i+d.fixture_id}>
-                            <div style={{ marginLeft: '.5rem', marginRight: '.5rem' }}>
-                                <small>Game ID: {d.fixture_id}</small>
-                                <div className='row bg-dark rounded-pill text-light p-1 m-1'>
+                        <div 
+                        className='card bg-primary text-white shadow pb-3 border-0 card-child' 
+                        key={i+d.fixture_id}
+                        style={{ 
+                            borderTop: '1px solid white', 
+                        }}
+                        >
+                            <div 
+                            style={{ 
+                                marginLeft: '.5rem', 
+                                marginRight: '.5rem',
+                            }}>
+                                <small >Game ID: {d.fixture_id}</small>
+                                <div className='row icon-status bg-primary rounded-pill text-light p-1 m-1'>
                                     <Col style={{ maxWidth: 20 }}>
                                         <span><FontAwesomeIcon icon={faSoccerBall} /></span>
                                     </Col>
@@ -146,16 +220,17 @@ export default function HistoryComponent ({ data, setPageNumber, pageNumber, ref
                                 <span>Picked: {d.betslip_picked}</span>
                                 <span>Outcome: {Boolean(name.outcome) ? name.outcome : '__-__'}</span>
                             </div>
+                          
                         </div>
                     )
                 })}
             </div>
-        </div>
+        </StyleHistoryElements>
         )
     }
 
     return (
-        <div className="bg-white pt-3 pb-3 h-100">
+        <StyleHistoryElements className="pt-3 pb-3 h-100" style={{ background: '#fff' }}>
         
             <div>
                 <Pagination 
@@ -168,8 +243,9 @@ export default function HistoryComponent ({ data, setPageNumber, pageNumber, ref
             <div className='d-flex justify-content-center mb-2'>
                 <RefreshButtonElement refetch={refetch}/>
             </div>
+            
             {data?.data.length > 0 ? 
-                <div className='bg-white rounded p-2'>
+                <div className='rounded p-2' style={{ background: '#ebeded' }}>
                     <div className='mb-4'>                      
                         {data.data.map(BetHistoryElements) }
                     </div>
@@ -198,7 +274,7 @@ export default function HistoryComponent ({ data, setPageNumber, pageNumber, ref
                 </div>       
             : <NoBetslipHistory/>
             }
-        </div>
+        </StyleHistoryElements>
     )
 }
 
