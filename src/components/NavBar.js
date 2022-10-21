@@ -225,7 +225,7 @@ export default function NavBar({ login }) {
         return (
                 <div className="d-flex align-items-center log-out">
                         <button
-                            className="d-flex align-items-center"
+                            className="d-flex align-items-center custom-btn"
                             onClick={logout}
                         >
                           <i className="bi bi-box-arrow-left"></i>
