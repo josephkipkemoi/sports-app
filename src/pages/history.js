@@ -15,7 +15,7 @@ import {    useGetAllUserHistoryBetslipV1Query,
             useGetUnsettledHistoryBetslipQuery, 
         } from '../hooks/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRefresh } from '@fortawesome/free-solid-svg-icons';
+import { faRefresh , faCalendar} from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
 import AuthUser from '../hooks/AuthUser';
 import { withProtected } from '../hooks/RouteProtection';
@@ -404,10 +404,25 @@ const StyleFilterBtn = styled.div`
     button[type=search] {
         display: none;
     }
+    .icon-status {
+        background: linear-gradient(-45deg, rgba(0,0,0,0.22), rgba(255,255,255,0.25));
+        border-radius: 12px;
+        border: none;
+        box-shadow: 
+        3px 3px 4px 0 rgba(0, 0, 0, 0.25),
+        -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    }
 `
 
 const StyleSearch = styled.div`
- 
+.icon-status {
+    background: linear-gradient(-45deg, rgba(0,0,0,0.22), rgba(255,255,255,0.25));
+    border-radius: 12px;
+    border: none;
+    box-shadow: 
+    3px 3px 4px 0 rgba(0, 0, 0, 0.25),
+    -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+}
     button {
         width: 102px;        
     }
@@ -418,11 +433,12 @@ const StyleHeaderNav = styled.div`
      cursor: pointer;   
     }
     .active-h5 {
-        border-bottom: 3px solid gray;
+        border-bottom: 3px solid #191970;
     }
     h5:last-child {
         margin-left: 12px;
     }
+
 `
 const HistoryFilter = () => {
     const positionRef = useRef(null)
@@ -454,7 +470,7 @@ const HistoryFilter = () => {
                 >
                     <a 
                     itemProp="url" 
-                    className={`btn btn-primary shadow ${tab === 'all' || tab === 'j_all' && 'active'}`}
+                    className={`btn icon-status ${tab === 'all' || tab === 'j_all' && 'active'}`}
                     ref={positionRef}
                     >
                         All
@@ -465,7 +481,7 @@ const HistoryFilter = () => {
                 >
                     <a 
                     itemProp='url' 
-                    className={`btn btn-primary shadow ${tab === 'settled' || tab === 'mega_jackpot' && 'active'}`}
+                    className={`btn icon-status  ${tab === 'settled' || tab === 'mega_jackpot' && 'active'}`}
                     style={{ marginLeft: 5 }}
                     >
                         {his_tab === 'sbets' ? "Settled" : "Mega Jackpot"}
@@ -476,7 +492,7 @@ const HistoryFilter = () => {
                 >
                     <a 
                     itemProp='url' 
-                    className={`btn btn-primary shadow ${tab === 'unsettled' || tab === 'five_jackpot' && 'active'}`}
+                    className={`btn icon-status  ${tab === 'unsettled' || tab === 'five_jackpot' && 'active'}`}
                     style={{ marginLeft: 5 }}
                     >
                         {his_tab === 'sbets' ? "Unsettled" : "Five Jackpot"}
@@ -492,7 +508,7 @@ const HistoryFilter = () => {
     }, [])
 
     return (
-        <div className='history-header card p-2 shadow-sm border-0' style={{ backgroundColor: '#edebeb' }}>
+        <div className='history-header card p-2 shadow-sm border-0 bg-info'>
             <div>
                 <StyleHeaderNav className='d-flex mb-2'>
                     <Link href="history?his_tab=sbets&tab=all">
@@ -521,22 +537,22 @@ const HistoryFilter = () => {
                     </Link>
                 </StyleHeaderNav>          
             </div>
-            <div className='d-sm-flex justify-content-between'>
-            <div className='m-1'>
-                <SportBetsLinks />          
-            </div>
-            <div className='d-flex justify-content-end m-1'>
-                <StyleSearch >
-                    <button 
-                        type="search" 
-                        className='btn btn-primary shadow d-flex justify-content-between float-end'
-                        onClick={openModal}
-                    >
-                        <span>All Dates </span>    
-                        <i className="bi bi-caret-down"></i>                 
-                    </button>                    
-                </StyleSearch>                
-            </div>              
+            <div className='d-flex justify-content-between '>
+                <div className='m-1'>
+                    <SportBetsLinks />          
+                </div>
+                <div className='d-flex justify-content-end m-1'>
+                    <StyleSearch >
+                        <button 
+                            type="search" 
+                            className='btn icon-status shadow d-flex justify-content-between align-items-center float-end'
+                            onClick={openModal}
+                        >
+                            <span>All Dates </span>    
+                            <FontAwesomeIcon icon={faCalendar} />              
+                        </button>                    
+                    </StyleSearch>                
+                </div>              
             </div>     
             <Modal show={isModalOpen} className="mt-5 pt-5 " modalId="modal-ref">
                 <Modal.Body modalId="modal-ref" className="p-4 rounded" style={{ background: '#e4e4e4' }}>

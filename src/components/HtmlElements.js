@@ -7,18 +7,15 @@ import { Span } from './Html';
 import Link from 'next/link';
 import { Card } from 'react-bootstrap';
 import Confetti from './Confetti';
+
 export const RefreshButtonElement = ({ refetch }) => {
     return (
-        <button 
-            className='btn btn-outline-secondary border-0 shadow-sm d-flex align-items-center m-1'
-            onClick={refetch}
-        >
             <FontAwesomeIcon
                 icon={faRefresh}
-                style={{ marginRight: 8 }}
+                onClick={refetch}
+                className="text-white icon-status p-2"
+                size='lg'
             />
-            Refresh
-        </button>
     )
 }
 
