@@ -178,6 +178,36 @@ const DepositComponent = () => {
     )
 }
 
+const StyleDepositComponent = styled.div` 
+    nav {
+        overflow-x: scroll;
+        padding-bottom: .4rem;
+    }
+    button {
+        border-radius: 12px;
+        padding: .5rem;
+    }
+    .custom-btn {
+        border-radius: 12px;
+        border: none;     
+        margin: .45rem;     
+    }
+    .custom-active-btn {       
+        box-shadow: 
+        2px 2px 3px 0 rgba(255, 255, 255, 0.25),
+        -2px -2px 3px 0 rgba(0, 0, 0, 0.3);
+    }
+    .custom-notactive-btn {
+        box-shadow: 
+        2px 2px 3px 0 rgba(0, 0, 0, 0.25),
+        -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    }
+    .custom-active-container {
+        box-shadow: 
+        2px 2px 3px 0 rgba(255, 255, 255, 0.25),
+        -2px -2px 3px 0 rgba(0, 0, 0, 0.3);
+    }
+`
 const DepositOptionsComponent = () => {
 
     const [depositContainer, setDepositContainer] = useState(config.MPESA_DEPOSIT_OPTION)
@@ -187,14 +217,14 @@ const DepositOptionsComponent = () => {
     }
 
     return (
-        <>
-            <nav className="d-sm-flex justify-content-between">
+        <StyleDepositComponent >
+            <nav className="d-flex justify-content-between">
                 <button 
                 className=
-                {` btn  
+                {`  
                 ${depositContainer === config.MPESA_DEPOSIT_OPTION ? 
-                    'rounded-pill btn-success shadow' : 
-                    'rounded btn-primary'} m-1 w-100 d-flex align-items-center`} 
+                    'custom-btn custom-active-btn' : 
+                    'custom-btn custom-notactive-btn'}`} 
                 onClick={handleClick}
                 >                   
                     {config.MPESA_DEPOSIT_OPTION}
@@ -203,8 +233,8 @@ const DepositOptionsComponent = () => {
                 className=
                 {`btn  
                 ${depositContainer === config.AIRTEL_DEPOSIT_OPTION ? 
-                    'rounded-pill btn-secondary shadow' : 
-                    'rounded btn-primary'} m-1 w-100 d-flex align-items-center`} 
+                    'custom-btn custom-active-btn' : 
+                    'custom-btn custom-notactive-btn'}`} 
                 onClick={handleClick}
                 >
                     {config.AIRTEL_DEPOSIT_OPTION}
@@ -213,8 +243,8 @@ const DepositOptionsComponent = () => {
                 className=
                 {`btn  
                 ${depositContainer === config.PAYPALL_DEPOSIT_OPTION ? 
-                    'rounded-pill btn-success shadow' : 
-                    'rounded btn-primary'} m-1 w-100 d-flex align-items-center`} 
+                    'custom-btn custom-active-btn' : 
+                    'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
                 onClick={handleClick}
                 >
                     <svg 
@@ -234,8 +264,8 @@ const DepositOptionsComponent = () => {
                 className=
                 {`btn  
                 ${depositContainer === config.BITCOIN_DEPOSIT_OPTION ? 
-                    'rounded-pill btn-warning shadow' : 
-                    'rounded btn-primary'} m-1 w-100 d-flex align-items-center`} 
+                    'custom-btn custom-active-btn' : 
+                    'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
                 onClick={handleClick}
                 >    
                     <svg 
@@ -255,8 +285,8 @@ const DepositOptionsComponent = () => {
                 className=
                 {`btn  
                 ${depositContainer === config.BEYONIC_DEPOSIT_OPTION ? 
-                    'rounded-pill btn-dark shadow' : 
-                    'rounded btn-primary'} m-1 w-100 d-flex align-items-center`} 
+                    'custom-btn custom-active-btn' : 
+                    'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
                 onClick={handleClick}
                 >
                     <span className="fw-bold rounded-circle" style={{ marginRight: 8 }}>B</span>
@@ -268,7 +298,7 @@ const DepositOptionsComponent = () => {
             {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PayPalDeposit/> }
             {depositContainer === config.BITCOIN_DEPOSIT_OPTION &&  <BitCoinDeposit/> }
 
-        </>
+        </StyleDepositComponent>
     )
 }
 
@@ -454,7 +484,7 @@ const MpesaDeposit = () => {
 
 
     return (
-        <Card className="border-0 shadow mt-3 rounded">
+        <Card className="border-0 mt-3 rounded custom-active-container">
             <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
                 <Image src="https://www.pinaclebet.com/mpesa.jpeg" width={72} height={72} />
             </Card.Header>
@@ -463,7 +493,7 @@ const MpesaDeposit = () => {
                 <button 
                 inc={configData.INCREMENT_DEPOSIT_100} 
                 onClick={incrementDepositAmount} modalid="modal-ref" 
-                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                className='custom-btn custom-notactive-btn m-1 mb-2'
                 >
                 + {configData.INCREMENT_DEPOSIT_100}
                 </button>       
@@ -471,7 +501,7 @@ const MpesaDeposit = () => {
                 inc={configData.INCREMENT_DEPOSIT_250} 
                 modalid="modal-ref" 
                 onClick={incrementDepositAmount} 
-                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                className='custom-btn custom-notactive-btn m-1 mb-2'
                 >
                 + {configData.INCREMENT_DEPOSIT_250}
                 </button>       
@@ -479,7 +509,7 @@ const MpesaDeposit = () => {
                 inc={configData.INCREMENT_DEPOSIT_500} 
                 modalid="modal-ref" 
                 onClick={incrementDepositAmount} 
-                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                className='custom-btn custom-notactive-btn m-1 mb-2'
                 >
                 + {configData.INCREMENT_DEPOSIT_500}
                 </button>       
@@ -487,14 +517,14 @@ const MpesaDeposit = () => {
                 inc={configData.INCREMENT_DEPOSIT_1000} 
                 modalid="modal-ref" 
                 onClick={incrementDepositAmount} 
-                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                className='custom-btn custom-notactive-btn m-1 mb-2'
                 >
                 + {configData.INCREMENT_DEPOSIT_1000}
                 </button>      
                 <button 
                 inc={configData.INCREMENT_DEPOSIT_5000} 
                 modalid="modal-ref" onClick={incrementDepositAmount} 
-                className='btn btn-secondary btn-sm rounded-pill fw-bold m-1 mb-2'
+                className='custom-btn custom-notactive-btn m-1 mb-2'
                 >
                 + {configData.INCREMENT_DEPOSIT_5000}
                 </button>   
@@ -503,17 +533,18 @@ const MpesaDeposit = () => {
                 </Small> : ''}  
             
                 <InputNumber 
-                    className="d-block form-control p-3" 
+                    className="d-block form-control p-3 custom-active-btn mt-2 mb-2" 
                     placeholder={depositAmount}
                     onChange={updateDepositAmount}
+                    value={depositAmount}
                 />
                 <Small className="d-block text-danger">
                     Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </Small>
                 <div className="text-center">
-                    <Button variant="warning" onClick={deposit} disabled={depositLoading || true}>
+                    <button className="custom-btn custom-active-btn text-secondary" onClick={deposit} disabled={depositLoading || true}>
                         { depositLoading ? 'Loading...' : 'Deposit'}
-                    </Button>
+                    </button>
                 </div>
             </Card.Body>
             <Card.Footer className="border-0">

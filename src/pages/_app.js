@@ -38,6 +38,7 @@ const GlobalStyles = createGlobalStyle`
  }
  ::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
   }
   ::-webkit-scrollbar-track {
     background: #edebeb;
