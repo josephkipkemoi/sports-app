@@ -111,7 +111,7 @@ function App() {
             <CustomAds/>
             <CustomFilter heading="Highlights"/>
 
-            <StyleGameData style={{ display: 'none' }}>
+            <StyleGameData style={{ display: 'block' }}>
           
               <div style={{ position:  'relative' }}>
                <Tooltip 
