@@ -39,8 +39,45 @@ const StyleProfile = styled.div`
         width: 80px;
         overflow: hidden;
     }
-`
 
+    nav {
+        overflow-x: scroll;
+        padding-bottom: .4rem;
+    }
+    button {
+        border-radius: 12px;
+        padding: .5rem;
+    }
+    .custom-btn {
+        border-radius: 12px;
+        border: none;     
+        margin: .45rem;     
+    }
+    .custom-active-btn {       
+        box-shadow: 
+        2px 2px 3px 0 rgba(255, 255, 255, 0.25),
+        -2px -2px 3px 0 rgba(0, 0, 0, 0.3);
+    }
+    .custom-notactive-btn {
+        box-shadow: 
+        2px 2px 3px 0 rgba(0, 0, 0, 0.25),
+        -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    }
+    .custom-active-container {
+        box-shadow: 
+        2px 2px 3px 0 rgba(255, 255, 255, 0.25),
+        -2px -2px 3px 0 rgba(0, 0, 0, 0.3);
+    }
+    .user-phone-number h6 {
+        max-width: 124px;
+        letter-spacing: 2px;
+    }
+    .user-balance {
+        max-width: 124px;
+        padding: .5rem;
+        border-radius: 12px;
+    }
+`
 const Profile = () => {
 
     const router = useRouter()
@@ -97,9 +134,11 @@ const AuthUserProfile = () => {
             const { uu_id } = AuthUser()
  
             return (
-                 <h6 className="d-block fw-bold mt-3">
-                  {uu_id.phone_number}    
-                 </h6>
+                <div className="user-phone-number d-flex justify-content-center">
+                    <h6 className="d-block fw-bold mt-3 custom-btn p-2">
+                        {uu_id.phone_number}    
+                    </h6>
+                </div>                
             )
     }   
 
@@ -109,7 +148,7 @@ const AuthUserProfile = () => {
 
     return (
         <div className="pt-3 pb-2 text-center">
-            <button className="btn btn-light rounded-pill p-3 text-dark" ref={positionRef}>
+            <button className="custom-btn custom-notactive-btn p-3 text-dark" ref={positionRef}>
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     width="32" 
@@ -141,8 +180,9 @@ const BalanceComponent = () => {
                     </div>
                     <div className="col d-flex flex-column">
                         <Span className="d-block">Balance</Span>
-
-                        <UserBalance user_id={uu_id?.id} type="regular" />
+                        <div className="custom-active-btn user-balance">
+                            <UserBalance user_id={uu_id?.id} type="regular" />
+                        </div>                       
                     </div>
                 </div>
             </div>
@@ -156,9 +196,9 @@ const BalanceComponent = () => {
                     <div className="col d-flex flex-column">
                         <Span className="d-block">Bonus</Span>
                         <Span className="fw-bold d-flex align-items-center justify-content-start" style={{ width: 124 }}>
-                            <span className="text-dark amount">
+                            <div className="custom-active-btn user-balance">
                                 <UserBalance user_id={uu_id?.id} type="bonus" />
-                            </span>  
+                            </div>  
                         </Span>                    
                     </div>
                 </div>      
@@ -178,36 +218,7 @@ const DepositComponent = () => {
     )
 }
 
-const StyleDepositComponent = styled.div` 
-    nav {
-        overflow-x: scroll;
-        padding-bottom: .4rem;
-    }
-    button {
-        border-radius: 12px;
-        padding: .5rem;
-    }
-    .custom-btn {
-        border-radius: 12px;
-        border: none;     
-        margin: .45rem;     
-    }
-    .custom-active-btn {       
-        box-shadow: 
-        2px 2px 3px 0 rgba(255, 255, 255, 0.25),
-        -2px -2px 3px 0 rgba(0, 0, 0, 0.3);
-    }
-    .custom-notactive-btn {
-        box-shadow: 
-        2px 2px 3px 0 rgba(0, 0, 0, 0.25),
-        -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
-    }
-    .custom-active-container {
-        box-shadow: 
-        2px 2px 3px 0 rgba(255, 255, 255, 0.25),
-        -2px -2px 3px 0 rgba(0, 0, 0, 0.3);
-    }
-`
+
 const DepositOptionsComponent = () => {
 
     const [depositContainer, setDepositContainer] = useState(config.MPESA_DEPOSIT_OPTION)
@@ -217,7 +228,7 @@ const DepositOptionsComponent = () => {
     }
 
     return (
-        <StyleDepositComponent >
+        <>
             <nav className="d-flex justify-content-between">
                 <button 
                 className=
@@ -298,7 +309,7 @@ const DepositOptionsComponent = () => {
             {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PayPalDeposit/> }
             {depositContainer === config.BITCOIN_DEPOSIT_OPTION &&  <BitCoinDeposit/> }
 
-        </StyleDepositComponent>
+        </>
     )
 }
 
