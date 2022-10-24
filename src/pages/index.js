@@ -13,6 +13,7 @@ import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
 import CustomAds from '../components/CustomAds';
 import { Spinner } from 'react-bootstrap';
+import JackpotContainer from '../components/JackpotContainer';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -110,7 +111,7 @@ function App() {
             <CustomAds/>
             <CustomFilter heading="Highlights"/>
 
-            <StyleGameData>
+            <StyleGameData style={{ display: 'none' }}>
           
               <div style={{ position:  'relative' }}>
                <Tooltip 
@@ -124,8 +125,12 @@ function App() {
                <GameComponent />
 
               </div>
-              
-            </StyleGameData>   
+            
+            </StyleGameData> 
+
+           
+            <JackpotContainer/>
+
             </StyledMain>  
                                                                                                                                
            </Col>

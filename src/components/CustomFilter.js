@@ -74,7 +74,13 @@ export default function CustomFilter({ heading }) {
                 onchange={onchange} 
                 customClass="search-comp"
               />  
-              <FontAwesomeIcon icon={faBars} className="text-white icon" size="lg" style={{ marginLeft: 8 }}/> 
+              <FontAwesomeIcon 
+                icon={faBars} 
+                className="text-white icon" 
+                size="lg" 
+                style={{ marginLeft: 8 }}
+                onClick={() => ''}
+              /> 
           </div>
         </StyleCustomFilter>
     

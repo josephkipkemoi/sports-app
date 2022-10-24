@@ -7,7 +7,7 @@ import BetslipContainer from '../components/BetslipContainer';
 import CustomerInfo from '../components/CustomerInfo';
 import TopNavBar from "../components/TopNavBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrophy } from '@fortawesome/free-solid-svg-icons'
+import { faTrophy, faSoccerBall } from '@fortawesome/free-solid-svg-icons'
 import { useGetJackpotFixturesQuery } from "../hooks/admin";
 import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 
@@ -34,6 +34,60 @@ const StyleJackpotContainer = styled.div`
     overflow-x: hidden;
 `
 export default function Jackpot() {
+   
+    return (
+        <StyledJackpot>
+            <Row className="px-2">
+                <Col lg="9" md="9" sm="12" style={{ padding: 0, height: 'auto' }}> 
+                    <TopNavBar/>
+                    <StyleJackpotContainer>
+                        {/* <JackpotContainer 
+                            data={megaJackpotData.data}
+                            setMegaJackpotId={setMegaJackpotId}
+                            setMarket={setMarket}
+                            jackpot={megaMarket?.market}
+                            jackpot_prize={megaMarket?.jackpot_prize}
+                            games_count={MegaCount}
+                        />
+
+                        <JackpotContainer 
+                            data={fiveJackpotData.data} 
+                            setFiveJackpotId={setFiveJackpotId}
+                            setMarket={setMarket}
+                            jackpot={fiveMarket?.market}
+                            jackpot_prize={fiveMarket?.jackpot_prize}
+                            games_count={FiveCount}
+                        />  */}
+
+                        {/* <NoJackpotAvailable/> */}
+                        <Jackpots/>
+                    </StyleJackpotContainer>                   
+                </Col>
+                <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0, height: '100vh', overflowY: 'scroll', overflowX: 'hidden' }}>
+                    {/* <BetslipContainer 
+                        megaJackpotId={megaJackpotId} 
+                        fiveJackpotId={fiveJackpotId}
+                        setMegaJackpotId={setMegaJackpotId}
+                        setFiveJackpotId={setFiveJackpotId}
+                        market={market}
+                    /> */}
+                    <CustomerInfo/>
+                </Col>
+            </Row>       
+        </StyledJackpot>
+    )
+}
+
+const NoJackpotAvailable = () => {
+    return (
+        <div className="text-center mt-5 text-dark p-5 ">
+            <FontAwesomeIcon icon={faTrophy} size="10x" className="text-success"/>
+            <h4 className="mt-3">Coming Soon!</h4>
+        </div>
+    )
+}
+
+const Jackpots = () => {
     const [megaJackpotId, setMegaJackpotId] = useState([])
     const [fiveJackpotId, setFiveJackpotId] = useState([])
 
@@ -42,7 +96,7 @@ export default function Jackpot() {
     const megaJackpotData = useGetJackpotFixturesQuery('Mega Jackpot')
     const fiveJackpotData = useGetJackpotFixturesQuery('Five Jackpot')
     const jackpotPrize = useGetJackpotPrizeWinsQuery()
-
+ 
     const fetchJackpotGames = () => {
         const megaJackpotIds = JSON.parse(sessionStorage.getItem('Mega Jackpot'))
         const fiveJackpotIds = JSON.parse(sessionStorage.getItem('Five Jackpot'))
@@ -79,54 +133,35 @@ export default function Jackpot() {
 
     const { data, MegaCount, FiveCount } = jackpotPrize.data
     const [ megaMarket, fiveMarket ] = data
+    console.log(megaMarket)
     return (
-        <StyledJackpot>
-            <Row className="px-2">
-                <Col lg="9" md="9" sm="12" style={{ padding: 0, height: 'auto' }}> 
-                    <TopNavBar/>
-                    <StyleJackpotContainer>
-                        <JackpotContainer 
-                            data={megaJackpotData.data}
-                            setMegaJackpotId={setMegaJackpotId}
-                            setMarket={setMarket}
-                            jackpot={megaMarket?.market}
-                            jackpot_prize={megaMarket?.jackpot_prize}
-                            games_count={MegaCount}
-                        />
+        <>
+        <JackpotContainer 
+            data={megaJackpotData.data}
+            setMegaJackpotId={setMegaJackpotId}
+            setMarket={setMarket}
+            jackpot={megaMarket?.market}
+            jackpot_prize={megaMarket?.jackpot_prize}
+            games_count={MegaCount}
+        />
 
-                        <JackpotContainer 
-                            data={fiveJackpotData.data} 
-                            setFiveJackpotId={setFiveJackpotId}
-                            setMarket={setMarket}
-                            jackpot={fiveMarket?.market}
-                            jackpot_prize={fiveMarket?.jackpot_prize}
-                            games_count={FiveCount}
-                        /> 
+        <JackpotContainer 
+            data={fiveJackpotData.data} 
+            setFiveJackpotId={setFiveJackpotId}
+            setMarket={setMarket}
+            jackpot={fiveMarket?.market}
+            jackpot_prize={fiveMarket?.jackpot_prize}
+            games_count={FiveCount}
+        /> 
 
-                        <NoJackpotAvailable/>
-                    </StyleJackpotContainer>                   
-                </Col>
-                <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0, height: '100vh', overflowY: 'scroll', overflowX: 'hidden' }}>
-                    <BetslipContainer 
-                        megaJackpotId={megaJackpotId} 
-                        fiveJackpotId={fiveJackpotId}
-                        setMegaJackpotId={setMegaJackpotId}
-                        setFiveJackpotId={setFiveJackpotId}
-                        market={market}
-                    />
-                    <CustomerInfo/>
-                </Col>
-            </Row>       
-        </StyledJackpot>
-    )
-}
-
-const NoJackpotAvailable = () => {
-    return (
-        <div className="text-center mt-5 text-dark p-5 ">
-            <FontAwesomeIcon icon={faTrophy} size="10x" className="text-success"/>
-            <h4 className="mt-3">Coming Soon!</h4>
-        </div>
+        {/* <BetslipContainer 
+            megaJackpotId={megaJackpotId} 
+            fiveJackpotId={fiveJackpotId}
+            setMegaJackpotId={setMegaJackpotId}
+            setFiveJackpotId={setFiveJackpotId}
+            market={market}
+        />  */}
+        </>
     )
 }
 
@@ -234,7 +269,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
     }
     return (
         <>
-          {/* {data.length > 0 ? 
+          {data.length > 0 ? 
             <Row className="p-3" style={{ padding: 0, margin: 0 }}>              
             <div 
             className="d-flex align-items-center justify-content-between text-white p-3 bg-dark rounded shadow-sm mb-3"
@@ -263,7 +298,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
             </div>
             {data.map(JackpotItems)}
         </Row>
-          : <NoJackpotAvailable/>} */}
+          : <NoJackpotAvailable/>}
     
         </>          
     )
