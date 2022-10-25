@@ -85,6 +85,12 @@ export default function MyApp({ Component, pageProps }) {
 
     useEffect(() => {
         setLoading(true)
+        const displayMode = localStorage.getItem('display-mode')
+
+        if(Boolean(displayMode) === false) {
+            localStorage.setItem('display-mode', 'light-mode')
+        }
+     
         // if('serviceWorker' in navigator) {
         //     // Wait for the load event not to block other work
         //     window.addEventListener('load', async () => {

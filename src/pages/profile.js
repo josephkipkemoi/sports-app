@@ -26,9 +26,16 @@ import Image from "next/image"
 import UserBalance from "../components/UserBalance"
 
 const StyleProfile = styled.div`
-    background-color: #fff;
-    padding-bottom: 24px;
-
+    // background-color: #fff;
+    
+    .light-mode {
+        background-color: #fff;
+        color: #000;
+    }
+    .dark-mode {
+        background-color: #000;
+        color: #fff;
+    }
     .refresh {
         width: auto;
         padding-right: 8px;
@@ -39,7 +46,6 @@ const StyleProfile = styled.div`
         width: 80px;
         overflow: hidden;
     }
-
     nav {
         overflow-x: scroll;
         padding-bottom: .4rem;
@@ -77,50 +83,87 @@ const StyleProfile = styled.div`
         padding: .5rem;
         border-radius: 12px;
     }
+    .deposit-dark-mode button{
+        color: #fff;
+    }
+    .deposit-light-mode button{
+        color: #000;
+    }
 `
 const Profile = () => {
 
+    const [displayMode, setDisplayMode] = useState('');
     const router = useRouter()
     const { pathname } = router
 
     const { logout } = useAuth({ middleware: 'guest' })
-   
+    
     const logoutUser = (e) => {
         e.preventDefault()
         logout()
     }
 
+    const checkDisplay = () => {
+
+        const displaySetting = localStorage.getItem('display-mode')
+
+        if(Boolean(displayMode) === false) {
+            setDisplayMode(displaySetting)
+        }        
+    }
+
+    if(Boolean(displayMode) === true) {
+        localStorage.setItem('display-mode', displayMode)
+    }
+
     useEffect(() => {
-        
-    },[pathname])
+        checkDisplay()
+    },[pathname, displayMode])
+
     return (
         <StyleProfile>
-            <Container >
-                <AuthUserProfile />
-                <BalanceComponent />
-                <DepositComponent />
-                <WithdrawComponent/>
+            <div className={displayMode}>
+                <Container>
+                    <AuthUserProfile />
+                    <BalanceComponent 
+                     displayMode={displayMode}
+                    />
+                    <DepositComponent 
+                     displayMode={displayMode} 
+                    />
+                    <WithdrawComponent
+                    displayMode={displayMode}
+                    />
 
-                <div className="p-4">
-                    <h6>Preferences</h6>
-                    <Span>Customise your experience</Span>
-                </div>
-                
-                <PreferenceComponent/>
-                <SupportComponent/>
+                    <div className="p-4">
+                        <h6>Preferences</h6>
+                        <Span>Customise your experience</Span>
+                    </div>
+                    
+                    <PreferenceComponent 
+                        setDisplayMode={setDisplayMode}
+                        displayMode={displayMode}
+                    />
+                    <SupportComponent
+                        displayMode={displayMode}
+                    />
 
-                <Link href="/logout">
-                    <a 
-                    itemProp="url" 
-                    className="d-block text-decoration-none btn btn-warning btn-sm log-out text-dark fw-bold p-3"
-                    onClick={logoutUser}
-                    >
-                        Logout
-                    </a>
-                </Link>
-
-            </Container>      
-            <Support/>  
+                    <div className="pb-4">
+                        <Link href="/logout">
+                            <a 
+                            itemProp="url" 
+                            className="d-block text-decoration-none btn btn-warning btn-sm log-out text-dark fw-bold p-3"
+                            onClick={logoutUser}
+                            >
+                                Logout
+                            </a>
+                        </Link>
+                    </div>
+                   
+                </Container>      
+                <Support/>  
+            </div>
+            
             <MobileNavComponent/>
         </StyleProfile>
     )
@@ -165,12 +208,15 @@ const AuthUserProfile = () => {
     )
 }
 
-const BalanceComponent = () => {
+const BalanceComponent = ({ displayMode }) => {
 
     const { uu_id } = AuthUser()
 
     return (
-        <div className="d-sm-flex justify-content-between shadow-sm p-4 mb-4 bg-light rounded ">
+        <div className
+        ={`d-sm-flex justify-content-between 
+        shadow-sm p-4 mb-4 ${displayMode === 'dark-mode' ? 'bg-dark' : 'bg-light'} rounded`
+        }>
             <div >
                 <div className="row align-items-center ">
                     <div className="col" style={{ maxWidth: '30%' }}>
@@ -181,7 +227,11 @@ const BalanceComponent = () => {
                     <div className="col d-flex flex-column">
                         <Span className="d-block">Balance</Span>
                         <div className="custom-active-btn user-balance">
-                            <UserBalance user_id={uu_id?.id} type="regular" />
+                            <UserBalance 
+                                displayMode={displayMode} 
+                                user_id={uu_id?.id} 
+                                type="regular" 
+                            />
                         </div>                       
                     </div>
                 </div>
@@ -196,8 +246,12 @@ const BalanceComponent = () => {
                     <div className="col d-flex flex-column">
                         <Span className="d-block">Bonus</Span>
                         <Span className="fw-bold d-flex align-items-center justify-content-start" style={{ width: 124 }}>
-                            <div className="custom-active-btn user-balance">
-                                <UserBalance user_id={uu_id?.id} type="bonus" />
+                            <div className="custom-active-btn user-balance text-white">
+                                <UserBalance 
+                                    user_id={uu_id?.id} 
+                                    type="bonus"
+                                    displayMode={displayMode}
+                                />
                             </div>  
                         </Span>                    
                     </div>
@@ -208,18 +262,18 @@ const BalanceComponent = () => {
     )
 }
 
-const DepositComponent = () => {
+const DepositComponent = ({ displayMode }) => {
 
     return (
-        <div className="shadow-sm p-4 mb-4 bg-light">
+        <div className={`shadow-sm p-4 mb-4 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
             <h5>Deposit</h5>        
-            <DepositOptionsComponent/>
+            <DepositOptionsComponent displayMode={displayMode}/>
         </div>
     )
 }
 
 
-const DepositOptionsComponent = () => {
+const DepositOptionsComponent = ({ displayMode }) => {
 
     const [depositContainer, setDepositContainer] = useState(config.MPESA_DEPOSIT_OPTION)
 
@@ -229,10 +283,10 @@ const DepositOptionsComponent = () => {
 
     return (
         <>
-            <nav className="d-flex justify-content-between">
+            <nav className={`d-flex justify-content-between ${displayMode === 'dark-mode' ? 'deposit-dark-mode' : 'deposit-light-mode'} `}>
                 <button 
                 className=
-                {`  
+                {`btn  
                 ${depositContainer === config.MPESA_DEPOSIT_OPTION ? 
                     'custom-btn custom-active-btn' : 
                     'custom-btn custom-notactive-btn'}`} 
@@ -305,9 +359,9 @@ const DepositOptionsComponent = () => {
                 </button>
             </nav>
 
-            {depositContainer === config.MPESA_DEPOSIT_OPTION &&  <MpesaDeposit/> }
-            {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PayPalDeposit/> }
-            {depositContainer === config.BITCOIN_DEPOSIT_OPTION &&  <BitCoinDeposit/> }
+            {depositContainer === config.MPESA_DEPOSIT_OPTION &&  <MpesaDeposit displayMode={displayMode}/> }
+            {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PayPalDeposit displayMode={displayMode}/> }
+            {depositContainer === config.BITCOIN_DEPOSIT_OPTION &&  <BitCoinDeposit displayMode={displayMode}/> }        
 
         </>
     )
@@ -354,10 +408,10 @@ const ComingSoonPaymentsComponent = ({ option }) => {
     )
 }
 
-const BitCoinDeposit = () => {
+const BitCoinDeposit = ({ displayMode }) => {
     return (
-        <Card>
-            <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem' }}>
+        <Card className={`${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
+            <Card.Header className="d-flex justify-content-center border-0" style={{ margin: 0, paddingTop: '1rem' }}>
                 <Image src="https://www.pinaclebet.com/bitcoin.png" width={72} height={72} />
             </Card.Header>
             <hr className="text-secondary"/>
@@ -386,10 +440,10 @@ const BitCoinDeposit = () => {
     )
 }
 
-const PayPalDeposit = () => {
+const PayPalDeposit = ({ displayMode }) => {
     return (
-        <Card className="border-0 shadow mt-3 rounded">
-        <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
+        <Card className={`border-0 shadow mt-3 rounded ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
+        <Card.Header className="d-flex justify-content-center bg-light border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
             <Image src="https://www.pinaclebet.com/paypallogo.png" width={200} height={56} />
         </Card.Header>
         <Card.Body style={{ paddingTop: 0 }}>
@@ -417,7 +471,7 @@ const PayPalDeposit = () => {
     )
 }
 
-const MpesaDeposit = () => {
+const MpesaDeposit = ({ displayMode }) => {
     const [authToken, setAuthToken] = useState('')
 
     const { uu_id } = AuthUser()
@@ -495,9 +549,9 @@ const MpesaDeposit = () => {
 
 
     return (
-        <Card className="border-0 mt-3 rounded custom-active-container">
-            <Card.Header className="d-flex justify-content-center bg-white border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
-                <Image src="https://www.pinaclebet.com/mpesa.jpeg" width={72} height={72} />
+        <Card className={`border-0 mt-3 rounded custom-active-container ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
+            <Card.Header className="d-flex justify-content-center border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
+                <Image src="https://www.pinaclebet.com/mpesa.png" width={72} height={72} />
             </Card.Header>
             <Card.Body style={{ paddingTop: 0 }}>
                 <Span className="d-block">Send money into your {APP_NAME} account</Span>
@@ -552,8 +606,8 @@ const MpesaDeposit = () => {
                 <Small className="d-block text-danger">
                     Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </Small>
-                <div className="text-center">
-                    <button className="custom-btn custom-active-btn text-secondary" onClick={deposit} disabled={depositLoading || true}>
+                <div className={`text-center ${displayMode === 'dark-mode' ? 'deposit-dark-mode' : 'deposit-light-mode'}`}>
+                    <button className={`custom-btn custom-active-btn `} onClick={deposit} disabled={depositLoading || true}>
                         { depositLoading ? 'Loading...' : 'Deposit'}
                     </button>
                 </div>
@@ -574,7 +628,7 @@ const MpesaDeposit = () => {
     )
 }
 
-const WithdrawComponent = () => {
+const WithdrawComponent = ({ displayMode }) => {
     
     const { 
         APP_NAME, 
@@ -583,7 +637,7 @@ const WithdrawComponent = () => {
     } = configData;
 
     return (
-        <div className="shadow-sm p-4 mb-4 bg-light">
+        <div className={`shadow-sm p-4 mb-4 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
             <h5>Withdraw</h5>
             <Span>Withdraw from your {APP_NAME} wallet</Span>
             <InputNumber className="d-block form-control p-3" placeholder="Enter amount"/>
@@ -598,45 +652,79 @@ const WithdrawComponent = () => {
     )
 }
 
-const PreferenceComponent = () => {
+const StyleToggleElement = styled.div`
+ .toggle {
+    width: 64px;
+ }
+`
+const PreferenceComponent = ({ setDisplayMode, displayMode }) => {
+
+    const changeDisplay = () => {
+        if(displayMode === 'light-mode') {
+            setDisplayMode('dark-mode')
+        }
+        if(displayMode === 'dark-mode') {
+            setDisplayMode('light-mode')
+        }
+    }
+
+    const ToggleElement = () => {
+        return (
+            <StyleToggleElement>
+                <label className="switch">
+                    <div className="d-flex align-items-center toggle">
+                        {displayMode === 'light-mode' ?
+                            <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="16" 
+                            height="16" 
+                            fill="currentColor" 
+                            className="bi bi-moon-stars-fill float-start" 
+                            viewBox="0 0 16 16"
+                            onClick={changeDisplay}
+                            >
+                                <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+                                <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+                            </svg> 
+                        :
+                            <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="16" 
+                            height="16" 
+                            fill="currentColor" 
+                            className="bi bi-brightness-high-fill float-end text-warning" 
+                            viewBox="0 0 16 16"
+                            style={{ marginLeft: 30 }}
+                            onClick={changeDisplay}
+                            >
+                                <path d="M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+                            </svg>
+                        }
+                    </div>  
+                </label>
+            </StyleToggleElement>
+        )
+    }
     return (
-        <div className="shadow-sm p-4 mb-4 bg-info">
+        <div className={`shadow-sm p-4 mb-4 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
             <h5>Display</h5>
-            <Span>Switch between light theme and dark theme</Span>
-            <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="16" 
-            height="16" 
-            fill="currentColor" 
-            className="bi bi-moon-stars-fill float-end" 
-            viewBox="0 0 16 16"
-            >
-                <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
-                <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
-            </svg>
-            {/* Dark Theme Icon */}
-            {/* <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="24" 
-            height="24" 
-            fill="currentColor" 
-            className="bi bi-brightness-high-fill float-end text-warning" 
-            viewBox="0 0 16 16">
-                <path d="M12 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
-            </svg> */}
+            <div className="d-flex justify-content-between align-items-center">
+                <Span>Switch between light theme and dark theme</Span>
+                <ToggleElement/>
+            </div>
         </div>
     )
 }
 
-const SupportComponent = () => {
+const SupportComponent = ({ displayMode }) => {
     return (
-        <div className="shadow-sm p-4 mb-4">
+        <div className={`shadow-sm p-4 mb-4 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
             <h5>Support</h5>
-            <Span className="text-secondary d-block">Info</Span>
+            <Span className="d-block">Info</Span>
             <Link href="/help">
                 <a
                     itemProp="url"
-                    className="text-decoration-none text-dark fw-bold"
+                    className="text-decoration-none fw-bold"
                 >   
                     Help and Support
                 </a>

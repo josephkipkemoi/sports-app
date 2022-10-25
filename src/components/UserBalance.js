@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Spinner } from "react-bootstrap";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 
-export default function UserBalance({ user_id, type }) {
+export default function UserBalance({ user_id, type, displayMode }) {
 
     const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(user_id)
 
@@ -21,10 +21,10 @@ export default function UserBalance({ user_id, type }) {
             <FontAwesomeIcon  
                 icon={faRefresh} 
                 style={{ paddingRight: '.25rem', paddingLeft: '.25rem', cursor: 'pointer' }} 
-                className="btn"
+                className={`btn ${displayMode === 'dark-mode' ? 'text-white' : 'text-dark'}`}
                 onClick={refetch}
             />
-            <span className="text-dark amount fw-bold">
+            <span className={` ${displayMode === 'dark-mode' ? 'text-white' : 'text-dark'} amount fw-bold`}>
                 {data.currency} {type === 'regular' && data?.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }                 
                 {type === 'bonus' && data?.bonus.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) }                 
             </span> 
