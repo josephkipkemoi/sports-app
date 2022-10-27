@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from '../lib/axios';
 import styled from 'styled-components';
 import Row  from 'react-bootstrap/Row';
 import Col  from 'react-bootstrap/Col';
@@ -12,7 +11,6 @@ import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
 import CustomAds from '../components/CustomAds';
-import { Spinner } from 'react-bootstrap';
 import JackpotContainer from '../components/JackpotContainer';
 
 const ThemedBody = styled('div')`
@@ -82,34 +80,38 @@ background: #424242;
 `
 
 function App() {
-
-  const [loading, setLoading] = useState(true)
+  const [displayMode, setDisplayMode] = useState('')
 
   useEffect(() => {
-    setLoading(false)
+   
     const currentSession = sessionStorage.getItem('session_id')
 
     if(!!currentSession === false) {
       sessionStorage.setItem('session_id', Date.now())
     }  
 
+    setDisplayMode(localStorage.getItem('display-mode'))
+    window.addEventListener('click', (e) => {
+        if(e.target.getAttribute('display') === 'toggle-off' || 
+            e.target.getAttribute('display') === 'toggle-on'
+        ) {
+            setDisplayMode(localStorage.getItem('display-mode'))
+        };      
+    })
+
   },[])
  
   return (
     <>
-    {loading ?
-    <div className='bg-light d-flex justify-content-center' style={{ height: '100vh' }}>    
-      <Spinner style={{ position: 'absolute', top: '50%', width: '4rem', height: '4rem' }} animation="border"/>
-    </div> :
      <ThemedBody>
      <TopNavBar/>
-     <main id="main" className='bg-light'>
+     <main id="main">
        <Row>
            <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
             <StyledMain>
         
             <CustomAds/>
-            <CustomFilter heading="Highlights"/>
+            <CustomFilter displayMode={displayMode} />
 
             <StyleGameData style={{ display: 'block' }}>
           
@@ -122,7 +124,7 @@ function App() {
                  caret_position="right"
                /> 
 
-               <GameComponent />
+               <GameComponent displayMode={displayMode}/>
 
               </div>
             
@@ -148,7 +150,6 @@ function App() {
      <Support/>  
 
 </ThemedBody>
-    }
    
     </>
     

@@ -24,7 +24,7 @@ const StyleNotificationCount = styled.div`
         -2px -2px 3px 0 rgba(255, 255, 255, 0.3); 
     }
 `
-export default function NotificationComponent({ user }) {
+export default function NotificationComponent({ user, displayMode }) {
     const [notificationsLength, setNotificationLength] = useState(0)
     const [notificationOpen, setNotificationOpen] = useState(false)
     const [unreadData, setUnreadData] = useState([])
@@ -53,17 +53,22 @@ export default function NotificationComponent({ user }) {
 
     useEffect(() => {
         fetchUnreadNotifications()
-    }, [])
+    }, [displayMode])
     return (
         <>
            {Boolean(user?.uu_id?.id) ?
-           <StyleNotificationCount className='d-flex align-items-center' >
+           <StyleNotificationCount className='d-flex align-items-center ' >
                 <div className='customer-care notification'>
                     <Link href="/contact">
                         <a
                             itemProp='url'
                         >
-                            <FontAwesomeIcon icon={faHeadset} className="text-white" size='xl'/>
+                            <FontAwesomeIcon 
+                            icon={faHeadset} 
+                            className=
+                            {`${displayMode === 'dark-mode' ? 'text-white' : 'text-white'}`} 
+                            size='xl'
+                            />
                         </a>
                     </Link>
                 </div>
@@ -72,7 +77,12 @@ export default function NotificationComponent({ user }) {
                         <a
                             itemProp='url'
                         >
-                            <FontAwesomeIcon icon={faMessage} className="text-white" size='xl'/>
+                            <FontAwesomeIcon 
+                                icon={faMessage} 
+                                size='xl'
+                                className=
+                                {`${displayMode === 'dark-mode' ? 'text-white' : 'text-white'}`} 
+                            />
                         </a>
                     </Link>
                 </div>
@@ -81,7 +91,8 @@ export default function NotificationComponent({ user }) {
                         width="20" 
                         height="20" 
                         fill="currentColor" 
-                        className="bi bi-bell text-white bg-none rounded-circle" 
+                        className=
+                        {`bi bi-bell bg-none rounded-circle ${displayMode === 'dark-mode' ? 'text-white' : 'text-white'}`}
                         viewBox="0 0 16 16"
                         style={{ cursor: 'pointer' }}
                         onClick={handleNotification}

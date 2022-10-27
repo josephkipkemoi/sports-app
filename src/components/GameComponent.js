@@ -27,15 +27,14 @@ const StyleFavorites = styled.i`
 `
 const StyleGameComponent = styled.div`
   small {
-    color: #001041;
+    // color: #001041;
     font-weight: 700;
     opacity: .8;
   }
   span {
-    color: #001041;
+    // color: #001041;
   }
   button {
-    color: #191970 !important;
     align-items: center;
     background: linear-gradient(-45deg, #00FFFF, #F0F8FF);
     box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.15),
@@ -47,7 +46,7 @@ const StyleGameComponent = styled.div`
     letter-spacing: 1px;
   }
 `
-export default function GameComponent() {
+export default function GameComponent({ displayMode }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
     const { uu_id } = AuthUser()
@@ -121,7 +120,7 @@ export default function GameComponent() {
           <React.Fragment key={ii+i+odds.odd}>         
                 <div className='d-sm-flex m-1 mt-3 mb-3 btn-sm text-white text-center' style={{ width: '30%', padding: 0, margin: 0}}>               
                   <span 
-                    className='text-dark w-100 flex-wrap p-2'   
+                    className={`w-100 flex-wrap p-2 ${displayMode === 'light-mode' && 'text-dark'} `}
                     id="fix-btn"
                     odds={odds.odd} 
                     market_id={i} 
@@ -132,7 +131,7 @@ export default function GameComponent() {
                     {odds.value}                 
                   </span>
                   <button 
-                     className='text-white w-100 flex-wrap p-2'   
+                     className={`w-100 flex-wrap p-2 ${displayMode === 'light-mode' && 'text-dark'} `} 
                      id="fix-btn"
                      odds={odds.odd} 
                      market_id={i} 
@@ -150,7 +149,10 @@ export default function GameComponent() {
       return ( 
         <React.Fragment key={i+name.name}>
               <div 
-                className=' w-100 p-2 fw-bold d-flex flex-row align-items-center'
+                className
+                ={`w-100 p-2 fw-bold d-flex flex-row align-items-center rounded
+                 ${displayMode === 'dark-mode' && 'bg-secondary'}
+                `}
                 style={{ lineHeight: '30px', backgroundColor: '#fff' }}
               >
                 <i className="bi bi-star-fill"></i>
@@ -256,7 +258,7 @@ export default function GameComponent() {
     }
 
     return (
-      <StyleGameComponent >
+      <StyleGameComponent className={`${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
          <Row className="custom-grid" style={{ margin: 0 }}>   
         {data.data.map((innerData,index) => {
           const oddsData = JSON.parse(innerData.odds) 
@@ -265,7 +267,7 @@ export default function GameComponent() {
             <Col 
             lg={8} 
             sm={8} 
-            className="card p-2" 
+            className={`card p-2 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-white text-dark'}`}
             style={{ borderRight: '0px', border: 'none', marginTop: 0, paddingTop: 0, marginBottom: 0 }}
             >  
       
@@ -290,7 +292,7 @@ export default function GameComponent() {
                     <Col className='d-inline-flex'>
                       <StyleFavorites>
                         <i 
-                          className={`bi bi-star-fill ${innerData.favorite_active ? 'text-warning' : 'text-dark'}`}
+                          className={`bi bi-star-fill ${innerData.favorite_active ? 'text-warning' : 'text-secondary'}`}
                           onClick={() => updateFavorite(innerData.fixture_id, innerData.favorite_active)}                      
                         ></i>
                       </StyleFavorites>
@@ -307,7 +309,9 @@ export default function GameComponent() {
             <Col 
               lg={4} 
               sm={4} 
-              className="card d-flex flex-row active-btn" 
+              className=
+              {`card d-flex flex-row active-btn 
+              ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}
               style={{ background: '#F0F8FF', borderLeft: '0px', border: 'none' }}
             >
                
@@ -315,12 +319,12 @@ export default function GameComponent() {
    
                 return odd.id === 1 && odd.values.map((val, i) => {
                   return (
-                     <div key={i} className='text-center mb-3 w-100 m-1'>
+                     <div key={i} className='text-center mb-3 w-100 m-1 '>
                         <small className=' text-center'>{val.value}</small>  
                         <div onClick={() => activatBtn(index,i)}>                        
                           <button 
                             odds={val.odd} 
-                            className='btn btn-sm w-100 active-btn-btn p-2'
+                            className='btn btn-sm w-100 active-btn-btn p-2 text-dark '
                             id="fix-btn"
                             btn_id={i}
                             home_team={innerData.home} 
@@ -343,7 +347,7 @@ export default function GameComponent() {
 
                 <Small 
                   onClick={() => displayMoreMarkets(index, innerData.home, innerData.away, innerData.fixture_id)}
-                  className="text-dark fw-bold d-flex flex-column mt-3 p-2"                    
+                  className="text-secondary fw-bold d-flex flex-column mt-3 p-2"                    
                 >
                     <i className="bi bi-plus d-flex align-items-center" style={{ height: 20, marginTop: '2px' }}>
                     {oddsData?.length || 42} 
@@ -355,10 +359,16 @@ export default function GameComponent() {
               </div>
                
             </Col>
-            <div className='more-market' style={{ display: 'none' }}>
+            <div className='more-market ' style={{ display: 'none' }}>
               <hr className='text-light'/>
-              <div className='fw-bold text-center bg-light p-2 rounded' style={{ letterSpacing: 2 }}>
-                <span className="text-dark">More Markets</span>
+              <div 
+              className=
+              {`fw-bold text-center p-2 rounded
+              ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}
+              `} 
+              style={{ letterSpacing: 2 }}
+              >
+                <span>More Markets</span>
               </div>
               {oddsData?.map(MoreFixtureMarket)}
             </div>            

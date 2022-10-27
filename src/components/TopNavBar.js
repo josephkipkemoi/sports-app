@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,7 +19,6 @@ import  {
 import { useRouter } from "next/router";
 
 const StyleSideNav = styled.div`
-background-color: #191970; 
 overflow-x: scroll;
 overflow-y: hidden;
 padding-top: .25rem;
@@ -35,8 +34,7 @@ padding-bottom: .25rem;
   border-radius: 8px;
 }
  
-@media screen and (max-width: 992px) {
-  background-color: #191970; 
+@media screen and (max-width: 992px) {  
   .nav-container {
   align-items: center;
   background: linear-gradient(-45deg, rgba(255,255,255,0.22), rgba(25,25,12,0.25));
@@ -119,11 +117,23 @@ const topNavLinks = [
     }
 ]
 
-export default function TopNavBar() {
-    
+export default function TopNavBar() {    
     const positionRef = useRef(null)
     const router = useRouter()
     const { pathname } = router
+
+    const [displayMode, setDisplayMode] = useState('')
+
+    useEffect(() => {
+        setDisplayMode(localStorage.getItem('display-mode'))
+        window.addEventListener('click', (e) => {
+            if(e.target.getAttribute('display') === 'toggle-off' || 
+                e.target.getAttribute('display') === 'toggle-on'
+            ) {
+                setDisplayMode(localStorage.getItem('display-mode'))
+            };      
+        })
+    }, [displayMode])
 
     const TopNavLinkItem = (link, i) => (
         <div sm={1} key={i} className={`${link.path === pathname ? 'nav-container-active' : ''} nav-container m-2 mt-3 mb-3`}>     
@@ -152,7 +162,11 @@ export default function TopNavBar() {
     }, [])
     
       return (
-        <StyleSideNav className='d-flex justify-content-between shadow rounded' ref={positionRef}>
+        <StyleSideNav 
+        className=
+        {`d-flex justify-content-between shadow rounded ${displayMode === 'dark-mode' ? 'dark-mode' : 'light-nav-mode'} `} 
+        ref={positionRef}
+        >
             {topNavLinks.map(TopNavLinkItem)}
         </StyleSideNav>
       )

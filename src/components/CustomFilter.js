@@ -44,7 +44,7 @@ position: static;
   border-radius: 8px;
  }
 `
-export default function CustomFilter({ heading }) {
+export default function CustomFilter({ displayMode }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [searchResults, setSearchResults] = useState([])
     const [isSearchLoading, setIsSearchLoading] = useState(false)
@@ -64,8 +64,8 @@ export default function CustomFilter({ heading }) {
     }
     return (
       <>
-        <StyleCustomFilter >
-          <div className="d-flex align-items-center justify-content-between custom-filter">
+        <StyleCustomFilter className={` ${displayMode === 'dark-mode' && 'bg-dark'}`}>
+          <div className={`d-flex align-items-center justify-content-between custom-filter`}>
               <FontAwesomeIcon className=" text-white icon" icon={faSoccerBall} size="lg"/>
               <FontAwesomeIcon icon={faPrint} className="text-white icon" size="lg"/>
               <FontAwesomeIcon icon={faRefresh} className="text-white icon" size="lg"/>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import AuthUser from "../hooks/AuthUser";
 import { BetslipSvgIcon } from "./Svg";
@@ -18,7 +18,7 @@ const StyleMobileNavComponent = styled.div`
     margin: 0;
     padding: 0;
     // background-color: #fff;
-    background: linear-gradient(-45deg,rgba(25,25,112,1), rgba(25,25,112,1));
+    // background: linear-gradient(-45deg,rgba(25,25,112,1), rgba(25,25,112,1));
     span {
         line-height: 12px;
         letter-spacing: .5px;
@@ -61,12 +61,32 @@ const StyleMobileNavComponent = styled.div`
         font-size: 16px;
     }
 `
-export default function MobileNavComponent ({ length, openSlip }) {
+export default function MobileNavComponent ({ length, openSlip, displayMode }) {
     const { uu_id } = AuthUser()
     const router = useRouter()
     const { pathname } = router
+    const [display, setDisplay] = useState(displayMode)
+
+    useEffect(() => {
+        const displaySetting = localStorage.getItem('display-mode')
+        setDisplay(displaySetting)
+    }, [displayMode])
+
+    let color;
+
+    if(display === 'dark-mode') {
+        color = '#000'
+    }
+
+    if(display === 'light-mode') {
+        color = '#191970'
+    }
+
     return (
-        <StyleMobileNavComponent className="w-100">
+        <StyleMobileNavComponent 
+        className="w-100" 
+        style={{ backgroundColor: color }}
+        >
             <div 
             className="d-flex justify-content-between text-white  align-items-center mobile-display"
             >
