@@ -19,7 +19,7 @@ export default function OffersModal({ isModalOpen,closeMenu }) {
                 <div className="d-flex align-items-center justify-content-start">
                     <h1 className="text-white fw-bold p-3 bg-danger rounded-pill shadow">100%</h1>
                     <h6 className="m-3 ">
-                        Receive 100% Cash Bonus on every Deposit of Kes 5,000/= and above.
+                        Receive 100% Cash Bonus on every Deposit of Kes 500/= and above.
                     </h6>
                 </div>
                 <div className="d-flex align-items-center justify-content-start mt-3">
