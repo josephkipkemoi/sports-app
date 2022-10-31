@@ -793,6 +793,30 @@ const BetCartFormElements = ({ betData }) => {
       const removeBetslipCart = () => {
         sessionStorage.clear()
       }
+
+      const postBonusBalanceAfterPlacing = async (cart_id,possible_payout,betAmount,cart ) => {
+        const res = await axios.post('api/users/fixtures/cart', {
+          cart_id,
+          possible_payout,
+          cart,
+          bet_amount: betAmount,
+          user_id: uu_id.id
+        })
+  
+        if(res.status === 200) {
+          setLoading(false)
+          setCongratulationModalOpen(true)
+        }
+
+        const balance_response = await axios.post(`api/users/${uu_id.id}/bonus`, {
+          bonus: betAmount
+        });
+
+        if(balance_response.status === 200) {
+          refetch()
+        }
+     
+      }
   
       const postBalanceAfterPlacing = async () => {
         const res = await axios.post(`api/users/${uu_id.id}/balance/decrement`, {
@@ -819,16 +843,23 @@ const BetCartFormElements = ({ betData }) => {
         setLoading(true)
   
         const balanceAfterPlacing = data.amount - betAmount
-    
-        if(data.amount < betAmount || balanceAfterPlacing < 0) {
+        const bonusAfterPlacing = data.bonus - betAmount
+        const cart_id = randomString()
+        const possible_payout = Math.floor(possibleWin)
+
+        if( data.amount < betAmount || balanceAfterPlacing < 0 ) {
+            if(data.bonus < betAmount || bonusAfterPlacing < 0) {
+              setIsBalanceModalOpen(true)
+              setLoading(false)
+             } else {
+              return postBonusBalanceAfterPlacing(cart_id, possible_payout, betAmount, JSON.stringify(betData))
+             }
+
           setIsBalanceModalOpen(true)
           setLoading(false)
           return
         }   
         
-        const cart_id = randomString()
-        const possible_payout = Math.floor(possibleWin)
-  
         const res = await axios.post('api/users/fixtures/cart', {
           cart_id,
           possible_payout,
