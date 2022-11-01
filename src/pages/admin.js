@@ -1165,7 +1165,7 @@ const UserProfileElement = ({ user_id, refetchData }) => {
                                     value={newUserBalance}
                                 />                                 
                             </div>
-                            <button className="btn btn-light" onClick={updateBalance}>
+                            <button className="btn btn-light" onClick={updateBalance} disabled={isBalanceUpdated}>
                                 {isBalanceUpdated ?  
                                 <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 8 }}/> :
                                 <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
