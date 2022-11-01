@@ -36,14 +36,22 @@ const StyleGameComponent = styled.div`
   }
   button {
     align-items: center;
-    background: linear-gradient(-45deg, #00FFFF, #F0F8FF);
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.15),
-    -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
-    border-radius: 20px;
+    background: linear-gradient(-45deg, #1affff, #1affff);
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15),
+    -1px -1px 2px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
     border: 0;
     display: flex;  
     justify-content: center; 
     letter-spacing: 1px;
+    color: #2562bd !important;
+  }
+  .active {
+    background: linear-gradient(-45deg, #191970, #191970);
+    color: #fff !important;
+  }
+  button:hover {
+    color: #fff;
   }
 `
 export default function GameComponent({ displayMode }) {
@@ -52,8 +60,6 @@ export default function GameComponent({ displayMode }) {
     const { uu_id } = AuthUser()
     const router = useRouter()
    
-   
-
     const fetchSharedFixtureIds =  () => {
       const shareCode = sessionStorage.getItem('share_code')
     
@@ -324,7 +330,7 @@ export default function GameComponent({ displayMode }) {
                         <div onClick={() => activatBtn(index,i)}>                        
                           <button 
                             odds={val.odd} 
-                            className='btn btn-sm w-100 active-btn-btn p-2 text-dark '
+                            className='w-100 active-btn-btn p-2'
                             id="fix-btn"
                             btn_id={i}
                             home_team={innerData.home} 
