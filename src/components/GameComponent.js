@@ -356,7 +356,7 @@ export default function GameComponent({ displayMode }) {
                   className="text-secondary fw-bold d-flex flex-column mt-3 p-2"                    
                 >
                     <i className="bi bi-plus d-flex align-items-center" style={{ height: 20, marginTop: '2px' }}>
-                    {oddsData?.length || 42} 
+                    {oddsData?.length === 1 ? 42 : oddsData?.length } 
                     </i>    
                     <i className="bi bi-caret-down-fill" style={{ marginTop: '-7px' }}></i>    
                      
