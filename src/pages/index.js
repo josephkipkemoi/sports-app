@@ -139,8 +139,8 @@ function App() {
            
            <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>    
             
-             <BetslipContainer />
-             <CustomerInfo />
+             <BetslipContainer displayMode={displayMode}/>
+             <CustomerInfo displayMode={displayMode}/>
 
            </Col>
 
