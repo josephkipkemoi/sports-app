@@ -54,7 +54,7 @@ export default function JackpotContainer() {
     const [ megaMarket, fiveMarket ] = data
 
     return (
-        <div className='bg-light'>
+        <div className='bg-dark'>
             {megaJackpotData.length > 0 && 
               <div >
               <h1 className='text-dark text-center'>Mega Jackpot</h1>
@@ -137,7 +137,7 @@ const JackpotElements = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, ga
  
         return (
             <div key={i} className="d-flex justify-content-between shadow-sm mb-3">
-                <div className="col-lg-9 col-md-9 col-sm-9 d-flex align-items-center">
+                <div className="col-lg-9 col-md-9 col-sm-9 d-flex align-items-center text-dark">
                     <span className="text-dark">{i+1}</span>
                     <div style={{ marginLeft: 20 }}>
                         <small className="text-dark">{n.jp_time}</small>
@@ -199,10 +199,10 @@ const JackpotElements = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, ga
           {data.length > 0 ? 
             <Row className="p-3" style={{ padding: 0, margin: 0 }}>              
             <div 
-            className="d-flex align-items-center justify-content-between text-white p-3 bg-dark rounded shadow-sm mb-3"
+            className="d-flex align-items-center justify-content-between text-dark p-3 bg-dark rounded shadow-sm mb-3"
             >
                 <button style={{ margin: 0, padding: 0, background: 'none', border: 'none' }}>
-                    <FontAwesomeIcon icon={faSoccerBall} className="text-white"/>
+                    <FontAwesomeIcon icon={faSoccerBall} className="text-dark"/>
                 </button>
                 <div className="d-flex align-items-center">
                     <span className="fw-bold" >{jackpot}</span>

@@ -1061,6 +1061,15 @@ const UserProfileElement = ({ user_id, refetchData }) => {
             }
         }
 
+        const updateBalanceDecrement = async () => {
+            const amount = Number(newUserBalance) 
+            const res = await axios.patch(`api/users/${user_id}/balance/decrement_user`, {
+                amount,
+                user_id,
+            });
+            console.log(res)
+        }
+
         const changeBalance = (e) => {
             setNewUserBalance(e.target.value)
         }
@@ -1171,6 +1180,24 @@ const UserProfileElement = ({ user_id, refetchData }) => {
                                 <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
                                
                                 {isBalanceUpdated ? 'Balance Updated' : 'Update Balance'}  
+                            </button>  
+                            <label htmlFor="balance" className="text-white">Balance: </label>
+                            <div className="d-flex align-items-center mb-3">
+                                <InputNumber 
+                                    id="balance" 
+                                    className="form-control d-block w-100" 
+                                    placeholder={0} 
+                                    style={{ maxWidth: 120 }}
+                                    onChange={changeBalance}
+                                    value={newUserBalance}
+                                />                                 
+                            </div>
+                            <button className="btn btn-light" onClick={updateBalanceDecrement} disabled={isBalanceUpdated}>
+                                {isBalanceUpdated ?  
+                                <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 8 }}/> :
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
+                               
+                                {'Decrement'}  
                             </button>                     
                         </div>  
                      </div>

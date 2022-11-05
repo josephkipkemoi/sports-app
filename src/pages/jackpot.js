@@ -133,7 +133,7 @@ const Jackpots = () => {
 
     const { data, MegaCount, FiveCount } = jackpotPrize.data
     const [ megaMarket, fiveMarket ] = data
-    console.log(megaMarket)
+ 
     return (
         <>
         <JackpotContainer 
@@ -176,13 +176,25 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
             const picked = e.target.getAttribute('picked')
             const market = e.target.getAttribute('market')
             const divs = document.getElementsByClassName('mjp_btn_div')[i]
-            const btn = divs.getElementsByClassName('jp_btn')
- 
-            for(let i = 0; i < btn.length; i++) {
-                btn[i].classList.remove('active')
+            const fiveJpDivs = document.getElementsByClassName('fjp_btn_div')[i] 
+            const jp_btn = divs.getElementsByClassName('jp_btn')
+            const fjp_btn = fiveJpDivs.getElementsByClassName('fjp_btn')
+   
+            if(market === 'Mega Jackpot') {
+                for(let i = 0; i < jp_btn.length; i++) {
+                    jp_btn[i].classList.remove('active')
+                }
+        
+                jp_btn[btnIndex].classList.add('active')
             }
-    
-            btn[btnIndex].classList.add('active')
+
+            if(market === 'Five Jackpot') {
+                for(let i = 0; i < fjp_btn.length; i++) {
+                    fjp_btn[i].classList.remove('active')
+                }
+        
+                fjp_btn[btnIndex].classList.add('active')
+            }
 
             const jData = {
                 home,
@@ -210,19 +222,19 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
  
         return (
             <div key={i} className="d-flex justify-content-between shadow-sm mb-3">
-                <div className="col-lg-9 col-md-9 col-sm-9 d-flex align-items-center">
-                    <span className="text-white">{i+1}</span>
+                <div className="col-lg-9 col-md-9 col-sm-9 d-flex align-items-center text-dark">
+                    <span>{i+1}</span>
                     <div style={{ marginLeft: 20 }}>
-                        <small className="text-light">{n.jp_time}</small>
-                        <span className="text-white">{n.jp_home}</span>
-                        <span className="text-white">{n.jp_away}</span>
+                        <small>{n.jp_time}</small>
+                        <span>{n.jp_home}</span>
+                        <span>{n.jp_away}</span>
                     </div>
                 </div>
                 <div 
-                    className={`col-lg-3 col-md-3 col-sm-3 d-flex mjp_btn_div`}
+                    className={`col-lg-3 col-md-3 col-sm-3 d-flex ${n.jp_market === 'Mega Jackpot' ? 'mjp_btn_div' : 'fjp_btn_div'} `}
                 >
                     <button 
-                        className={`btn btn-success m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `}
+                        className={`btn btn-outline-primary m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `}
                         style={{ width: '80px' }}
                         home={n.jp_home}
                         away={n.jp_away}
@@ -236,7 +248,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                         {!n.jp_active ?  <i className="bi bi-exclamation-circle"></i> : n.jp_home_odds}                       
                     </button>
                     <button 
-                        className="btn btn-success m-1 w-100 jp_btn" 
+                        className={`btn btn-outline-primary m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `} 
                         style={{ width: '80px' }}
                         home={n.jp_home}
                         j_click="jp"
@@ -250,7 +262,7 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
                         {!n.jp_active ?  <i className="bi bi-exclamation-circle"></i> : n.jp_draw_odds}
                     </button>
                     <button 
-                        className="btn btn-success m-1 w-100 jp_btn" 
+                        className={`btn btn-outline-primary m-1 w-100 ${n.jp_market === 'Mega Jackpot' ? 'jp_btn' : 'fjp_btn'} `}
                         style={{ width: '80px' }}
                         j_click="jp"
                         home={n.jp_home}
@@ -299,8 +311,20 @@ const JackpotContainer = ({ data, setMegaJackpotId, setFiveJackpotId, jackpot, g
             {data.map(JackpotItems)}
         </Row>
           : <NoJackpotAvailable/>}
-    
+         
+        <SubmitJackpotElements/>       
         </>          
+    )
+}
+
+const SubmitJackpotElements = () => {
+    const handleSubmitJackpot = () => {
+
+    }
+    return (
+        <div>
+            <button onClick={handleSubmitJackpot}>Submit</button>
+        </div>
     )
 }
 
