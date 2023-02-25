@@ -271,28 +271,9 @@ const JackpotComponent = () => {
             <Card.Body className="px-4">
                 <Row className="gx-2">
                     <div className="mb-3">
-                        <UpdateJackpotPrize/>
+                        <JackpotMarket/>
                     </div>
-                   
-                   
-                    <h5 className="text-center fw-bold bg-primary p-2 text-white">Add/Update Games to  {fields.jp_market}</h5>
-                    <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
-                        <div >
-                            <Small className="text-dark">Jackpot Market</Small>
-                            <Select 
-                                className="mb-2" 
-                                options={jackpot_options} 
-                                onChange={handleMarketField} 
-                                name="jp_market" 
-                            />                      
-                            <hr className="text-white"/>
-                            <Small className="text-dark">Select ID to Update</Small>
-                            <Select 
-                                options={ fields.jp_market === 'Mega Jackpot' ? mega_jackpot_id_options : five_jackpot_id_options}
-                                onChange={updateJackpotId}
-                            />
-                        </div>
-                    </Col>
+                    <AddUpdateJackpotGame/>
                     <Col className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
                         <div >
                             <Small className="text-dark">
@@ -420,6 +401,92 @@ const JackpotComponent = () => {
                
             </Card.Body>           
         </Card>
+    )
+}
+
+const AddUpdateJackpotGame = () => {
+    return (
+        <>
+         <h5 className="text-center fw-bold bg-primary p-2 text-white">Add/Update Games to </h5>
+            <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
+                <div>
+                <Small className="text-dark">Jackpot Market</Small>
+                <Select 
+                    className="mb-2" 
+                    // options={jackpot_options} 
+                    // onChange={handleMarketField} 
+                    name="jp_market" 
+                />                      
+                <hr className="text-white"/>
+                <Small className="text-dark">Select ID to Update</Small>
+                    <Select 
+                        // options={ fields.jp_market === 'Mega Jackpot' ? mega_jackpot_id_options : five_jackpot_id_options}
+                        // onChange={updateJackpotId}
+                    />
+                </div>
+            </Col>
+        </>
+    )
+}
+const JackpotMarket = () => {
+    const [market, setMarket] = useState({
+        market_id: 0,
+        market: '',
+        market_prize: 0
+    })
+    const [marketAdded, setMarketAdded] = useState(false)
+
+    const handlechange = (e) => {
+        setMarket(prev => ({...prev, [e.target.name]: e.target.value}))
+    }
+
+    const postJpMarket = async () => {
+        const res = await axios.post("api/jackpots/markets", market)
+        if (res.status == 201) {
+            setMarketAdded(true)
+        } 
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if(marketAdded == true) {
+                setMarketAdded(false)
+            }
+        }, 2000)
+        return () => clearTimeout(timer)
+    }, [marketAdded])
+
+    return (
+        <>
+            {marketAdded && <span className="alert alert-info">{market.market} Added</span>}
+            <input 
+                className="form-control m-2" 
+                type="number" 
+                placeholder="Jackpot Market ID" 
+                onChange={handlechange}
+                name="market_id"
+            />
+            <input 
+                className="form-control m-2" 
+                placeholder="Add Jackpot Market" 
+                onChange={handlechange}
+                name="market"
+            />
+            <input 
+                className="form-control m-2" 
+                type="number" 
+                placeholder="Add Jackpot Prize(KSHS)" 
+                onChange={handlechange}
+                name="market_prize"
+            />
+            <button 
+                className="btn btn-primary"
+                onClick={postJpMarket}
+                disabled={marketAdded}
+            >
+                Add Jackpot Market
+            </button>
+        </>
     )
 }
 
