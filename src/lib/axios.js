@@ -6,7 +6,7 @@ const axios = Axios.create({
               process.env.NEXT_PUBLIC_BACKEND_URL}`,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
-    }
-    // withCredentials: true
+    },
+    withCredentials: true
 })
 export default axios

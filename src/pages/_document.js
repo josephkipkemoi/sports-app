@@ -37,7 +37,7 @@ export default class MyDocument extends Document {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
                 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet"/>                
                 
-                <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/> 
+                {/* <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>  */}
 
                 </Head>
 
