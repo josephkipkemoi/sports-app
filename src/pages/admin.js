@@ -19,7 +19,7 @@ import {
 } from "../hooks/admin";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 import { PhoneSvgIcon } from "../components/Svg";
-import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
+import { useGetJackpotMarketQuery, useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
 import { Container, Modal, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { useGetFixtureIdsWhereOddsNullQuery } from "../hooks/fixture";
 import { AlertModalElement, ErrorElement, ProgressBarElement } from "../components/HtmlElements";
@@ -150,12 +150,12 @@ export default function Admin() {
             <div style={{ height: '100vh' }}>
             {tab === 'fixtures' && 
              <FixturesComponent 
-             postFixtureIds={postFixtureIds}
-             postFixtureOdds={postFixtureOdds}
-             fixtureIdLoading={fixtureIdLoading}
-             fixtureLoaded={fixtureLoaded}
-             fixtureOddsLoaded={fixtureOddsLoaded}
-             fixtureOddsLoading={fixtureOddsLoading}
+                postFixtureIds={postFixtureIds}
+                postFixtureOdds={postFixtureOdds}
+                fixtureIdLoading={fixtureIdLoading}
+                fixtureLoaded={fixtureLoaded}
+                fixtureOddsLoaded={fixtureOddsLoaded}
+                fixtureOddsLoading={fixtureOddsLoading}
              />
              }
             {tab === 'users' && <UsersProfileComponent/>}
@@ -274,93 +274,6 @@ const JackpotComponent = () => {
                         <JackpotMarket/>
                     </div>
                     <AddUpdateJackpotGame/>
-                    <Col className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
-                        <div >
-                            <Small className="text-dark">
-                                Games Added: 
-                                {fields.jp_market === "Mega Jackpot" ? megaJackpotData.data.length : fiveJackpotData.data.length}
-                            </Small>
-                            <div className="d-flex">
-                                <input 
-                                    type="text" 
-                                    onChange={handleField} 
-                                    name="jp_home" 
-                                    placeholder="Home Team" 
-                                    className="form-control m-1"
-                                />
-                                <input 
-                                    type="text" 
-                                    onChange={handleField}
-                                    name="jp_away" 
-                                    placeholder="Away Team" 
-                                    className="form-control m-1"
-                                />
-                            </div>
-                            <div className="d-flex">
-                                <InputNumber 
-                                    onChange={handleField} 
-                                    name="jp_home_odds"  
-                                    placeholder="Home Odds" 
-                                    className="form-control m-1"
-                                />
-                                <InputNumber 
-                                    onChange={handleField} 
-                                    name="jp_draw_odds" 
-                                    placeholder="Draw Odds" 
-                                    className="form-control m-1"
-                                />
-                                <InputNumber 
-                                    onChange={handleField} 
-                                    name="jp_away_odds" 
-                                    placeholder="Away Odds" 
-                                    className="form-control m-1"
-                                />
-                                <input 
-                                    onChange={handleField} 
-                                    name="jp_time" 
-                                    type="datetime-local" 
-                                    className="form-control m-1"
-                                />      
-                            </div>
-                            <div>
-                                <button 
-                                    className="btn btn-primary m-1" 
-                                    onClick={submitGame}
-                                    disabled={
-                                        (fields.jp_market === 'Mega Jackpot' && megaJackpotData.data.length === 10 ) ||
-                                        (fields.jp_market === 'Five Jackpot' && fiveJackpotData.data.length === 5 ) 
-                                    }
-                                >
-                                    Add Game
-                                </button>
-                                <button
-                                className="btn btn-warning m-1" 
-                                onClick={updateGame}
-                                disabled={
-                                    (fields.jp_market === 'Mega Jackpot' && megaJackpotData.data.length < 10 ) ||
-                                    (fields.jp_market === 'Five Jackpot' && fiveJackpotData.data.length < 5 ) 
-                                }
-                                >
-                                    Update Game
-                                </button>
-                                <button 
-                                className="btn btn-danger m-1"
-                                onClick={activateJackpotMarket}
-                                >
-                                    Activate Jackpot
-                                </button>
-                                <button 
-                                className="btn btn-danger m-1"
-                                onClick={deactivateJackpotMarket}
-                                >
-                                    Deactivate Jackpot
-                                </button>
-                            </div>
-                            <div>
-
-                            </div>
-                        </div>
-                    </Col>
                 </Row>
               
                 <hr/>
@@ -398,24 +311,86 @@ const JackpotComponent = () => {
                     </div>
                 </Col>
                 </div>
-               
             </Card.Body>           
         </Card>
     )
 }
 
 const AddUpdateJackpotGame = () => {
+    const [gameAdded, setGameAdded] = useState(false)
+    const [game, setGame] = useState({
+        market: null,
+        jackpot_market_id: null,
+        home_team: '',
+        away_team: '',
+        home_odds: null,
+        draw_odds: null,
+        away_odds: null,
+        kick_off_time: null
+    })
+
+    const { market, jackpot_market_id, home_team, away_team, home_odds, draw_odds, away_odds, kick_off_time } = game
+    const jpMarket = useGetJackpotMarketQuery()
+
+    const handleField = (e) =>  setGame(prev => ({
+        ...prev, 
+        [e.target.name]: e.target.value
+    }))
+
+    const submitGame = async () => {
+        const res = await axios.post(`api/jackpots/markets/${jackpot_market_id}/games`, {
+            jackpot_market_id,
+            home_team,
+            away_team,
+            home_odds,
+            draw_odds,
+            away_odds,
+            kick_off_time
+        })
+        if (res.status == 201 ) {
+            setGameAdded(true)
+        }
+    }
+    const updateGame = () => {
+
+    }
+
+    const handleMarket = (e) => setGame(prev => ({
+        ...prev, 
+        market: e.label,
+        jackpot_market_id: e.value
+    }))
+
+    if (jpMarket.isLoading) {
+        return <Spinner animation="grow" />
+    }
+    const jackpotMarkets = jpMarket?.data?.map(d => {
+        return {
+            value: d.market_id,
+            label: d.market
+        }
+    })
+
+    // useEffect(() => {
+    //     const timeout = setTimeout(() => {
+    //         if(gameAdded) {
+    //             setGameAdded(false)
+    //         }
+    //     },1000)
+    //     return () => clearTimeout(timeout)
+    // }, [gameAdded])
     return (
-        <>
-         <h5 className="text-center fw-bold bg-primary p-2 text-white">Add/Update Games to </h5>
+        <div className="bg-primary">
+            <h5 className="text-center fw-bold  p-2 text-white">Add/Update Games to {market}</h5>
             <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
                 <div>
                 <Small className="text-dark">Jackpot Market</Small>
+                {gameAdded && <span className="text-danger fw-bold">Game Added</span>}
                 <Select 
                     className="mb-2" 
-                    // options={jackpot_options} 
-                    // onChange={handleMarketField} 
-                    name="jp_market" 
+                    options={jackpotMarkets} 
+                    onChange={handleMarket} 
+                    name="market" 
                 />                      
                 <hr className="text-white"/>
                 <Small className="text-dark">Select ID to Update</Small>
@@ -425,14 +400,81 @@ const AddUpdateJackpotGame = () => {
                     />
                 </div>
             </Col>
-        </>
+            <Col className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
+                        <div>
+                            <Small className="text-dark">
+                                Games Added: 
+                                {/* {fields.jp_market === "Mega Jackpot" ? megaJackpotData.data.length : fiveJackpotData.data.length} */}
+                            </Small>
+                            <div className="d-flex">
+                                <input 
+                                    type="text" 
+                                    onChange={handleField} 
+                                    name="home_team" 
+                                    placeholder="Home Team" 
+                                    className="form-control m-1"
+                                />
+                                <input 
+                                    type="text" 
+                                    onChange={handleField}
+                                    name="away_team" 
+                                    placeholder="Away Team" 
+                                    className="form-control m-1"
+                                />
+                            </div>
+                            <div className="d-flex">
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="home_odds"  
+                                    placeholder="Home Odds" 
+                                    className="form-control m-1"
+                                />
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="draw_odds" 
+                                    placeholder="Draw Odds" 
+                                    className="form-control m-1"
+                                />
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="away_odds" 
+                                    placeholder="Away Odds" 
+                                    className="form-control m-1"
+                                />
+                                <input 
+                                    onChange={handleField} 
+                                    name="kick_off_time" 
+                                    type="datetime-local" 
+                                    className="form-control m-1"
+                                />      
+                            </div>
+                            <div>
+                                <button 
+                                    className="btn btn-primary m-1" 
+                                    onClick={submitGame}
+                                >
+                                    Add Game
+                                </button>
+                                <button
+                                    className="btn btn-warning m-1" 
+                                    onClick={updateGame}
+                                >
+                                    Update Game
+                                </button>                              
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+            </Col>
+        </div>
     )
 }
 const JackpotMarket = () => {
     const [market, setMarket] = useState({
-        market_id: 0,
+        market_id: null,
         market: '',
-        market_prize: 0
+        market_prize: null,
+        games_count: null,
     })
     const [marketAdded, setMarketAdded] = useState(false)
 
@@ -457,128 +499,52 @@ const JackpotMarket = () => {
     }, [marketAdded])
 
     return (
-        <>
+        <div className="bg-danger p-2 shadow rounded">
             {marketAdded && <span className="alert alert-info">{market.market} Added</span>}
-            <input 
-                className="form-control m-2" 
-                type="number" 
-                placeholder="Jackpot Market ID" 
-                onChange={handlechange}
-                name="market_id"
-            />
-            <input 
-                className="form-control m-2" 
-                placeholder="Add Jackpot Market" 
-                onChange={handlechange}
-                name="market"
-            />
-            <input 
-                className="form-control m-2" 
-                type="number" 
-                placeholder="Add Jackpot Prize(KSHS)" 
-                onChange={handlechange}
-                name="market_prize"
-            />
+            <div className="row">
+                <h6 className="fw-bold text-white text-center m-3">
+                    Fill form to add Jackpot Market
+                </h6>
+                <div className="col">
+                    <input 
+                        className="form-control m-2" 
+                        type="number" 
+                        placeholder="Jackpot Market ID" 
+                        onChange={handlechange}
+                        name="market_id"
+                    />
+                    <input 
+                        className="form-control m-2" 
+                        placeholder="Add Jackpot Market" 
+                        onChange={handlechange}
+                        name="market"
+                    />
+                </div>
+                <div className="col">
+                    <input 
+                        className="form-control mt-2" 
+                        type="number" 
+                        placeholder="Add Jackpot Prize(KSHS)" 
+                        onChange={handlechange}
+                        name="market_prize"
+                    />
+                    <input 
+                        className="form-control mt-2" 
+                        type="number" 
+                        placeholder="Market Games Count" 
+                        onChange={handlechange}
+                        name="games_count"
+                    />
+                </div>
+            </div>        
             <button 
-                className="btn btn-primary"
+                className="btn btn-primary w-100 p-2 mt-3 mb-3 shadow-sm rounded-0"
                 onClick={postJpMarket}
                 disabled={marketAdded}
             >
                 Add Jackpot Market
             </button>
-        </>
-    )
-}
-
-const UpdateJackpotPrize = () => {
-    const { data, isLoading, error } = useGetJackpotPrizeWinsQuery()
-    const [isModalOpen, setIsModalOpen] = useState(false)
-
-    const [balance, setBalance] = useState(0)
-    const [market, setMarket] = useState('')
-    const [jackpotPrize, setJackpotPrize] = useState(0)
-
-    if(isLoading) {
-        return <Spinner animation="grow"/>
-    }
-
-    if(error) {
-        return <span>Error</span>
-    }
-    const [megaMarket, fiveMarket] = data.data
-
-    const handleJpMarket = ({ value }) => {
-       setMarket(value)
-       if(value === megaMarket.market) {
-            setBalance(megaMarket.jackpot_prize)
-       }
-       if(value === fiveMarket.market) {
-        setBalance(fiveMarket.jackpot_prize)
-        }
-    }
-
-    const handleJpPrize = e => setJackpotPrize(e.target.value)
-
-    const cancelJp = () => setIsModalOpen(false)
-
-    const handleUpdate = async () => {
-        await axios.post('api/admin/jackpot/prize', {
-            market: market,
-            jackpot_prize: jackpotPrize
-        })
-        cancelJp()
-    }
-
-    return (
-        <React.Fragment>
-         <h5 className="text-center fw-bold bg-primary p-2 text-white">Update {market} Jackpot Prize</h5>
-         <h6 className="fw-bold">Current Jackpot Prize: {balance}</h6>
-            <Col className="d-sm-flex">
-                <Select
-                    options={jackpot_options}
-                    onChange={handleJpMarket}
-                    className="w-50 m-1"
-                />
-                <InputNumber 
-                    className="form-control m-1" 
-                    placeholder="Enter Amount"
-                    onChange={handleJpPrize}
-                />
-                <button 
-                    className="btn btn-primary m-1"
-                    onClick={() => setIsModalOpen(true)}
-                >
-                    Submit
-                </button>
-            </Col>
-            <Modal show={isModalOpen}>
-                <Modal.Body>
-                    <h2 className="alert alert-danger">
-                        <i className="bi bi-exclamation-circle"></i>
-                        Are you sure you want to update {market} prize?
-                    </h2>
-                    <h3>
-                        New {market} prize 
-                    </h3>
-                    <h4>
-                        KES  {(Number(jackpotPrize)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                    </h4>
-
-                    <button 
-                        className="btn btn-danger w-50"
-                        onClick={cancelJp}
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        className="btn btn-primary w-50"
-                        onClick={handleUpdate}
-                    >
-                        Update
-                    </button>
-                </Modal.Body>
-            </Modal>
-        </React.Fragment>
+        </div>
     )
 }
 
@@ -615,7 +581,6 @@ const CustomerFeedback = () => {
             original_message: originalMessage,
             user_id: userId
         })
-        // console.log(res)
     }
 
     const MessageItems = (link, i) => {
@@ -663,9 +628,7 @@ const CustomerFeedback = () => {
 
     // sessionStorage.setItem('timestamps',JSON.stringify(Array.from(timesArr)))
 
-    // console.log(sessionStorage.getItem(Array.from(timesArr)) )
     // Array.from(timesArr).map(MessageItems)
-    // console.log(data.messages.length)
     return (
         <Card className="mt-2"> 
             <Card.Header className="bg-primary text-light">
@@ -767,7 +730,6 @@ const MessageComponent = ({ user, id }) => {
     }
 
     const submitMessage = async () => {
-        console.log(formDetails)
         const res = await axios.post('api/admin/users/message', formDetails)
     }
 
@@ -1134,7 +1096,6 @@ const UserProfileElement = ({ user_id, refetchData }) => {
                 amount,
                 user_id,
             });
-            console.log(res)
         }
 
         const changeBalance = (e) => {
@@ -1146,7 +1107,6 @@ const UserProfileElement = ({ user_id, refetchData }) => {
         //         user_id,
         //         phone_number: Number(newNum)
         //     })
-        //     console.log(res)
         // }
         const handleRemove = () => {
             setIsModalOpen(true)
