@@ -35,6 +35,12 @@ const StyleJackpotContainer = styled.div`
     background-color: #edebeb;
     overflow-y: scroll;
     overflow-x: hidden;
+    .markets-id {
+        width: 30%;
+    }
+    .markets-id-temp {
+        width: 70%;
+    }
 `
 export default function Jackpot() {
    
@@ -48,7 +54,6 @@ export default function Jackpot() {
                     </StyleJackpotContainer>                   
                 </Col>
                 <Col lg="3" md="3" sm="12" style={{ paddingLeft: 0, height: '100vh', overflowY: 'scroll', overflowX: 'hidden' }}>
-                    <h1>Betlsip Container</h1>
                     <CustomerInfo/>
                 </Col>
             </Row>       
@@ -129,26 +134,74 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
     if (error) {
         return <span className="text-danger">Error! Try again later</span>
     }
-    console.log(data)
+    const JackpotGamesItems = (d, i) => {
+        const da = new Date(d?.kick_off_time)
+        const date = da.getDate() + '/' + da.getMonth() + '/' + da.getFullYear() + '-' + da.getHours() + ':' + da.getMinutes()
+        return (
+            <React.Fragment key={i}>
+                <div className="d-flex align-items-center p-2">
+                    <div className="d-flex align-items-center markets-id-temp">
+                        <span style={{ marginRight: 18, marginLeft: 12 }}>{i+1}</span>
+                        <div>
+                            <small>{date}</small>
+                            <span>{d?.home_team} - {d?.away_team}</span>
+                        </div>
+                    </div>
+                    <div className="markets-id d-flex justify-content-around">
+                        <button
+                            className="btn btn-primary w-100 m-1 p-2"
+                            disabled={!market_active}
+                        >
+                            {d?.home_odds}.45
+                        </button>
+                        <button
+                            className="btn btn-primary w-100 m-1 p-2"
+                            disabled={!market_active}
+                        >
+                            {d?.draw_odds}.90
+                        </button>
+                        <button
+                            className="btn btn-primary w-100 m-1 p-2"
+                            disabled={!market_active}
+                        >
+                            {d?.away_odds}.43
+                        </button>
+                    </div>
+                </div>
+            </React.Fragment>
+        )
+    }
     return (
-        <div className="mb-2">
-            <button 
-            className="btn btn-primary"
-            disabled={!market_active}
-            >
-                {market_id}
-            </button>
-            <div className="d-flex justify-content-center">
+        <div>
+            <div className="d-flex justify-content-between align-items-center p-2">
+                <span>
+                    Don't have time? Let Random Pick choose the {market} for you!
+                </span>
+                <button
+                    className="btn btn-warning shadow-sm w-100 p-2"
+                >
+                    Random Pick
+                </button>
+            </div>
+            <div className="bg-light d-flex p-2">
+                <div className="markets-id-temp"></div>
+                <div className="d-flex justify-content-around markets-id fw-bold">
+                    <small>1</small>
+                    <small>X</small>
+                    <small>2</small>
+                </div>
+            </div>
+            {data?.jackpot_games?.map(JackpotGamesItems)}
+            <div className="d-flex justify-content-center p-2">
                 <button className="btn btn-secondary rounded-0 shadow-sm m-1">
                     <FontAwesomeIcon icon={faClose} style={{ marginRight: 6 }}/>
-                    Cancel
+                    Clear
                 </button>
                 <button className="btn btn-danger rounded-0 shadow-sm m-1 fw-bold">
                     <FontAwesomeIcon icon={faCheck} style={{ marginRight: 6 }}/>
                     Submit {market}
                 </button>
             </div>
-        
         </div>
     )
 }
