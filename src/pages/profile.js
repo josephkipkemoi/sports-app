@@ -21,6 +21,8 @@ import Image from "next/image"
 import UserBalance from "../components/UserBalance"
 import MpesaComponent from "../components/Payments/Mpesa/MpesaComponent"
 import AirtelComponent from "../components/Payments/Airtel/AirtelComponent"
+import PaypalComponent from "../components/Payments/Paypal/PaypalComponent"
+import BitcoinComponent from "../components/Payments/Bitcoin/BitcoinComponent"
 
 const StyleProfile = styled.div`
     // background-color: #fff;
@@ -358,8 +360,8 @@ const DepositOptionsComponent = ({ displayMode }) => {
 
             {depositContainer === config.MPESA_DEPOSIT_OPTION &&  <MpesaComponent displayMode={displayMode}/> }
             {depositContainer === config.AIRTEL_DEPOSIT_OPTION &&  <AirtelComponent displayMode={displayMode}/> }
-            {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PayPalDeposit displayMode={displayMode}/> }
-            {depositContainer === config.BITCOIN_DEPOSIT_OPTION &&  <BitCoinDeposit displayMode={displayMode}/> }        
+            {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PaypalComponent displayMode={displayMode}/> }
+            {depositContainer === config.BITCOIN_DEPOSIT_OPTION &&  <BitcoinComponent displayMode={displayMode}/> }        
 
         </>
     )
@@ -403,69 +405,6 @@ const ComingSoonPaymentsComponent = ({ option }) => {
                 <h2>COMING SOON</h2>
             </Card.Footer>
         </Card>
-    )
-}
-
-const BitCoinDeposit = ({ displayMode }) => {
-    return (
-        <Card className={`${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
-            <Card.Header className="d-flex justify-content-center border-0" style={{ margin: 0, paddingTop: '1rem' }}>
-                <Image src="https://www.pinaclebet.com/bitcoin.png" width={72} height={72} />
-            </Card.Header>
-            <hr className="text-secondary"/>
-            <div className="p-1 text-center">
-            <p>Make payment to Bitcoin address and wait at least 2 minutes before reloading your balance</p>
-            <h6>Scan QR Code</h6>
-            <Image src="https://www.pinaclebet.com/bitcoinQR.png" width={102} height={102} />
-            <span className="text-center" style={{ letterSpacing: '2px' }}>
-                    <label htmlFor="bitcoin" className="mb-3 fw-bold text-center">{configData.BITCOIN_DEPOSIT_ADDRESS}</label>
-                    <input 
-                        id="bitcoin"
-                        style={{ fontSize: '1.4rem' }} 
-                        className="text-center form-control" 
-                        type="text" 
-                        disabled 
-                        value={configData.BITCOIN_DEPOSIT_ADDRESS}
-                    />                   
-            </span>
-            </div>
-          
-            <Card.Body style={{ paddingTop: 0 }}>
-               
-               
-            </Card.Body>
-        </Card>
-    )
-}
-
-const PayPalDeposit = ({ displayMode }) => {
-    return (
-        <Card className={`border-0 shadow mt-3 rounded ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
-        <Card.Header className="d-flex justify-content-center bg-light border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
-            <Image src="https://www.pinaclebet.com/paypallogo.png" width={200} height={56} />
-        </Card.Header>
-        <Card.Body style={{ paddingTop: 0 }}>
-            <hr className="text-secondary"/>
-            <div className="text-center m-3 fw-bold">
-                <p>Make payment to paypal email address and wait at least 2 minutes before reloading your balance</p>
-                <h5 className="text-center" style={{ letterSpacing: '2px' }}>
-                    <label htmlFor="paypal" className="mb-3 fw-bold">Email: cynkemltd@gmail.com</label>
-                    <input 
-                        id="paypal"
-                        style={{ fontSize: '1.4rem' }} 
-                        className="text-center form-control" 
-                        type="text" 
-                        disabled 
-                        value=" cynkemltd@gmail.com" 
-                    />                   
-                </h5>
-            </div>
-            <Small className="d-block text-danger text-center fw-bold">
-                Minimum USD 10.00
-            </Small>      
-        </Card.Body>
-    
-    </Card>
     )
 }
 
