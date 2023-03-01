@@ -42,7 +42,7 @@ const AirtelComponent = ({ displayMode }) => {
     return (
         <Card className={`border-0 mt-3 rounded custom-active-container ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
         <Card.Header className="d-flex justify-content-center border-0" style={{ margin: 0, paddingTop: '1rem', paddingBottom: '.5rem' }}>
-            <Image src={`${config.FRONT_END_URL}airtelmoney.webp`} width={72} height={72} />
+            <Image src={`${config.FRONT_END_URL}airtelmoney.webp`} width={126} height={72} />
         </Card.Header>
         <Card.Body style={{ paddingTop: 0 }}>
             <Span className="d-block">Send money into your {APP_NAME} account</Span>
