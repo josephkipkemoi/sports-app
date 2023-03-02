@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import  Row from "react-bootstrap/Row";
 import  Col  from "react-bootstrap/Col";
 import Spinner from "react-bootstrap/Spinner";
@@ -127,6 +127,8 @@ const JackpotMarkets = ({ market }) => {
 }
 
 const JackpotMarketGames = ({ market_id , market_active, market}) => {
+    const [activeIds, setActiveIds] = useState([])
+    const ids = Array.from(new Set(activeIds))
     const {data, isLoading, error} = useGetJackpotMarketGamesQuery(market_id)
     if (isLoading) {
         return <Spinner animation="grow" />
@@ -134,9 +136,30 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
     if (error) {
         return <span className="text-danger">Error! Try again later</span>
     }
+
+    const handleGame = (e) => {
+        const id = e.target.getAttribute('market_id') + e.target.getAttribute('game_id')
+        const picked = e.target.getAttribute('picked')
+        console.log(picked, id)
+        const data = {
+            picked,
+            picked_id: id
+        }
+        localStorage.setItem(id, JSON.stringify(data))
+        localStorage.setItem(id+"picked", picked)
+        fetchPicked(id)
+    }
+
+    const fetchPicked = (id) => {
+        const p = localStorage.getItem(id)
+        const d = JSON.parse(p)
+        setActiveIds(prev => prev.concat(d))
+    }
+
     const JackpotGamesItems = (d, i) => {
         const da = new Date(d?.kick_off_time)
         const date = da.getDate() + '/' + da.getMonth() + '/' + da.getFullYear() + '-' + da.getHours() + ':' + da.getMinutes()
+      
         return (
             <React.Fragment key={i}>
                 <div className="d-flex align-items-center p-2">
@@ -148,29 +171,53 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                         </div>
                     </div>
                     <div className="markets-id d-flex justify-content-around">
+                        {/* {console.log(ids[i] , (d?.jackpot_market_id+ '' +d?.id))} */}
                         <button
-                            className="btn btn-primary w-100 m-1 p-2"
+                            className={`btn btn-${ids[i]?.picked_id === (d?.jackpot_market_id+ '' +d?.id) ? 'warning' :'primary'} w-100 m-1 p-2`}
                             disabled={!market_active}
+                            onClick={handleGame}
+                            market_id={d?.jackpot_market_id}
+                            game_id={d?.id}
+                            home_team={d?.home_team}
+                            away_team={d?.away_team}
+                            picked={d?.home_team}
+                            picked_id={d?.jackpot_market_id+ '' +d?.id}
                         >
-                            {d?.home_odds}.45
+                            {d?.home_odds}
                         </button>
                         <button
                             className="btn btn-primary w-100 m-1 p-2"
                             disabled={!market_active}
+                            onClick={handleGame}
+                            market_id={d?.jackpot_market_id}
+                            game_id={d?.id}
+                            home_team={d?.home_team}
+                            away_team={d?.away_team}
+                            picked={"X"}
+                            picked_id={d?.jackpot_market_id+ '' +d?.id}
                         >
-                            {d?.draw_odds}.90
+                            {d?.draw_odds}
                         </button>
                         <button
                             className="btn btn-primary w-100 m-1 p-2"
                             disabled={!market_active}
+                            onClick={handleGame}
+                            market_id={d?.jackpot_market_id}
+                            game_id={d?.id}
+                            home_team={d?.home_team}
+                            away_team={d?.away_team}
+                            picked={d?.away_team}
+                            picked_id={d?.jackpot_market_id+ '' +d?.id}
                         >
-                            {d?.away_odds}.43
+                            {d?.away_odds}
                         </button>
                     </div>
                 </div>
             </React.Fragment>
         )
     }
+
+  
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center p-2">
