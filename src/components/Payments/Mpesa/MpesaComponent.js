@@ -3,11 +3,24 @@ import generateTimestamp from "../../../hooks/generateTimestamp";
 import generateBase64Encoding from "../../../hooks/generateBase64Encoding";
 import AuthUser from "../../../hooks/AuthUser";
 import configData from '../../../../config.json';
-import { Card } from "react-bootstrap";
+import { Card, Modal } from "react-bootstrap";
 import { InputNumber, Small, Span } from "../../Html";
 import Image from "next/image";
 import axios from "../../../lib/axios";
+import styled from "styled-components";
 
+
+const StyleMpesaPaybill = styled.div`
+    h1 {
+        letter-spacing: 4px;
+    }
+    h5 {
+        letter-spacing: 2px;
+    }
+    p {
+        font-size: 14px;
+    }
+`
 const MpesaComponent = ({ displayMode }) => {
     const [authToken, setAuthToken] = useState('')
 
@@ -15,8 +28,12 @@ const MpesaComponent = ({ displayMode }) => {
  
     const { APP_NAME, MINIMUM_DEPOSIT_AMOUNT } = configData;
 
-    const [depositAmount, setDepositAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
+    const [depositAmount, setDepositAmount] = useState(MINIMUM_DEPOSIT_AMOUNT);
     const [depositLoading, setDepositLoading] = useState(false)
+    const [mpesaOpen, setMpesaOpen] = useState(false)
+
+    const closeMpesaModal = () => setMpesaOpen(false)
+    const openMpesaModal = () => setMpesaOpen(true)
 
     const updateDepositAmount = (e) => {
         e.preventDefault()
@@ -137,32 +154,76 @@ const MpesaComponent = ({ displayMode }) => {
                     className="d-block form-control p-3 custom-active-btn mt-2 mb-2" 
                     placeholder={depositAmount}
                     onChange={updateDepositAmount}
-                    value={depositAmount}
+                    // value={depositAmount}
                 />
                 <Small className="d-block text-danger">
                     Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </Small>
                 <div className={`text-center ${displayMode === 'dark-mode' ? 'deposit-dark-mode' : 'deposit-light-mode'}`}>
-                    <button className={`custom-btn custom-active-btn `} onClick={deposit} disabled={depositLoading || true}>
+                    {/* <button className={`custom-btn custom-active-btn `} onClick={deposit} disabled={depositLoading || true}>
                         { depositLoading ? 'Loading...' : 'Deposit'}
+                    </button> */}
+                    <button className="btn btn-warning w-100 shadow-sm" onClick={openMpesaModal}>
+                        Deposit
                     </button>
                 </div>
             </Card.Body>
             <Card.Footer className="border-0">
                 <span className="d-block mb-2">Having trouble?</span>
-                <div className="text-center">
-                    <h6 className="fw-bold">
-                        USE PAYBILL: {configData.MPESA_PAYBILL_NUMBER}                    
-                    </h6>
-                    <h6 className="fw-bold">
-                        ACCOUNT NO: 07-XXX-XXX
-                    </h6>
-                </div>
-               
+                <StyleMpesaPaybill className="text-center">
+                    <h5 className="fw-bold">
+                        USE PAYBILL:                  
+                    </h5>
+                    <h1 className="fw-bold pay-bill">
+                        {configData.MPESA_PAYBILL_NUMBER}   
+                    </h1>
+                    <h5 className="fw-bold">
+                        ACCOUNT NO:
+                    </h5>
+                    <h4 className="fw-bold">
+                        07-XXX-XXX
+                    </h4>
+                    <DepositModal mpesaOpen={mpesaOpen} closeMpesaModal={closeMpesaModal}/>
+                </StyleMpesaPaybill>               
             </Card.Footer>
+           
         </Card>
     )
 }
 
+const DepositModal = ({ mpesaOpen, closeMpesaModal }) => {
+    const [phoneNumber, setPhoneNumber] = useState("07XX-XXX-XXX")
+    useEffect(() => {
+        const user = localStorage.getItem('uu_id')
+        setPhoneNumber(JSON.parse(user)?.uu_id?.phone_number)
+    }, [mpesaOpen])
+    return (
+        <Modal show={mpesaOpen} centered>
+            <Modal.Header className="bg-success fw-bold text-white">
+               <h4 style={{ margin: 0 }}>
+                    MPESA DEPOSIT
+               </h4> 
+            </Modal.Header>
+            <Modal.Body className="bg-light">
+                <StyleMpesaPaybill>
+                    <p>Open Mpesa STK</p>
+                    <p>Go to Lipa Na Mpesa</p>
+                    <p>> Pay Bill</p>
+                    <p>> Enter Business No: <span className="fw-bold"> {configData.MPESA_PAYBILL_NUMBER}</span>  </p>
+                    <p>> Account No: <span className="fw-bold">{phoneNumber}</span></p>
+                    <p>> Amount: (KES {configData.MINIMUM_DEPOSIT_AMOUNT}) Minimum Deposit Allowed</p>
+                    <p>Enter Mpesa Pin and continue betting</p>
+                </StyleMpesaPaybill>  
+            </Modal.Body>
+            <Modal.Footer>
+                <div className="d-flex justify-content-between w-100">
+                    <button className="btn btn-danger w-100 m-1 p-2" onClick={closeMpesaModal}> 
+                        Close
+                    </button>                   
+                </div>
+            </Modal.Footer>
+        </Modal>
+    )
+}
 
 export default MpesaComponent
