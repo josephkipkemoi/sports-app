@@ -208,10 +208,10 @@ const DepositModal = ({ mpesaOpen, closeMpesaModal }) => {
                 <StyleMpesaPaybill>
                     <p>Open Mpesa STK</p>
                     <p>Go to Lipa Na Mpesa</p>
-                    <p>> Pay Bill</p>
-                    <p>> Enter Business No: <span className="fw-bold"> {configData.MPESA_PAYBILL_NUMBER}</span>  </p>
-                    <p>> Account No: <span className="fw-bold">{phoneNumber}</span></p>
-                    <p>> Amount: (KES {configData.MINIMUM_DEPOSIT_AMOUNT}) Minimum Deposit Allowed</p>
+                    <p>&gt; Pay Bill</p>
+                    <p>&gt; Enter Business No: <span className="fw-bold"> {configData.MPESA_PAYBILL_NUMBER}</span>  </p>
+                    <p>&gt; Account No: <span className="fw-bold">{phoneNumber}</span></p>
+                    <p>&gt; Amount: (KES {configData.MINIMUM_DEPOSIT_AMOUNT}) Minimum Deposit Allowed</p>
                     <p>Enter Mpesa Pin and continue betting</p>
                 </StyleMpesaPaybill>  
             </Modal.Body>
