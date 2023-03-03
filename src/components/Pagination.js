@@ -3,14 +3,14 @@ import styled from "styled-components";
 
 const StylePagination = styled.div`
   .active button {
-    background: linear-gradient(-45deg, rgba(255,255,255,0.22), rgba(0,0,0,0.25));
+    background: #191970;
     box-shadow: 
     12px 12px 16px 0 rgba(0, 0, 0, 0.25),
     -8px -8px 12px 0 rgba(255, 255, 255, 0.3);
+    color: #fff !important;
   }
   .disabled button {
-    color: lightgray;
-    background: linear-gradient(-45deg, rgba(255,255,255,0.22), rgba(0,0,0,0.25));
+    background: darkgray;
   }
   button {
     color: #fff;
