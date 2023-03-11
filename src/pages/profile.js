@@ -628,6 +628,7 @@ const MpesaDeposit = ({ displayMode }) => {
 
 const WithdrawComponent = ({ displayMode }) => {
     const [withdrawModalOpen, setWithdrawModalOpen] = useState(false)
+    const { uu_id } = AuthUser()
 
     const { 
         APP_NAME, 
@@ -662,7 +663,11 @@ const WithdrawComponent = ({ displayMode }) => {
                         Withdrawal Failed
                     </h4>
                     <h5>Pending Balance:</h5>
-                    <UserBalance/>
+                    <UserBalance
+                        displayMode={displayMode} 
+                        user_id={uu_id?.id} 
+                        type="regular" 
+                    />
                     <p>
                         Admin action required. Kindly contact customer care for assistance!
                     </p>
