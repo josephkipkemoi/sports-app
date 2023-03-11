@@ -1,14 +1,12 @@
 import Link from "next/link"
 import React, { useEffect, useRef, useState } from "react"
-import { Button, Card, Container, Spinner } from "react-bootstrap"
+import { Button, Card, Container, Modal } from "react-bootstrap"
 import styled from "styled-components"
 import useAuth from "../hooks/auth"
-import { useGetBalanceByUserIdQuery } from "../hooks/balance"
 import configData from '../../config.json';
 import generateTimestamp from "../hooks/generateTimestamp";
 import generateBase64Encoding from "../hooks/generateBase64Encoding"
 import config from '../../config.json';
-
 import { 
     InputNumber, 
     Span,
@@ -21,7 +19,7 @@ import AuthUser from '../hooks/AuthUser';
 import { withProtected } from "../hooks/RouteProtection"
 import MobileNavComponent from "../components/MobileNavComponent"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faRefresh } from "@fortawesome/free-solid-svg-icons"
+import { faClose, faWarning } from "@fortawesome/free-solid-svg-icons"
 import Image from "next/image"
 import UserBalance from "../components/UserBalance"
 
@@ -629,13 +627,17 @@ const MpesaDeposit = ({ displayMode }) => {
 }
 
 const WithdrawComponent = ({ displayMode }) => {
-    
+    const [withdrawModalOpen, setWithdrawModalOpen] = useState(false)
+
     const { 
         APP_NAME, 
         MINIMUM_WITHDRAW_AMOUNT, 
         MAXIMUM_WITHDRAW_AMOUNT 
     } = configData;
 
+    const openWithdrawModal = () => setWithdrawModalOpen(true)
+    const closeWithdrawModal = () => setWithdrawModalOpen(false)
+    
     return (
         <div className={`shadow-sm p-4 mb-4 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
             <h5>Withdraw</h5>
@@ -645,9 +647,33 @@ const WithdrawComponent = ({ displayMode }) => {
                 Minimum KES {MINIMUM_WITHDRAW_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})},
                 Maximum KES {MAXIMUM_WITHDRAW_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})},
             </Small>
-            <Button variant="warning">
+            <Button variant="warning" onClick={openWithdrawModal} className="w-100">
                 Withdraw
             </Button>
+            <Modal show={withdrawModalOpen}>
+                <Modal.Header className="bg-success text-white">
+                  <h2>
+                    Withdraw
+                  </h2>  
+                </Modal.Header>
+                <Modal.Body className="alert alert-info">
+                    <h4 className="alert alert-danger">
+                        <FontAwesomeIcon icon={faWarning} style={{ marginRight: 8 }} />
+                        Withdrawal Failed
+                    </h4>
+                    <h5>Pending Balance:</h5>
+                    <UserBalance/>
+                    <p>
+                        Admin action required. Kindly contact customer care for assistance!
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button onClick={closeWithdrawModal} className="btn btn-dark">
+                        <FontAwesomeIcon icon={faClose} style={{ marginRight: 8 }}/>
+                        Close
+                    </button>
+                </Modal.Footer>
+            </Modal>
         </div>
     )
 }
