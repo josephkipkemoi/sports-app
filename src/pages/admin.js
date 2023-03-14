@@ -27,7 +27,7 @@ import {
     useGetAllUsersWhoMessagedAdminQuery, 
     useGetUserMessageByIdQuery } from "../hooks/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHeadset, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faWarning, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import Echo from "laravel-echo";
 import Pagination from '../components/Pagination';
 
@@ -317,6 +317,8 @@ const JackpotComponent = () => {
 }
 
 const AddUpdateJackpotGame = () => {
+
+    const [error, setError] = useState(null)
     const [gameAdded, setGameAdded] = useState(false)
     const [game, setGame] = useState({
         market: null,
@@ -338,18 +340,26 @@ const AddUpdateJackpotGame = () => {
     }))
 
     const submitGame = async () => {
-        const res = await axios.post(`api/jackpots/markets/${jackpot_market_id}/games`, {
-            jackpot_market_id,
-            home_team,
-            away_team,
-            home_odds,
-            draw_odds,
-            away_odds,
-            kick_off_time
-        })
-        if (res.status == 201 ) {
-            setGameAdded(true)
+        try {
+            const res = await axios.post(`api/jackpots/markets/${jackpot_market_id}/games`, {
+                jackpot_market_id,
+                home_team,
+                away_team,
+                home_odds,
+                draw_odds,
+                away_odds,
+                kick_off_time
+            })
+            if (res.status == 201 ) {
+                setGameAdded(true)
+                setError(null)
+            }
+        } catch (error) {
+            if(error.response.status == 400) {
+                setError(error.response.data.message)
+            }
         }
+      
     }
     const updateGame = () => {
 
@@ -371,17 +381,15 @@ const AddUpdateJackpotGame = () => {
         }
     })
 
-    // useEffect(() => {
-    //     const timeout = setTimeout(() => {
-    //         if(gameAdded) {
-    //             setGameAdded(false)
-    //         }
-    //     },1000)
-    //     return () => clearTimeout(timeout)
-    // }, [gameAdded])
     return (
         <div className="bg-primary">
             <h5 className="text-center fw-bold  p-2 text-white">Add/Update Games to {market}</h5>
+            {error && 
+            <p className="alert alert-danger">
+                <FontAwesomeIcon icon={faWarning} style={{ marginRight: 8 }}/>
+                {error}
+            </p>
+            }
             <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
                 <div>
                 <Small className="text-dark">Jackpot Market</Small>
@@ -475,6 +483,7 @@ const JackpotMarket = () => {
         market: '',
         market_prize: null,
         games_count: null,
+        min_stake: null
     })
     const [marketAdded, setMarketAdded] = useState(false)
 
@@ -482,11 +491,17 @@ const JackpotMarket = () => {
         setMarket(prev => ({...prev, [e.target.name]: e.target.value}))
     }
 
-    const postJpMarket = async () => {
-        const res = await axios.post("api/jackpots/markets", market)
-        if (res.status == 201) {
-            setMarketAdded(true)
-        } 
+    const postJpMarket =  () => {
+        try {
+            const res =  axios.post("api/jackpots/markets", market)
+
+            if (res.status == 201) {
+                setMarketAdded(true)
+            }  
+        } catch (error) {
+            console.error(error)
+        }
+      
     }
 
     useEffect(() => {
@@ -534,6 +549,13 @@ const JackpotMarket = () => {
                         placeholder="Market Games Count" 
                         onChange={handlechange}
                         name="games_count"
+                    />
+                    <input 
+                        className="form-control mt-2" 
+                        type="number" 
+                        placeholder="Minimum Stake" 
+                        onChange={handlechange}
+                        name="min_stake"
                     />
                 </div>
             </div>        
