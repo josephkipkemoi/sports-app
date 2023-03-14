@@ -6,8 +6,11 @@ import styled from "styled-components";
 import CustomerInfo from '../components/CustomerInfo';
 import TopNavBar from "../components/TopNavBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrophy, faSoccerBall, faClose, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faTrophy, faSoccerBall, faClose, faCheck, faWarning } from '@fortawesome/free-solid-svg-icons'
 import { useGetJackpotMarketGamesQuery, useGetJackpotMarketQuery } from "../hooks/jackpot";
+import AuthUser from '../hooks/AuthUser';
+import { Modal } from "react-bootstrap";
+import Link from "next/link";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -126,7 +129,27 @@ const JackpotMarkets = ({ market }) => {
     )
 }
 
+const StyleJackpotActive = styled.div`
+    .disabled-btn {
+        position: relative;
+    }
+    .disabled-btn:hover::after {
+        content: "Login to place jackpot!";
+        position: absolute;
+        top: -35px;
+        padding: 4px 8px;
+        color: #fff;
+        left: 0;
+        width: auto;
+        height: auto;
+        background: red;
+        cursor: not-allowed;
+    }
+`
+
 const JackpotMarketGames = ({ market_id , market_active, market}) => {
+    const [errorModalOoen, setErrorModalOpen] = useState(false)
+    const user = AuthUser()
     const {data, isLoading, error} = useGetJackpotMarketGamesQuery(market_id)
     if (isLoading) {
         return <Spinner animation="grow" />
@@ -134,6 +157,9 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
     if (error) {
         return <span className="text-danger">Error! Try again later</span>
     }
+
+    const openErrorModal = () => setErrorModalOpen(true)
+    const closeErrorModal = () => setErrorModalOpen(false)
 
     const handleGame = (e) => {
         const id = e.target.getAttribute('game_id')
@@ -151,6 +177,12 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
             btns[i].classList.remove('btn-warning')
         }
         btns[i].classList.add('btn-warning')
+    }
+
+    const postJackpot = () => {
+        if(!!user?.uu_id?.id == false) {
+            openErrorModal()
+        }
     }
 
     const JackpotGamesItems = (d, i) => {
@@ -222,7 +254,6 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
         )
     }
 
-  
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center p-2">
@@ -244,16 +275,45 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                 </div>
             </div>
             {data?.jackpot_games?.map(JackpotGamesItems)}
-            <div className="d-flex justify-content-center p-2">
+            <StyleJackpotActive className="d-flex justify-content-center p-2">
                 <button className="btn btn-secondary rounded-0 shadow-sm m-1">
                     <FontAwesomeIcon icon={faClose} style={{ marginRight: 6 }}/>
                     Clear
                 </button>
-                <button className="btn btn-danger rounded-0 shadow-sm m-1 fw-bold">
+                <button 
+                    className={`btn btn-danger rounded-0 shadow-sm m-1 fw-bold ${!!user?.uu_id?.id == true ? '' : 'disabled-btn'}`}
+                    onClick={postJackpot}
+                >
                     <FontAwesomeIcon icon={faCheck} style={{ marginRight: 6 }}/>
                     Submit {market}
                 </button>
-            </div>
+            </StyleJackpotActive>
+            <JackpotErrorModal
+                errorModalOoen={errorModalOoen}
+                closeErrorModal={closeErrorModal}
+            />
         </div>
+    )
+}
+
+const JackpotErrorModal = ({ errorModalOoen, closeErrorModal }) => {
+    return (
+        <Modal show={errorModalOoen} >
+            <Modal.Body className="bg-light">
+                <h4 className="alert alert-danger shadow mb-4">
+                    <FontAwesomeIcon icon={faWarning} style={{ marginRight: 8 }} />
+                    Unauthorized Action
+                </h4>
+                <h5 className="text-dark">
+                    Please <Link href="/login">Login</Link>  to place bet or <Link href="/register">Signup Here</Link>
+                </h5>
+            </Modal.Body>
+            <Modal.Footer>
+                <button className="btn btn-dark" onClick={closeErrorModal}>
+                    <FontAwesomeIcon icon={faClose} style={{ marginRight: 8 }} />
+                    Close
+                </button>
+            </Modal.Footer>
+        </Modal>
     )
 }
