@@ -6,11 +6,12 @@ import styled from "styled-components";
 import CustomerInfo from '../components/CustomerInfo';
 import TopNavBar from "../components/TopNavBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrophy, faSoccerBall, faClose, faCheck, faWarning } from '@fortawesome/free-solid-svg-icons'
+import { faTrophy, faSoccerBall, faClose, faCheck, faWarning, faRefresh } from '@fortawesome/free-solid-svg-icons'
 import { useGetJackpotMarketGamesQuery, useGetJackpotMarketQuery } from "../hooks/jackpot";
 import AuthUser from '../hooks/AuthUser';
 import { Modal } from "react-bootstrap";
 import Link from "next/link";
+import axios from "../lib/axios";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -118,6 +119,7 @@ const JackpotMarkets = ({ market }) => {
                     market={d?.market}
                     market_id={d?.market_id} 
                     market_active={d?.market_active}
+                    games_count={d?.games_count}
                 />
             </React.Fragment>
         )
@@ -148,27 +150,52 @@ const StyleJackpotActive = styled.div`
 `
 
 const JackpotMarketGames = ({ market_id , market_active, market}) => {
+
+    const [successMessage, setSuccessMessage] = useState('')
+    const [successModalOpen, setSuccessModalOpen] = useState(false)
+    const [jackpotSelectionError, setJackpotSelectionError] = useState([])
+    const [ids, setIds] = useState([])
     const [errorModalOoen, setErrorModalOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const uniqueIds = Array.from(new Set(ids))
     const user = AuthUser()
-    const {data, isLoading, error} = useGetJackpotMarketGamesQuery(market_id)
-    if (isLoading) {
-        return <Spinner animation="grow" />
-    }
+    const {data, error} = useGetJackpotMarketGamesQuery(market_id)
+
     if (error) {
         return <span className="text-danger">Error! Try again later</span>
     }
 
     const openErrorModal = () => setErrorModalOpen(true)
     const closeErrorModal = () => setErrorModalOpen(false)
+    const closeSuccessModal = () => setSuccessModalOpen(false)
 
     const handleGame = (e) => {
         const id = e.target.getAttribute('game_id')
         const picked = e.target.getAttribute('picked')
+        const marketId = e.target.getAttribute('market_id')
+
         const data = {
             picked,
-            picked_id: id
+            game_id: id,
+            market_id: marketId
         }
         localStorage.setItem(id, JSON.stringify(data))
+        setIds(prev => prev.concat(id))
+
+        axios.post(`api/jackpots/${marketId}/users/${user?.uu_id?.id}/games`, {
+            user_id: user?.uu_id?.id,
+            jackpot_market_id: marketId,
+            game_id: id,
+            picked: picked,
+            picked_games_count: uniqueIds.length
+        }).then(r => r.json())
+        .catch(e => {
+            if(e?.response?.status == 400) {
+                return setJackpotSelectionError(p => p.concat(e.response.data.message))
+            }
+        });
+
     }
 
     const activatBtn = (index,i) => {
@@ -179,11 +206,30 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
         btns[i].classList.add('btn-warning')
     }
 
-    const postJackpot = () => {
+    const postJackpot = async () => {
+        setIsLoading(true)
         if(!!user?.uu_id?.id == false) {
-            openErrorModal()
+            setIsLoading(false)
+           return openErrorModal()
         }
-    }
+        try {
+            const res = await axios.post("api/jackpots/results/validate", {
+                'user_id': user?.uu_id?.id,
+                'market_id': market_id,
+                'picked_games_count': uniqueIds.length
+            })
+            if(res.status == 201) {
+                setIsLoading(false)
+                setSuccessMessage(res.data.message)
+                setSuccessModalOpen(true)
+            }
+        } catch (e) {
+            if(e?.response?.status == 400) {
+                setIsLoading(false)
+                return setJackpotSelectionError(p => p.concat(e.response.data.message))
+            }  
+        }
+   }
 
     const JackpotGamesItems = (d, i) => {
         const da = new Date(d?.kick_off_time)
@@ -254,6 +300,17 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
         )
     }
 
+    const customTimer = () => {
+        if(jackpotSelectionError.length > 0) {
+            setJackpotSelectionError([])
+        }
+    }
+    
+    useEffect(() => {
+        const timer = setTimeout(customTimer, 4500)
+        return () => clearTimeout(timer)
+    }, [jackpotSelectionError.length, market])
+
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center p-2">
@@ -266,6 +323,12 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                     Random Pick
                 </button>
             </div>
+            {jackpotSelectionError.length > 0 && 
+                <p className="alert alert-danger m-3">
+                <FontAwesomeIcon icon={faWarning} style={{ marginRight: 8 }} />
+                    {jackpotSelectionError[0]}
+                </p>
+            }
             <div className="bg-light d-flex p-2">
                 <div className="markets-id-temp"></div>
                 <div className="d-flex justify-content-around markets-id fw-bold">
@@ -281,21 +344,60 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                     Clear
                 </button>
                 <button 
-                    className={`btn btn-danger rounded-0 shadow-sm m-1 fw-bold ${!!user?.uu_id?.id == true ? '' : 'disabled-btn'}`}
+                    className={`d-flex align-items-center btn btn-danger rounded-0 shadow-sm m-1 fw-bold ${!!user?.uu_id?.id == true ? '' : 'disabled-btn'}`}
                     onClick={postJackpot}
+                    disabled={isLoading}
                 >
-                    <FontAwesomeIcon icon={faCheck} style={{ marginRight: 6 }}/>
-                    Submit {market}
+                    {isLoading ?
+                        <>
+                            <Spinner animation="grow" size="sm" style={{ marginRight: 6 }}/>
+                            Loading...
+                        </>
+                    : 
+                    <>
+                        <FontAwesomeIcon icon={faCheck} style={{ marginRight: 6 }}/>
+                        Submit {market}
+                    </>}
+                
                 </button>
             </StyleJackpotActive>
             <JackpotErrorModal
                 errorModalOoen={errorModalOoen}
                 closeErrorModal={closeErrorModal}
             />
+            <SuccessModal
+                successModalOpen={successModalOpen}
+                successMessage={successMessage}
+                closeSuccessModal={closeSuccessModal}
+            />
         </div>
     )
 }
 
+const SuccessModal = ({ successModalOpen, successMessage, closeSuccessModal }) => {
+    return (
+        <Modal show={successModalOpen} centered>
+            <Modal.Header className="bg-primary text-white p-3 border-0">
+                <h2>You are one step from becoming a Millionare!</h2>
+            </Modal.Header>
+            <Modal.Body className="bg-light border-0 p-5 text-center">
+                <h3>{successMessage}</h3>
+            </Modal.Body>
+            <Modal.Footer className="bg-info border-0">
+                <div className="d-flex justify-content-between w-100">
+                    <button className="btn btn-light m-2 w-100" onClick={closeSuccessModal}>
+                        <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 6 }}/>
+                        Place Again
+                    </button>
+                    <button className="btn btn-dark m-2 w-100" onClick={closeSuccessModal}>
+                        <FontAwesomeIcon icon={faClose}  style={{ marginRight: 6 }}/>
+                        Close
+                    </button>
+                </div>              
+            </Modal.Footer>
+        </Modal>
+    )
+}
 const JackpotErrorModal = ({ errorModalOoen, closeErrorModal }) => {
     return (
         <Modal show={errorModalOoen} >
