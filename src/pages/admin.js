@@ -30,6 +30,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faWarning, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import Echo from "laravel-echo";
 import Pagination from '../components/Pagination';
+import { randomString } from "../hooks/generateRandomId";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -317,7 +318,7 @@ const JackpotComponent = () => {
 }
 
 const AddUpdateJackpotGame = () => {
-
+    const generateId = randomString()
     const [error, setError] = useState(null)
     const [gameAdded, setGameAdded] = useState(false)
     const [game, setGame] = useState({
@@ -348,7 +349,8 @@ const AddUpdateJackpotGame = () => {
                 home_odds,
                 draw_odds,
                 away_odds,
-                kick_off_time
+                kick_off_time,
+                jackpot_bet_id : generateId
             })
             if (res.status == 201 ) {
                 setGameAdded(true)
@@ -371,6 +373,10 @@ const AddUpdateJackpotGame = () => {
         jackpot_market_id: e.value
     }))
 
+    useEffect(() => {
+
+    }, [gameAdded])
+    
     if (jpMarket.isLoading) {
         return <Spinner animation="grow" />
     }

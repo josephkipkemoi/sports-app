@@ -55,7 +55,7 @@ export default function Pagination( data ) {
           <>
            <nav aria-label="History page navigation">
             <ul className="pagination d-flex justify-content-center " >
-                {data.data.links.map(PaginationItems)}
+                {data?.data?.links?.map(PaginationItems)}
                 </ul>
            </nav>            
           </>

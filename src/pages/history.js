@@ -10,7 +10,7 @@ import Link from 'next/link';
 import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import { useRouter } from 'next/router';
 import {    useGetAllUserHistoryBetslipV1Query, 
-            useGetMegaJackpotHistoryQuery, 
+            useGetJackpotHistoryQuery, 
             useGetSettledHistoryBetslipQuery, 
             useGetUnsettledHistoryBetslipQuery, 
         } from '../hooks/history';
@@ -65,9 +65,9 @@ const SportBetsHistoryProfile = () => {
                         {tab === 'settled' && <SettledHistory user_id={uu_id.id}/>}
                         {tab === 'unsettled' && <UnsettledHistory user_id={uu_id.id}/>}
                         {tab === 'search' && <SearchFilterResults user_id={uu_id.id}/>}
-                        {(his_tab === 'jbets' && tab === 'j_all') && <AllJackpotHistory user_id={uu_id.id}/>} 
-                        {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={uu_id.id}/>} 
-                        {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={uu_id.id}/>} 
+                        {(his_tab === 'jbets' && tab === 'j_all') && <JackpotHistoryComponent user_id={uu_id.id}/>} 
+                        {/* {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={uu_id.id}/>}  */}
+                        {/* {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={uu_id.id}/>}  */}
                     </StyledHistory>                   
                 </Col>
             </Row>    
@@ -76,18 +76,18 @@ const SportBetsHistoryProfile = () => {
     )
 }
 
-const AllJackpotHistory = ({ user_id }) => {
+const JackpotHistoryComponent = ({ user_id }) => {
 
     const [pageNumber, setPageNumber] = useState(1)
-    const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'All'})
+    const { data, isLoading, error, refetch } = useGetJackpotHistoryQuery({user: user_id})
+    console.log(data)
+    // if(isLoading) {
+    //     return <Spinner animation='grow' />
+    // }
 
-    if(isLoading) {
-        return <Spinner animation='grow' />
-    }
-
-    if(error) {
-        return <span>Error</span>
-    }
+    // if(error) {
+    //     return <span>Error</span>
+    // }
 
     return (
         <>
@@ -102,55 +102,55 @@ const AllJackpotHistory = ({ user_id }) => {
     )
 }
 
-const MegaJackpotHistory = ({ user_id }) => {
+// const MegaJackpotHistory = ({ user_id }) => {
 
-    const [pageNumber, setPageNumber] = useState(1)
-    const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Mega Jackpot'})
+//     const [pageNumber, setPageNumber] = useState(1)
+//     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Mega Jackpot'})
  
-    if(isLoading) {
-        return <Spinner animation='grow' />
-    }
+//     if(isLoading) {
+//         return <Spinner animation='grow' />
+//     }
 
-    if(error) {
-        return <span>Error</span>
-    }
+//     if(error) {
+//         return <span>Error</span>
+//     }
 
-    return (
-        <>
-            <HistoryComponent 
-                data={data}
-                setPageNumber={setPageNumber} 
-                pageNumber={pageNumber}
-                refetch={refetch}
-                user_id={user_id}
-            /> 
-       </> 
-    )
-}
+//     return (
+//         <>
+//             <HistoryComponent 
+//                 data={data}
+//                 setPageNumber={setPageNumber} 
+//                 pageNumber={pageNumber}
+//                 refetch={refetch}
+//                 user_id={user_id}
+//             /> 
+//        </> 
+//     )
+// }
 
-const FiveJackpotHistory = ({ user_id }) => {
+// const FiveJackpotHistory = ({ user_id }) => {
 
-    const [pageNumber, setPageNumber] = useState(1)
-    const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Five Jackpot'})
+//     const [pageNumber, setPageNumber] = useState(1)
+//     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Five Jackpot'})
  
-    if(isLoading) {
-        return <Spinner animation='grow' />
-    }
+//     if(isLoading) {
+//         return <Spinner animation='grow' />
+//     }
 
-    if(error) {
-        return <span>Error</span>
-    }
+//     if(error) {
+//         return <span>Error</span>
+//     }
  
-    return (
-        <HistoryComponent 
-            data={data}
-            setPageNumber={setPageNumber} 
-            pageNumber={pageNumber}
-            refetch={refetch}
-            user_id={user_id}
-        /> 
-    )
-}
+//     return (
+//         <HistoryComponent 
+//             data={data}
+//             setPageNumber={setPageNumber} 
+//             pageNumber={pageNumber}
+//             refetch={refetch}
+//             user_id={user_id}
+//         /> 
+//     )
+// }
 
 const AllTabHistory = ({ user_id }) => {
 
@@ -451,62 +451,51 @@ const HistoryFilter = () => {
     const { from_date, to_date } = dates;
     const [isModalOpen, setIsModalOpen] = useState(false)
     const { tab, his_tab } = router.query
+    const [jackpotMarket, setJackpotMarket] = useState([])
 
-    const openModal = () => {
-        setIsModalOpen(prev => !prev)
+    const fetchMarkets = async () => {
+        const markets = JSON.parse(sessionStorage.getItem("jackpot_markets"));
+        if(!!markets == false) {
+            try {
+                const res = await axios.get("api/jackpots/markets/view")
+                if(res.status == 200) {
+                    sessionStorage.setItem("jackpot_markets", JSON.stringify(res.data))
+                    setJackpotMarket(res.data) 
+                }
+            } catch (error) {
+                console.error(error)
+            }
+        } else {
+            setJackpotMarket(markets)
+        }
     }
 
+    const openModal = () => setIsModalOpen(prev => !prev)
     const closeMenu = () => setIsModalOpen(false)
+    const filterDate = (e) => setDates(prev => ({...prev, [e.target.name]: e.target.value}))
 
-    const filterDate = (e) => {
-        setDates(prev => ({...prev, [e.target.name]: e.target.value}))
-    }
-
-    const SportBetsLinks = () => {
+    const SportBetsLinks = (i, d) => {
         return (
-            <StyleFilterBtn className="d-flex justify-content-start align-items-center">
-                <Link 
-                    href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=all' : 'history?his_tab=jbets&tab=j_all'}`}
+            <StyleFilterBtn key={d} className="d-sm-flex nav align-items-center">
+              <Link 
+                itemProp="url" 
+                href={`/history?his_tab=jbets&tab=j_all&m_id=${i?.market_id}`}
+                className={`btn`}
+              >
+                <a
+                    itemProp="url"
+                    className={`nav-link shadow w-100 text-center rounded text-white ${tab === 'all' ? 'bg-primary' : 'bg-secondary'} m-1`} 
                 >
-                    <a 
-                    itemProp="url" 
-                    className={`btn icon-status ${tab === 'all' || tab === 'j_all' && 'active'}`}
-                    ref={positionRef}
-                    >
-                        All
-                    </a>
-                </Link>
-                <Link 
-                    href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=settled' : 'history?his_tab=jbets&tab=mega_jackpot'} `}
-                >
-                    <a 
-                    itemProp='url' 
-                    className={`btn icon-status  ${tab === 'settled' || tab === 'mega_jackpot' && 'active'}`}
-                    style={{ marginLeft: 5 }}
-                    >
-                        {his_tab === 'sbets' ? "Settled" : "Mega Jackpot"}
-                    </a>
-                </Link>
-                <Link 
-                    href={`${his_tab === 'sbets' ? 'history?his_tab=sbets&tab=unsettled' : 'history?his_tab=jbets&tab=five_jackpot' }`}
-                >
-                    <a 
-                    itemProp='url' 
-                    className={`btn icon-status  ${tab === 'unsettled' || tab === 'five_jackpot' && 'active'}`}
-                    style={{ marginLeft: 5 }}
-                    >
-                        {his_tab === 'sbets' ? "Unsettled" : "Five Jackpot"}
-                    </a>
-                </Link>                  
+                    {i.market}
+                </a>
+              </Link>
             </StyleFilterBtn>  
         )
     }
-
-
     useEffect(() => {
         positionRef.current.focus()
+        fetchMarkets()
     }, [])
-
     return (
         <div className='history-header card p-2 shadow-sm border-0 bg-info'>
             <div>
@@ -518,6 +507,7 @@ const HistoryFilter = () => {
                         >
                             <h5 
                             className={`${his_tab === 'sbets' ? 'fw-bold active-h5' : ''}  p-3 text-dark`}
+                            ref={positionRef}
                             >
                                 Sports Bets
                             </h5>
@@ -537,9 +527,10 @@ const HistoryFilter = () => {
                     </Link>
                 </StyleHeaderNav>          
             </div>
-            <div className='d-flex justify-content-between '>
-                <div className='m-1'>
-                    <SportBetsLinks />          
+            <div className='d-sm-flex justify-content-between '>
+                <div className='m-1 d-sm-flex'>
+                    {his_tab === 'sbets' && <RegularBetsLinksComponent/>}
+                    {his_tab === 'jbets' && jackpotMarket?.map(SportBetsLinks)}
                 </div>
                 <div className='d-flex justify-content-end m-1'>
                     <StyleSearch >
@@ -599,6 +590,47 @@ const HistoryFilter = () => {
                                 
                 </Modal.Body>                            
             </Modal>      
+        </div>
+    )
+}
+
+const RegularBetsLinksComponent = () => {
+    const router = useRouter()
+    const { tab } = router.query
+    return (
+        <div className='d-flex align-items-center nav'>
+            <Link 
+                href="/history?his_tab=sbets&tab=all"
+            >
+            <a 
+                itemProp="url" 
+                className={`nav-link shadow rounded text-white ${tab === 'all' ? 'bg-primary' : 'bg-secondary'} `}
+            >
+                All
+            </a>
+            </Link>
+            <Link 
+                href="/history?his_tab=sbets&tab=settled"  
+            >
+            <a 
+                itemProp='url' 
+                style={{ marginLeft: 5 }}
+                className={`nav-link shadow rounded text-white ${tab === 'settled' ? 'bg-primary' : 'bg-secondary'} `}
+            >
+                Settled
+            </a>
+            </Link>
+            <Link 
+                href="/history?his_tab=sbets&tab=unsettled"
+            >
+            <a 
+                itemProp='url' 
+                style={{ marginLeft: 5 }}
+                className={`nav-link shadow rounded text-white ${tab === 'unsettled' ? 'bg-primary' : 'bg-secondary'} `}
+            >
+                Unsettled
+            </a>
+            </Link>                  
         </div>
     )
 }

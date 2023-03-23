@@ -12,6 +12,7 @@ import AuthUser from '../hooks/AuthUser';
 import { Modal } from "react-bootstrap";
 import Link from "next/link";
 import axios from "../lib/axios";
+import { randomString } from "../hooks/generateRandomId";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -150,7 +151,7 @@ const StyleJackpotActive = styled.div`
 `
 
 const JackpotMarketGames = ({ market_id , market_active, market}) => {
-
+    const randomId = randomString()
     const [successMessage, setSuccessMessage] = useState('')
     const [successModalOpen, setSuccessModalOpen] = useState(false)
     const [jackpotSelectionError, setJackpotSelectionError] = useState([])
@@ -170,32 +171,22 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
     const closeErrorModal = () => setErrorModalOpen(false)
     const closeSuccessModal = () => setSuccessModalOpen(false)
 
-    const handleGame = (e) => {
+    const handleGame = (e, jId) => {
         const id = e.target.getAttribute('game_id')
         const picked = e.target.getAttribute('picked')
         const marketId = e.target.getAttribute('market_id')
+        const homeTeam = e.target.getAttribute('home_team')
+        const awayTeam = e.target.getAttribute('away_team')
 
         const data = {
             picked,
             game_id: id,
-            market_id: marketId
+            market_id: marketId,
+            homeTeam,
+            awayTeam
         }
         localStorage.setItem(id, JSON.stringify(data))
         setIds(prev => prev.concat(id))
-
-        axios.post(`api/jackpots/${marketId}/users/${user?.uu_id?.id}/games`, {
-            user_id: user?.uu_id?.id,
-            jackpot_market_id: marketId,
-            game_id: id,
-            picked: picked,
-            picked_games_count: uniqueIds.length
-        }).then(r => r.json())
-        .catch(e => {
-            if(e?.response?.status == 400) {
-                return setJackpotSelectionError(p => p.concat(e.response.data.message))
-            }
-        });
-
     }
 
     const activatBtn = (index,i) => {
@@ -208,15 +199,24 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
 
     const postJackpot = async () => {
         setIsLoading(true)
+      
         if(!!user?.uu_id?.id == false) {
             setIsLoading(false)
            return openErrorModal()
         }
+
+        const games = uniqueIds.map(id => {
+            const game = localStorage.getItem(id)
+            return game
+        })
+
         try {
             const res = await axios.post("api/jackpots/results/validate", {
                 'user_id': user?.uu_id?.id,
                 'market_id': market_id,
-                'picked_games_count': uniqueIds.length
+                'picked_games_count': uniqueIds.length,
+                jackpot_bet_id: randomId,
+                jackpot_games: JSON.stringify(games)
             })
             if(res.status == 201) {
                 setIsLoading(false)
@@ -228,13 +228,17 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                 setIsLoading(false)
                 return setJackpotSelectionError(p => p.concat(e.response.data.message))
             }  
+            if(e?.response?.status == 422) {
+                setIsLoading(false)
+                return setJackpotSelectionError(p => p.concat("You need to pick all games in this market"))
+            }  
         }
    }
 
     const JackpotGamesItems = (d, i) => {
         const da = new Date(d?.kick_off_time)
         const date = da.getDate() + '/' + da.getMonth() + '/' + da.getFullYear() + '-' + da.getHours() + ':' + da.getMinutes()
-      
+
         return (
             <React.Fragment key={i}>
                 <div className="d-flex align-items-center p-2">
@@ -251,7 +255,7 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                                 id={d?.jackpot_market_id+ '' +d?.id}
                                 className={`btn btn-primary w-100 m-1 p-2 ${d?.jackpot_market_id+ '' +d?.id}`}
                                 disabled={!market_active}
-                                onClick={handleGame}
+                                onClick={e => handleGame(e, d?.jackpot_bet_id)}
                                 market_id={d?.jackpot_market_id}
                                 game_id={d?.id}
                                 home_team={d?.home_team}
