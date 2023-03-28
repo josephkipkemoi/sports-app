@@ -235,6 +235,29 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
             }  
         }
    }
+   const customTimer = () => {
+    if(jackpotSelectionError.length > 0) {
+        setJackpotSelectionError([])
+    }
+}
+
+    const randomPickGames = () => {
+        const marketId = data.jackpot_market[0].market_id
+        data.jackpot_games.map(g => {
+            const randInt = Math.floor(Math.random() * 3)
+            const picked = randInt === 0 && g.home_team || randInt === 1 && "X" || randInt === 2 && g.away_team
+            const d = {
+                picked,
+                game_id: g.id,
+                market_id: marketId,
+                homeTeam: g.home_team,
+                awayTeam: g.away_team
+            }
+            localStorage.setItem(g.id, JSON.stringify(d))
+            setIds(prev => prev.concat(g.id))
+            activatBtn(marketId + '' + g.id, randInt)
+        })       
+    }
 
     const JackpotGamesItems = (d, i) => {
         const da = new Date(d?.kick_off_time)
@@ -303,30 +326,6 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                 </div>
             </React.Fragment>
         )
-    }
-
-    const customTimer = () => {
-        if(jackpotSelectionError.length > 0) {
-            setJackpotSelectionError([])
-        }
-    }
-    
-    const randomPickGames = () => {
-        const marketId = data.jackpot_market[0].market_id
-        data.jackpot_games.map(g => {
-            const randInt = Math.floor(Math.random() * 3)
-            const picked = randInt === 0 && g.home_team || randInt === 1 && "X" || randInt === 2 && g.away_team
-            const d = {
-                picked,
-                game_id: g.id,
-                market_id: marketId,
-                homeTeam: g.home_team,
-                awayTeam: g.away_team
-            }
-            localStorage.setItem(g.id, JSON.stringify(d))
-            setIds(prev => prev.concat(g.id))
-            activatBtn(marketId + '' + g.id, randInt)
-        })       
     }
 
     useEffect(() => {
@@ -401,10 +400,7 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
 
 const SuccessModal = ({ successModalOpen, successMessage, closeSuccessModal }) => {
     return (
-        <Modal show={successModalOpen} centered>
-            <Modal.Header className="bg-primary text-white p-3 border-0">
-                <h2>You are one step from becoming a Millionare!</h2>
-            </Modal.Header>
+        <Modal show={successModalOpen} centered>  
             <Modal.Body className="bg-light border-0 p-5 text-center">
                 <h3>{successMessage}</h3>
             </Modal.Body>
