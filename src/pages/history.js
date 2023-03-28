@@ -22,6 +22,7 @@ import { withProtected } from '../hooks/RouteProtection';
 import MobileNavComponent from '../components/MobileNavComponent';
 import axios from '../lib/axios';
 import HistoryComponent from '../components/HistoryComponent';
+import Pagination from '../components/Pagination';
 
 const StyledHistory = styled.div`
     height: 100vh;
@@ -66,8 +67,6 @@ const SportBetsHistoryProfile = () => {
                         {tab === 'unsettled' && <UnsettledHistory user_id={uu_id.id}/>}
                         {tab === 'search' && <SearchFilterResults user_id={uu_id.id}/>}
                         {(his_tab === 'jbets' && tab === 'j_all') && <JackpotHistoryComponent user_id={uu_id.id}/>} 
-                        {/* {(his_tab === 'jbets' && tab === 'mega_jackpot') && <MegaJackpotHistory user_id={uu_id.id}/>}  */}
-                        {/* {(his_tab === 'jbets' && tab === 'five_jackpot') && <FiveJackpotHistory user_id={uu_id.id}/>}  */}
                     </StyledHistory>                   
                 </Col>
             </Row>    
@@ -76,81 +75,112 @@ const SportBetsHistoryProfile = () => {
     )
 }
 
+const StyleJackpotElements = styled.div`
+    .hide {
+        display: none;
+    }
+    .show {
+        display: block;
+    }
+    hr {
+        margin: 0;
+        padding: 0;
+    }
+    .jackpot_id {
+        text-transform: uppercase;
+    }
+`
 const JackpotHistoryComponent = ({ user_id }) => {
-
+    const [data, setData] = useState(null)
     const [pageNumber, setPageNumber] = useState(1)
-    const { data, isLoading, error, refetch } = useGetJackpotHistoryQuery({user: user_id})
-    console.log(data)
-    // if(isLoading) {
-    //     return <Spinner animation='grow' />
-    // }
 
-    // if(error) {
-    //     return <span>Error</span>
-    // }
+    const fetchJackpotGames = async () => {
+        try {
+            const res = await axios.get(`api/jackpots/users/${user_id}/results?page=${pageNumber}`)
+            setData(res.data)     
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
+   
+    const JackpotHistoryElements = (d, i) => {
+        const openMoreGames = (index) => {
+            const activeDiv = document.getElementsByClassName(`${index}-hide`)
+            if(activeDiv.item(0).classList.contains("hide")) {
+                activeDiv.item(0).classList.remove('hide')
+                activeDiv.item(0).classList.add('show')
+            } 
+            else {
+                activeDiv.item(0).classList.remove('show')
+                activeDiv.item(0).classList.add('hide')
+            }          
+        }
+
+        const JackpotGamesElements = (dd, i) => {
+            const { homeTeam, awayTeam, picked } = JSON.parse(dd)
+
+            return (
+                <React.Fragment key={i}>
+                    <hr/>
+                    <div className='d-flex flex-column card-body'>
+                        <div className='d-flex justify-content-between'>
+                            <p className='fw-bold'>{homeTeam}</p>
+                            <span>vs</span>
+                            <p className='fw-bold'>{awayTeam}</p>
+                        </div>
+                        <div className='d-flex justify-content-between'>
+                            <p>Picked: <span className='fw-bold'>{picked}</span></p>
+                            <p>Outcome: _-_</p>
+                        </div>                   
+                    </div>
+                </React.Fragment>
+            )
+        }
+
+        return (
+            <StyleJackpotElements key={i} className="card p-2 m-2 shadow bg-info border-0">
+                <div className='card-body d-flex justify-content-between'> 
+                    <div>
+                        <div className='d-flex'>
+                            <span>Jackpot ID: </span>
+                            <span className='jackpot_id fw-bold'> {d?.jackpot_bet_id}</span>
+                        </div>
+                        <div className='d-flex'>
+                            <span>Games: </span>
+                            <span>{d?.picked_games_count}</span>
+                        </div>
+                    </div>
+                    <div className='d-flex'>
+                        <span>Outcome: </span>
+                        <span>{"Active"}</span>
+                    </div>
+                </div>
+           
+                <div className='card-footer bg-info shadow border-0'>  
+                    <div className='d-flex justify-content-start'>
+                        <button className='btn btn-light btn-sm rounded mb-2' onClick={() => openMoreGames(i)}>
+                            + Collapse Games 
+                        </button>
+                    </div>         
+                    <div className={`${i}-hide hide`}>
+                        {Array.isArray(JSON.parse(d.jackpot_games)) && JSON.parse(d.jackpot_games)?.map(JackpotGamesElements)}
+                    </div>
+                </div>
+            </StyleJackpotElements>
+        )
+    }
+    useEffect(() => {
+        fetchJackpotGames()
+    }, [])
 
     return (
         <>
-           <HistoryComponent 
-                data={data}
-                setPageNumber={setPageNumber} 
-                pageNumber={pageNumber}
-                refetch={refetch}
-                user_id={user_id}
-            />   
-       </>
+            {data?.data.map(JackpotHistoryElements)}
+            <Pagination data={data}/>
+        </>
     )
 }
-
-// const MegaJackpotHistory = ({ user_id }) => {
-
-//     const [pageNumber, setPageNumber] = useState(1)
-//     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Mega Jackpot'})
- 
-//     if(isLoading) {
-//         return <Spinner animation='grow' />
-//     }
-
-//     if(error) {
-//         return <span>Error</span>
-//     }
-
-//     return (
-//         <>
-//             <HistoryComponent 
-//                 data={data}
-//                 setPageNumber={setPageNumber} 
-//                 pageNumber={pageNumber}
-//                 refetch={refetch}
-//                 user_id={user_id}
-//             /> 
-//        </> 
-//     )
-// }
-
-// const FiveJackpotHistory = ({ user_id }) => {
-
-//     const [pageNumber, setPageNumber] = useState(1)
-//     const { data, isLoading, error, refetch } = useGetMegaJackpotHistoryQuery({user: user_id, market: 'Five Jackpot'})
- 
-//     if(isLoading) {
-//         return <Spinner animation='grow' />
-//     }
-
-//     if(error) {
-//         return <span>Error</span>
-//     }
- 
-//     return (
-//         <HistoryComponent 
-//             data={data}
-//             setPageNumber={setPageNumber} 
-//             pageNumber={pageNumber}
-//             refetch={refetch}
-//             user_id={user_id}
-//         /> 
-//     )
-// }
 
 const AllTabHistory = ({ user_id }) => {
 
@@ -476,7 +506,7 @@ const HistoryFilter = () => {
 
     const SportBetsLinks = (i, d) => {
         return (
-            <StyleFilterBtn key={d} className="d-sm-flex nav align-items-center">
+            <StyleFilterBtn key={d} className="d-flex nav align-items-center">
               <Link 
                 itemProp="url" 
                 href={`/history?his_tab=jbets&tab=j_all&m_id=${i?.market_id}`}
@@ -528,7 +558,7 @@ const HistoryFilter = () => {
                 </StyleHeaderNav>          
             </div>
             <div className='d-sm-flex justify-content-between '>
-                <div className='m-1 d-sm-flex'>
+                <div className='m-1 d-flex'>
                     {his_tab === 'sbets' && <RegularBetsLinksComponent/>}
                     {his_tab === 'jbets' && jackpotMarket?.map(SportBetsLinks)}
                 </div>

@@ -13,6 +13,7 @@ import { Modal } from "react-bootstrap";
 import Link from "next/link";
 import axios from "../lib/axios";
 import { randomString } from "../hooks/generateRandomId";
+import MobileNavComponent from "../components/MobileNavComponent";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -374,6 +375,7 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                 successMessage={successMessage}
                 closeSuccessModal={closeSuccessModal}
             />
+            <MobileNavComponent/>
         </div>
     )
 }
