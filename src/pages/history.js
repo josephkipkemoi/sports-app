@@ -10,12 +10,11 @@ import Link from 'next/link';
 import {useGetBalanceByUserIdQuery} from '../hooks/balance';
 import { useRouter } from 'next/router';
 import {    useGetAllUserHistoryBetslipV1Query, 
-            useGetJackpotHistoryQuery, 
             useGetSettledHistoryBetslipQuery, 
             useGetUnsettledHistoryBetslipQuery, 
         } from '../hooks/history';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRefresh , faCalendar} from '@fortawesome/free-solid-svg-icons';
+import { faRefresh , faCalendar, faTrash} from '@fortawesome/free-solid-svg-icons';
 import Support from '../components/Support';
 import AuthUser from '../hooks/AuthUser';
 import { withProtected } from '../hooks/RouteProtection';
@@ -93,6 +92,14 @@ const StyleJackpotElements = styled.div`
 const JackpotHistoryComponent = ({ user_id }) => {
     const [data, setData] = useState(null)
     const [pageNumber, setPageNumber] = useState(1)
+    const [isRemoveJpModalOpen, setIsRemoveJpModalOpen] = useState(false)
+    const [gameId, setGameId] = useState(null)
+
+    const openRemoveModal = (id) => {
+        setIsRemoveJpModalOpen(true)
+        setGameId(id)
+    }
+    const closeRemoveModal = () => setIsRemoveJpModalOpen(false)
 
     const fetchJackpotGames = async () => {
         try {
@@ -101,7 +108,6 @@ const JackpotHistoryComponent = ({ user_id }) => {
         } catch (error) {
             console.error(error)
         }
-
     }
    
     const JackpotHistoryElements = (d, i) => {
@@ -158,15 +164,27 @@ const JackpotHistoryComponent = ({ user_id }) => {
                 </div>
            
                 <div className='card-footer bg-info shadow border-0'>  
-                    <div className='d-flex justify-content-start'>
-                        <button className='btn btn-light btn-sm rounded mb-2' onClick={() => openMoreGames(i)}>
+                    <div className='d-flex justify-content-between'>
+                        <button className='btn btn-light btn-sm rounded mb-2 shadow' onClick={() => openMoreGames(i)}>
                             + Collapse Games 
+                        </button>
+                        <button className='btn btn-danger btn-sm rounded mb-2 shadow' onClick={() => openRemoveModal(d.id)}>
+                            <FontAwesomeIcon icon={faTrash} style={{ marginRight: 8 }} />
+                            Delete
                         </button>
                     </div>         
                     <div className={`${i}-hide hide`}>
                         {Array.isArray(JSON.parse(d.jackpot_games)) && JSON.parse(d.jackpot_games)?.map(JackpotGamesElements)}
                     </div>
+                <RemoveJpGameModal
+                    isRemoveJpModalOpen={isRemoveJpModalOpen}
+                    closeRemoveModal={closeRemoveModal}
+                    user_id={user_id}
+                    gameId={gameId}
+                />
                 </div>
+
+               
             </StyleJackpotElements>
         )
     }
@@ -179,6 +197,35 @@ const JackpotHistoryComponent = ({ user_id }) => {
             {data?.data.map(JackpotHistoryElements)}
             <Pagination data={data}/>
         </>
+    )
+}
+
+const RemoveJpGameModal = ({ isRemoveJpModalOpen,closeRemoveModal,user_id,gameId }) => {
+    const [isJpRemoved, setIsJpRemoved] = useState(false)
+
+    const handleRemoveJp = async () => {
+        const res = await axios.delete(`api/jackpots/${gameId}/users/${user_id}/delete`)
+        if (res.status == 200) {
+            setIsJpRemoved(true)
+        }
+    }
+
+    return (
+        <Modal show={isRemoveJpModalOpen}>
+            <Modal.Header>
+                <h2>Warning! This action cannot be reversed</h2>
+            </Modal.Header>
+            <Modal.Body>
+                <p>Are you sure you want to delete this Bet from history?</p>
+                {isJpRemoved && <p>Bet history removed successfully!</p>}
+                <button className='btn btn-primary' onClick={handleRemoveJp}>
+                    Confirm
+                </button>
+                <button className='btn btn-dark' onClick={closeRemoveModal}>
+                    Cancel
+                </button>
+            </Modal.Body>
+        </Modal>
     )
 }
 
