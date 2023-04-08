@@ -6,7 +6,18 @@ import styled from "styled-components";
 import CustomerInfo from '../components/CustomerInfo';
 import TopNavBar from "../components/TopNavBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrophy, faSoccerBall, faClose, faCheck, faWarning, faRefresh } from '@fortawesome/free-solid-svg-icons'
+import { 
+    faTrophy, 
+    faSoccerBall, 
+    faClose, 
+    faCheck, 
+    faWarning, 
+    faRefresh,
+    faCheckCircle,
+    faHourglass,
+    faShuffle,
+    faInfoCircle
+    } from '@fortawesome/free-solid-svg-icons'
 import { useGetJackpotMarketGamesQuery, useGetJackpotMarketQuery } from "../hooks/jackpot";
 import AuthUser from '../hooks/AuthUser';
 import { Modal } from "react-bootstrap";
@@ -188,13 +199,14 @@ const StyleJackpotActive = styled.div`
     }
 `
 
-const JackpotMarketGames = ({ market_id , market_active, market}) => {
+const JackpotMarketGames = ({ market_id , market_active, market, games_count}) => {
     const randomId = randomString()
     const [successMessage, setSuccessMessage] = useState('')
     const [successModalOpen, setSuccessModalOpen] = useState(false)
     const [jackpotSelectionError, setJackpotSelectionError] = useState([])
     const [ids, setIds] = useState([])
     const [errorModalOoen, setErrorModalOpen] = useState(false)
+    const [errorOpen, setErrorOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
     const uniqueIds = Array.from(new Set(ids))
@@ -208,8 +220,9 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
     const openErrorModal = () => setErrorModalOpen(true)
     const closeErrorModal = () => setErrorModalOpen(false)
     const closeSuccessModal = () => setSuccessModalOpen(false)
+    const closeError = () => setErrorOpen(false)
 
-    const handleGame = (e, jId) => {
+    const handleGame = (e) => {
         const id = e.target.getAttribute('game_id')
         const picked = e.target.getAttribute('picked')
         const marketId = e.target.getAttribute('market_id')
@@ -264,19 +277,23 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
         } catch (e) {
             if(e?.response?.status == 400) {
                 setIsLoading(false)
+                setErrorOpen(true)
                 return setJackpotSelectionError(p => p.concat(e.response.data.message))
             }  
             if(e?.response?.status == 422) {
                 setIsLoading(false)
+                setErrorOpen(true)
                 return setJackpotSelectionError(p => p.concat("You need to pick all games in this market"))
             }  
         }
    }
-   const customTimer = () => {
-    if(jackpotSelectionError.length > 0) {
-        setJackpotSelectionError([])
+
+    const handleClear = () => {
+        uniqueIds.forEach(id => {
+            localStorage.removeItem(id)
+        })
+        setIds([])
     }
-}
 
     const randomPickGames = () => {
         const marketId = data.jackpot_market[0].market_id
@@ -304,17 +321,18 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
             <React.Fragment key={i}>
                 <div className="d-flex align-items-center p-2">
                     <div className="d-flex align-items-center markets-id-temp">
-                        <span style={{ marginRight: 18, marginLeft: 12 }}>{i+1}</span>
+                        <span className="text-secondary" style={{ marginRight: 18, marginLeft: 12 }}>{i+1}.</span>
                         <div>
                             <small>{date}</small>
-                            <span>{d?.home_team} - {d?.away_team}</span>
+                            <span>{d?.home_team} - </span>
+                            <span>{d?.away_team}</span>
                         </div>
                     </div>
-                    <div className="markets-id d-flex justify-content-around">
+                    <div className="markets-id d-flex justify-content-around w-75">
                         <div onClick={() => activatBtn(d?.jackpot_market_id+ '' +d?.id,0)}>
                             <button
                                 id={d?.jackpot_market_id+ '' +d?.id}
-                                className={`btn btn-primary w-100 m-1 p-2 ${d?.jackpot_market_id+ '' +d?.id}`}
+                                className={`btn btn-primary w-100 m-1 ${d?.jackpot_market_id+ '' +d?.id}`}
                                 disabled={!market_active}
                                 onClick={e => handleGame(e, d?.jackpot_bet_id)}
                                 market_id={d?.jackpot_market_id}
@@ -330,7 +348,7 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                         <div onClick={() => activatBtn(d?.jackpot_market_id+ '' +d?.id,1)}>
                             <button
                                 id={d?.jackpot_market_id+ '' +d?.id}
-                                className={`btn btn-primary w-100 m-1 p-2 ${d?.jackpot_market_id+ '' +d?.id}`}
+                                className={`btn btn-primary w-100 m-1 ${d?.jackpot_market_id+ '' +d?.id}`}
                                 disabled={!market_active}
                                 onClick={handleGame}
                                 market_id={d?.jackpot_market_id}
@@ -346,7 +364,7 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                         <div onClick={() => activatBtn(d?.jackpot_market_id+ '' +d?.id,2)}>
                             <button
                                 id={d?.jackpot_market_id+ '' +d?.id}
-                                className={`btn btn-primary w-100 m-1 p-2 ${d?.jackpot_market_id+ '' +d?.id}`}
+                                className={`btn btn-primary w-100 m-1 ${d?.jackpot_market_id+ '' +d?.id}`}
                                 disabled={!market_active}
                                 onClick={handleGame}
                                 market_id={d?.jackpot_market_id}
@@ -366,40 +384,63 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
     }
 
     useEffect(() => {
-        const timer = setTimeout(customTimer, 4500)
-        return () => clearTimeout(timer)
+     
     }, [jackpotSelectionError.length, market])
 
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center p-2">
-                <span>
+                <span className="w-75">
                     Don't have time? Let Random Pick choose the {market} for you!
                 </span>
                 <button
-                    className="btn btn-warning shadow-sm w-100 p-2"
+                    className="btn btn-warning shadow-sm w-50 p-1"
                     onClick={randomPickGames}
                 >
+                    <FontAwesomeIcon 
+                        icon={faShuffle} 
+                        style={{ marginRight: 8 }}
+                    />
                     Random Pick
                 </button>
             </div>
-            {jackpotSelectionError.length > 0 && 
-                <p className="alert alert-danger m-3">
-                <FontAwesomeIcon icon={faWarning} style={{ marginRight: 8 }} />
-                    {jackpotSelectionError[0]}
-                </p>
-            }
             <div className="bg-light d-flex p-2">
                 <div className="markets-id-temp"></div>
-                <div className="d-flex justify-content-around markets-id fw-bold">
+                <div className="d-flex w-75 justify-content-around markets-id fw-bold">
                     <small>1</small>
                     <small>X</small>
                     <small>2</small>
                 </div>
             </div>
             {data?.jackpot_games?.map(JackpotGamesItems)}
+            <div className="text-center">             
+                <span>
+                    {uniqueIds.length === games_count ?
+                    <FontAwesomeIcon 
+                      icon={faCheckCircle} 
+                      className="text-success" 
+                      style={{ marginRight: 8 }}
+                    />
+                    :
+                    <FontAwesomeIcon 
+                        icon={faHourglass} 
+                        className="text-danger" 
+                        style={{ marginRight: 8 }}
+                    />
+                    }                     
+                    Picked {uniqueIds.length} of {games_count}
+                </span>
+                {uniqueIds.length !== games_count &&
+                <small>
+                  You need to pick all {games_count} games
+                </small>
+                }
+            </div>
             <StyleJackpotActive className="d-flex justify-content-center p-2">
-                <button className="btn btn-secondary rounded-0 shadow-sm m-1">
+                <button 
+                    className="btn btn-secondary rounded-0 shadow-sm m-1"
+                    onClick={handleClear}
+                >
                     <FontAwesomeIcon icon={faClose} style={{ marginRight: 6 }}/>
                     Clear
                 </button>
@@ -417,8 +458,7 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                     <>
                         <FontAwesomeIcon icon={faCheck} style={{ marginRight: 6 }}/>
                         Submit {market}
-                    </>}
-                
+                    </>}                
                 </button>
             </StyleJackpotActive>
             <JackpotErrorModal
@@ -430,8 +470,29 @@ const JackpotMarketGames = ({ market_id , market_active, market}) => {
                 successMessage={successMessage}
                 closeSuccessModal={closeSuccessModal}
             />
+            <ErrorModal
+                message={jackpotSelectionError[0]}
+                errorModalOpen={errorOpen}
+                closeErrorModal={closeError}
+            />
             <MobileNavComponent/>
         </div>
+    )
+}
+
+const ErrorModal = ({ message, errorModalOpen, closeErrorModal }) => {
+    return (
+        <Modal show={errorModalOpen}>
+            <Modal.Body>
+                <p className="alert alert-info">
+                    <FontAwesomeIcon icon={faInfoCircle} style={{marginRight: 8}}/>
+                    {message}
+                </p>
+                <button className="btn btn-primary" onClick={closeErrorModal}>
+                    Close
+                </button>
+            </Modal.Body>
+        </Modal>
     )
 }
 
