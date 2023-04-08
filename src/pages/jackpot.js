@@ -14,6 +14,7 @@ import Link from "next/link";
 import axios from "../lib/axios";
 import { randomString } from "../hooks/generateRandomId";
 import MobileNavComponent from "../components/MobileNavComponent";
+import { useRouter } from "next/router";
 
 const StyledJackpot = styled.div`
     background: #424242;
@@ -77,6 +78,11 @@ const NoJackpotAvailable = () => {
 }
 
 const JackpotContainer = () => {
+    const router = useRouter()
+    const market = router.query.market
+    const [marketItems, setMarketItems] = useState([])
+    const [activeMarket, setActiveMarket] = useState("")
+
     const {data, isLoading, error} = useGetJackpotMarketQuery()
 
     if (isLoading) {
@@ -87,11 +93,42 @@ const JackpotContainer = () => {
         return <span className="text-danger d-block text-center">Error! Try again later!</span>
     }
 
+    const handleLinks = (mkt) => {
+       const jpMarket = data?.filter(g => g.market === mkt)
+       setMarketItems(jpMarket)
+       setActiveMarket(mkt)
+    }
+
+    const JackpotLinks = (li, i) => {
+        return (
+            <React.Fragment key={i}>
+                <Link href={`/jackpot?market=${li?.market}`}>
+                    <a
+                        className={`btn btn-${li?.market === activeMarket ? 'primary' : 'secondary'} m-1`}
+                        onClick={() => handleLinks(li?.market)}
+                    >
+                        {li?.market}
+                    </a>
+                </Link>
+            </React.Fragment>
+        )
+    }
     return (
         <>
-          {data.length > 0 ?         
-            <JackpotMarkets market={data}/>
-          : <NoJackpotAvailable/>}
+            <div className="d-flex justify-content-center m-2">
+                <Link href={`/jackpot`}>
+                    <a
+                        className="btn btn-warning shadow m-1"
+                        onClick={() => handleLinks("all")}
+                    >
+                        Jackpots
+                    </a>
+                </Link>
+                {data.map(JackpotLinks)}
+            </div>
+                {data.length === 0 && <NoJackpotAvailable/>}
+                {!market && <JackpotMarkets market={data}/>}
+                {market === activeMarket && <JackpotMarkets market={marketItems}/>}
         </>          
     )
 }
