@@ -461,20 +461,29 @@ const JackpotMarketGames = ({ market_id , market_active, market, games_count}) =
                     </>}                
                 </button>
             </StyleJackpotActive>
-            <JackpotErrorModal
-                errorModalOoen={errorModalOoen}
-                closeErrorModal={closeErrorModal}
+            {errorModalOoen &&
+             <JackpotErrorModal
+             errorModalOoen={errorModalOoen}
+             closeErrorModal={closeErrorModal}
             />
+            }
+           
+            {successModalOpen &&
             <SuccessModal
-                successModalOpen={successModalOpen}
-                successMessage={successMessage}
-                closeSuccessModal={closeSuccessModal}
+              successModalOpen={successModalOpen}
+              successMessage={successMessage}
+              closeSuccessModal={closeSuccessModal}
             />
+            }
+          
+            {errorOpen &&
             <ErrorModal
                 message={jackpotSelectionError[0]}
                 errorModalOpen={errorOpen}
                 closeErrorModal={closeError}
             />
+            }
+          
             <MobileNavComponent/>
         </div>
     )
@@ -482,7 +491,7 @@ const JackpotMarketGames = ({ market_id , market_active, market, games_count}) =
 
 const ErrorModal = ({ message, errorModalOpen, closeErrorModal }) => {
     return (
-        <Modal show={errorModalOpen}>
+        <Modal show={errorModalOpen} centered>
             <Modal.Body>
                 <p className="alert alert-info">
                     <FontAwesomeIcon icon={faInfoCircle} style={{marginRight: 8}}/>
