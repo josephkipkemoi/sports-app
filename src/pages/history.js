@@ -115,7 +115,9 @@ const JackpotHistoryComponent = ({ user_id }) => {
             const activeDiv = document.getElementsByClassName(`${index}-hide`)
             if(activeDiv.item(0).classList.contains("hide")) {
                 activeDiv.item(0).classList.remove('hide')
+                activeDiv.item(0).classList.remove('btn-light')
                 activeDiv.item(0).classList.add('show')
+                activeDiv.item(0).classList.add('btn-warning')
             } 
             else {
                 activeDiv.item(0).classList.remove('show')
@@ -145,7 +147,7 @@ const JackpotHistoryComponent = ({ user_id }) => {
         }
 
         return (
-            <StyleJackpotElements key={i} className="card p-2 m-2 shadow bg-info border-0">
+            <div key={i} className="card p-2 m-2 shadow bg-info border-0">
                 <div className='card-body d-flex justify-content-between'> 
                     <div>
                         <div className='d-flex'>
@@ -165,8 +167,8 @@ const JackpotHistoryComponent = ({ user_id }) => {
            
                 <div className='card-footer bg-info shadow border-0'>  
                     <div className='d-flex justify-content-between'>
-                        <button className='btn btn-light btn-sm rounded mb-2 shadow' onClick={() => openMoreGames(i)}>
-                            + Collapse Games 
+                        <button className='btn btn-sm btn-outline-light rounded mb-2 shadow' onClick={() => openMoreGames(i)}>
+                            + View Games 
                         </button>
                         <button className='btn btn-danger btn-sm rounded mb-2 shadow' onClick={() => openRemoveModal(d.id)}>
                             <FontAwesomeIcon icon={faTrash} style={{ marginRight: 8 }} />
@@ -176,16 +178,8 @@ const JackpotHistoryComponent = ({ user_id }) => {
                     <div className={`${i}-hide hide`}>
                         {Array.isArray(JSON.parse(d.jackpot_games)) && JSON.parse(d.jackpot_games)?.map(JackpotGamesElements)}
                     </div>
-                <RemoveJpGameModal
-                    isRemoveJpModalOpen={isRemoveJpModalOpen}
-                    closeRemoveModal={closeRemoveModal}
-                    user_id={user_id}
-                    gameId={gameId}
-                />
                 </div>
-
-               
-            </StyleJackpotElements>
+            </div>
         )
     }
     useEffect(() => {
@@ -193,10 +187,18 @@ const JackpotHistoryComponent = ({ user_id }) => {
     }, [])
 
     return (
-        <>
+        <StyleJackpotElements>
             {data?.data.map(JackpotHistoryElements)}
-            <Pagination data={data}/>
-        </>
+            <RemoveJpGameModal
+                isRemoveJpModalOpen={isRemoveJpModalOpen}
+                closeRemoveModal={closeRemoveModal}
+                user_id={user_id}
+                gameId={gameId}
+            />
+            {data?.data?.length > 5 &&
+                <Pagination data={data}/>
+            }
+        </StyleJackpotElements>
     )
 }
 
