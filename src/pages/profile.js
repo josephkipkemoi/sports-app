@@ -303,13 +303,8 @@ const DepositOptionsComponent = ({ displayMode }) => {
                 >
                     {config.AIRTEL_DEPOSIT_OPTION}
                 </button>
-                <button 
-                className=
-                {`btn  
-                ${depositContainer === config.PAYPALL_DEPOSIT_OPTION ? 
-                    'custom-btn custom-active-btn' : 
-                    'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
-                onClick={handleClick}
+                <div 
+                    className="d-flex align-items-center"
                 >
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" 
@@ -322,16 +317,21 @@ const DepositOptionsComponent = ({ displayMode }) => {
                     >
                         <path d="M14.06 3.713c.12-1.071-.093-1.832-.702-2.526C12.628.356 11.312 0 9.626 0H4.734a.7.7 0 0 0-.691.59L2.005 13.509a.42.42 0 0 0 .415.486h2.756l-.202 1.28a.628.628 0 0 0 .62.726H8.14c.429 0 .793-.31.862-.731l.025-.13.48-3.043.03-.164.001-.007a.351.351 0 0 1 .348-.297h.38c1.266 0 2.425-.256 3.345-.91.379-.27.712-.603.993-1.005a4.942 4.942 0 0 0 .88-2.195c.242-1.246.13-2.356-.57-3.154a2.687 2.687 0 0 0-.76-.59l-.094-.061ZM6.543 8.82a.695.695 0 0 1 .321-.079H8.3c2.82 0 5.027-1.144 5.672-4.456l.003-.016c.217.124.4.27.548.438.546.623.679 1.535.45 2.71-.272 1.397-.866 2.307-1.663 2.874-.802.57-1.842.815-3.043.815h-.38a.873.873 0 0 0-.863.734l-.03.164-.48 3.043-.024.13-.001.004a.352.352 0 0 1-.348.296H5.595a.106.106 0 0 1-.105-.123l.208-1.32.845-5.214Z"/>
                     </svg>
-                    {config.PAYPALL_DEPOSIT_OPTION}
-                </button>
-                <button 
-                className=
-                {`btn  
-                ${depositContainer === config.BITCOIN_DEPOSIT_OPTION ? 
-                    'custom-btn custom-active-btn' : 
-                    'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
-                onClick={handleClick}
-                >    
+                    <button 
+                    className=
+                    {`btn  
+                    ${depositContainer === config.PAYPALL_DEPOSIT_OPTION ? 
+                        'custom-btn custom-active-btn' : 
+                        'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
+                    onClick={handleClick}
+                    >
+                        {config.PAYPALL_DEPOSIT_OPTION}
+                    </button>
+                </div>
+            
+                <div
+                    className="d-flex align-items-center"
+                >                       
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" 
                         width="16" 
@@ -342,27 +342,39 @@ const DepositOptionsComponent = ({ displayMode }) => {
                         style={{ marginRight: 4 }}
                     >
                         <path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.084c1.992 0 3.416-1.033 3.416-2.82 0-1.502-1.007-2.323-2.186-2.44v-.088c.97-.242 1.683-.974 1.683-2.19C11.997 3.93 10.847 3 9.092 3H9V1.75a.25.25 0 0 0-.25-.25h-1a.25.25 0 0 0-.25.25V3h-.573V1.75a.25.25 0 0 0-.25-.25H5.75a.25.25 0 0 0-.25.25V3l-1.998.011a.25.25 0 0 0-.25.25v.989c0 .137.11.25.248.25l.755-.005a.75.75 0 0 1 .745.75v5.505a.75.75 0 0 1-.75.75l-.748.011a.25.25 0 0 0-.25.25v1c0 .138.112.25.25.25L5.5 13zm1.427-8.513h1.719c.906 0 1.438.498 1.438 1.312 0 .871-.575 1.362-1.877 1.362h-1.28V4.487zm0 4.051h1.84c1.137 0 1.756.58 1.756 1.524 0 .953-.626 1.45-2.158 1.45H6.927V8.539z"/>
-                    </svg>              
-                    {config.BITCOIN_DEPOSIT_OPTION}
-                </button>
-                <button 
-                className=
-                {`btn  
-                ${depositContainer === config.BEYONIC_DEPOSIT_OPTION ? 
-                    'custom-btn custom-active-btn' : 
-                    'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
-                onClick={handleClick}
-                >
+                    </svg> 
+                    <button 
+                    className=
+                    {`btn  
+                    ${depositContainer === config.BITCOIN_DEPOSIT_OPTION ? 
+                        'custom-btn custom-active-btn' : 
+                        'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
+                    onClick={handleClick}
+                    >             
+                        {config.BITCOIN_DEPOSIT_OPTION}
+                    </button>
+                </div>
+              
+                <div className="d-flex align-items-center">
                     <span className="fw-bold rounded-circle" style={{ marginRight: 8 }}>B</span>
-                    {config.BEYONIC_DEPOSIT_OPTION}
-                </button>
+                    <button 
+                        className=
+                        {`btn  
+                        ${depositContainer === config.BEYONIC_DEPOSIT_OPTION ? 
+                            'custom-btn custom-active-btn' : 
+                            'custom-btn custom-notactive-btn'} d-flex align-items-center`} 
+                        onClick={handleClick}
+                    >
+                        {config.BEYONIC_DEPOSIT_OPTION}
+                    </button>
+                </div>               
             </nav>
 
             {depositContainer === config.MPESA_DEPOSIT_OPTION &&  <MpesaComponent displayMode={displayMode}/> }
             {depositContainer === config.AIRTEL_DEPOSIT_OPTION &&  <AirtelComponent displayMode={displayMode}/> }
             {depositContainer === config.PAYPALL_DEPOSIT_OPTION &&  <PaypalComponent displayMode={displayMode}/> }
             {depositContainer === config.BITCOIN_DEPOSIT_OPTION &&  <BitcoinComponent displayMode={displayMode}/> }        
-
+            {depositContainer === config.BEYONIC_DEPOSIT_OPTION &&  <ComingSoonPaymentsComponent displayMode={displayMode} option={config.BEYONIC_DEPOSIT_OPTION}/> }        
         </>
     )
 }
@@ -375,10 +387,10 @@ const ComingSoonPaymentsComponent = ({ option }) => {
             { `${option === config.AIRTEL_DEPOSIT_OPTION && 'bg-danger text-white'}
             ${option === config.PAYPALL_DEPOSIT_OPTION && 'bg-success text-white'}
             ${option === config.BITCOIN_DEPOSIT_OPTION && 'bg-warning text-dark'}
-            ${option === config.BEYONIC_DEPOSIT_OPTION && 'bg-dark text-white'}
+            ${option === config.BEYONIC_DEPOSIT_OPTION && 'bg-light text-dark'}
                 text-center`}
             >
-                <h1 style={{ margin: 0, padding: 0 }}>{option}</h1>
+                <h1 style={{ margin: 0, padding: 0 }} >{option}</h1>
             </Card.Header>
             <Card.Body className="d-flex justify-content-center flex-column align-items-center">
             <svg 
@@ -386,24 +398,13 @@ const ComingSoonPaymentsComponent = ({ option }) => {
             width="64" 
             height="64" 
             fill="currentColor" 
-            className="bi bi-hourglass-bottom" 
+            className="bi bi-hourglass-bottom text-success m-4" 
             viewBox="0 0 16 16"
             >
                 <path d="M2 1.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1h-11a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1-.5-.5zm2.5.5v1a3.5 3.5 0 0 0 1.989 3.158c.533.256 1.011.791 1.011 1.491v.702s.18.149.5.149.5-.15.5-.15v-.7c0-.701.478-1.236 1.011-1.492A3.5 3.5 0 0 0 11.5 3V2h-7z"/>
             </svg>
-               
-            </Card.Body>
-            <Card.Footer 
-            className=
-            { `
-            ${option === config.AIRTEL_DEPOSIT_OPTION && 'bg-danger text-white'} 
-            ${option === config.PAYPALL_DEPOSIT_OPTION && 'bg-success text-white'}
-            ${option === config.BITCOIN_DEPOSIT_OPTION && 'bg-warning text-dark'}
-            ${option === config.BEYONIC_DEPOSIT_OPTION && 'bg-dark text-white'}
-            text-center`}
-            >
-                <h2>COMING SOON</h2>
-            </Card.Footer>
+            <h2>COMING SOON...</h2>
+            </Card.Body>           
         </Card>
     )
 }
@@ -420,13 +421,13 @@ const WithdrawComponent = ({ displayMode }) => {
     return (
         <div className={`shadow-sm p-4 mb-4 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
             <h5>Withdraw</h5>
-            <Span>Withdraw from your {APP_NAME} wallet</Span>
+            <Span>Withdraw from your {APP_NAME} wallet:</Span>
             <InputNumber className="d-block form-control p-3" placeholder="Enter amount"/>
             <Small className="d-block text-danger">
                 Minimum KES {MINIMUM_WITHDRAW_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})},
                 Maximum KES {MAXIMUM_WITHDRAW_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})},
             </Small>
-            <Button variant="warning">
+            <Button variant="warning w-100">
                 Withdraw
             </Button>
         </div>

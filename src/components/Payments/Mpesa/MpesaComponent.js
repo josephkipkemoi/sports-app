@@ -8,7 +8,7 @@ import { InputNumber, Small, Span } from "../../Html";
 import Image from "next/image";
 import axios from "../../../lib/axios";
 import styled from "styled-components";
-
+import config from '../../../../config.json';
 
 const StyleMpesaPaybill = styled.div`
     h1 {
@@ -23,6 +23,8 @@ const StyleMpesaPaybill = styled.div`
 `
 const MpesaComponent = ({ displayMode }) => {
     const [authToken, setAuthToken] = useState('')
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [isErrorModalOpen, setIsErrorModalOpen] = useState(false)
 
     const { uu_id } = AuthUser()
  
@@ -34,6 +36,8 @@ const MpesaComponent = ({ displayMode }) => {
 
     const closeMpesaModal = () => setMpesaOpen(false)
     const openMpesaModal = () => setMpesaOpen(true)
+    const closeErrorModal = () => setIsErrorModalOpen(false)
+    const openErrorModal = () => setIsErrorModalOpen(true)
 
     const updateDepositAmount = (e) => {
         e.preventDefault()
@@ -69,21 +73,27 @@ const MpesaComponent = ({ displayMode }) => {
         const phone_number = Number(uu_id.phone_number)
         const password = generateBase64Encoding(short_code, passkey, timestamp);
 
-        if(authToken) {
-           const res = await axios.post('api/mpesa/push', {
-                token: authToken,
-                phone_number,
-                timestamp,
-                amount: depositAmount         
-            })
-
-           if(res.status === 200) {
-            setTimeout(() => {
+        try {
+            if(authToken) {
+                const res = await axios.post('api/mpesa/push', {
+                     token: authToken,
+                     phone_number,
+                     timestamp,
+                     amount: depositAmount         
+                 })
+     
+                if(res.status === 200) {
+                    setDepositLoading(false)
+                }
+             } else {
+                setErrorMessage("Authentication Failed. Try again or use Paybill option to load funds in to your Pinaclebet Wallet.")
                 setDepositLoading(false)
-            }, 3000)
-           }
-        }
-    
+                openErrorModal()
+            }
+        } catch (error) {
+            setDepositLoading(false)
+            console.error(error)
+        }    
     }
 
     const mpesaAuth = async () => {
@@ -91,7 +101,6 @@ const MpesaComponent = ({ displayMode }) => {
         if(res.status === 200) {
             setAuthToken(res.data.access_token)
         }
-     
         return res
     }
 
@@ -107,7 +116,7 @@ const MpesaComponent = ({ displayMode }) => {
                 <Image src={`${configData.FRONT_END_URL}mpesa.png`} width={72} height={72} />
             </Card.Header>
             <Card.Body style={{ paddingTop: 0 }}>
-                <Span className="d-block">Send money into your {APP_NAME} account</Span>
+                <Span className="d-block">Send money into your {APP_NAME} account:</Span>
                 <button 
                 inc={configData.INCREMENT_DEPOSIT_100} 
                 onClick={incrementDepositAmount} modalid="modal-ref" 
@@ -154,17 +163,16 @@ const MpesaComponent = ({ displayMode }) => {
                     className="d-block form-control p-3 custom-active-btn mt-2 mb-2" 
                     placeholder={depositAmount}
                     onChange={updateDepositAmount}
-                    // value={depositAmount}
                 />
                 <Small className="d-block text-danger">
                     Minimum KES {MINIMUM_DEPOSIT_AMOUNT.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 </Small>
-                <div className={`text-center ${displayMode === 'dark-mode' ? 'deposit-dark-mode' : 'deposit-light-mode'}`}>
-                    {/* <button className={`custom-btn custom-active-btn `} onClick={deposit} disabled={depositLoading || true}>
-                        { depositLoading ? 'Loading...' : 'Deposit'}
-                    </button> */}
-                    <button className="btn btn-warning w-100 shadow-sm" onClick={openMpesaModal}>
-                        Deposit
+                <div className={`d-flex text-center ${displayMode === 'dark-mode' ? 'deposit-dark-mode' : 'deposit-light-mode'}`}>
+                    <button className={`btn btn-primary w-100 m-1 text-white`} onClick={deposit} disabled={depositLoading}>
+                        { depositLoading ? 'Loading...' : 'Direct Deposit'}
+                    </button>
+                    <button className="btn btn-warning w-100 m-1 shadow-sm" onClick={openMpesaModal}>
+                        Paybill Deposit
                     </button>
                 </div>
             </Card.Body>
@@ -186,7 +194,14 @@ const MpesaComponent = ({ displayMode }) => {
                     <DepositModal mpesaOpen={mpesaOpen} closeMpesaModal={closeMpesaModal}/>
                 </StyleMpesaPaybill>               
             </Card.Footer>
-           
+
+            {isErrorModalOpen && 
+            <ErrorModal
+                message={errorMessage}
+                isErrorModalOpen={isErrorModalOpen}
+                closeErrorModal={closeErrorModal}
+            />
+            }
         </Card>
     )
 }
@@ -222,6 +237,25 @@ const DepositModal = ({ mpesaOpen, closeMpesaModal }) => {
                     </button>                   
                 </div>
             </Modal.Footer>
+        </Modal>
+    )
+}
+
+const ErrorModal = ({ message, isErrorModalOpen, closeErrorModal }) => {
+    return (
+        <Modal show={isErrorModalOpen}>
+            <Modal.Header>
+                <h2>Authenication Failed</h2>
+            </Modal.Header>
+            <Modal.Body>
+                <p className="alert alert-danger">{message}</p>
+                <button
+                    className="btn btn-dark"
+                    onClick={closeErrorModal}
+                >   
+                    Close
+                </button>
+            </Modal.Body>
         </Modal>
     )
 }
