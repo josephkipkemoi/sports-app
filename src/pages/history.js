@@ -88,13 +88,17 @@ const StyleJackpotElements = styled.div`
     .jackpot_id {
         text-transform: uppercase;
     }
+    h2 {
+        margin: 0;
+        padding: 0;
+    }
 `
 const JackpotHistoryComponent = ({ user_id }) => {
     const [data, setData] = useState(null)
     const [pageNumber, setPageNumber] = useState(1)
     const [isRemoveJpModalOpen, setIsRemoveJpModalOpen] = useState(false)
     const [gameId, setGameId] = useState(null)
-
+  
     const openRemoveModal = (id) => {
         setIsRemoveJpModalOpen(true)
         setGameId(id)
