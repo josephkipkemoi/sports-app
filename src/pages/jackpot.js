@@ -292,11 +292,16 @@ const JackpotMarketGames = ({ market_id , market_active, market, games_count}) =
     const handleClear = () => {
         uniqueIds.forEach(id => {
             localStorage.removeItem(id)
+            const btns = document.getElementsByClassName(market_id + "" + id)
+            for(let i = 0; i < btns.length; i++) {
+                btns[i].classList.remove('btn-warning')
+            }
         })
         setIds([])
     }
 
     const randomPickGames = () => {
+        setIds([])
         const marketId = data.jackpot_market[0].market_id
         data.jackpot_games.map(g => {
             const randInt = Math.floor(Math.random() * 3)
@@ -391,9 +396,19 @@ const JackpotMarketGames = ({ market_id , market_active, market, games_count}) =
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center p-2">
-                <span className="w-100 text-center">
+                <span className="w-75 text-center">
                     Don't have time? Let Random Pick choose the {market} for you!
-                </span>               
+                </span>       
+                <button
+                    className="d-flex align-items-center justify-content-center btn btn-warning rounded-0 m-1"
+                    onClick={randomPickGames}
+                >
+                    <FontAwesomeIcon 
+                        icon={faShuffle} 
+                        style={{ marginRight: 8 }}
+                    />
+                    Random Pick
+                </button>        
             </div>
             <div className="bg-light d-flex p-2">
                 <div className="markets-id-temp"></div>
@@ -429,14 +444,14 @@ const JackpotMarketGames = ({ market_id , market_active, market, games_count}) =
             </div>
             <StyleJackpotActive className="d-flex justify-content-center p-1">
                 <button 
-                    className="btn btn-secondary rounded-0 m-1"
+                    className="d-flex align-items-center justify-content-center btn btn-secondary rounded-0 m-1"
                     onClick={handleClear}
                 >
                     <FontAwesomeIcon icon={faClose} style={{ marginRight: 6 }}/>
                     Clear
                 </button>
                 <button 
-                    className={`d-flex align-items-center btn btn-danger rounded-0 shadow m-1 fw-bold ${!!user?.uu_id?.id == true ? '' : 'disabled-btn'}`}
+                    className={`d-flex align-items-center justify-content-center btn btn-danger rounded-0 shadow m-1 fw-bold ${!!user?.uu_id?.id == true ? '' : 'disabled-btn'}`}
                     onClick={postJackpot}
                     disabled={isLoading}
                 >
@@ -451,16 +466,7 @@ const JackpotMarketGames = ({ market_id , market_active, market, games_count}) =
                         Submit {market}
                     </>}                
                 </button>
-                <button
-                    className="btn btn-warning rounded-0 p-1 m-1"
-                    onClick={randomPickGames}
-                >
-                    <FontAwesomeIcon 
-                        icon={faShuffle} 
-                        style={{ marginRight: 8 }}
-                    />
-                    Random Pick
-                </button>
+             
             </StyleJackpotActive>
             {errorModalOoen &&
              <JackpotErrorModal
