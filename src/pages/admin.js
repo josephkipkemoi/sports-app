@@ -1256,6 +1256,7 @@ const UserProfileElement = ({ user_id, refetchData }) => {
 const FixturesComponent = () => {
     const [startUpdate, setStartUpdate] = useState(false)
     const [gamesUpdateComplete, setGamesUpdateComplete] = useState(false)
+    const [isUpdateComplete,  setIsUpdateComplete] = useState(false)
 
     const handleUpdate = (e) => {
         if(e.target.innerText === 'Start') {
@@ -1314,8 +1315,12 @@ const FixturesComponent = () => {
                         </div>
                         }
                     </div>
-                    {gamesUpdateComplete && <FixtureOdds
-                       setStartUpdate={setStartUpdate}
+                    {gamesUpdateComplete && 
+                    <FixtureOdds
+                        setIsUpdateComplete={setIsUpdateComplete}
+                        setStartUpdate={setStartUpdate}
+                        startUpdate={startUpdate}
+                        isUpdateComplete={isUpdateComplete}
                     />}
                 </Card.Body>
             </Card>
@@ -1462,7 +1467,7 @@ const CustomFixture = () => {
     )
 }
 
-const FixtureOdds = ({ setStartUpdate }) => {    
+const FixtureOdds = ({ setStartUpdate,setIsUpdateComplete,startUpdate,isUpdateComplete }) => {    
 
     const { data, isLoading, error, refetch } = useGetFixtureIdsWhereOddsNullQuery()
     const [ids, setIds] = useState(0)
@@ -1470,7 +1475,6 @@ const FixtureOdds = ({ setStartUpdate }) => {
     const [fixtureId, setFixtureId] = useState(0)
     const [maxLength, setMaxLength] = useState(null)
     const [progress, setProgress] = useState(0)
-    const [isUpdateComplete, setIsUpdateComplete] = useState(false)
 
     const [homeValues, setHomeValues] = useState({
         value: '',
@@ -1520,6 +1524,8 @@ const FixtureOdds = ({ setStartUpdate }) => {
     }
   
     const updateFixture = async (sessionFixtureId, home, draw ,away) => {       
+        const fixtureLength = sessionStorage.getItem("data_length")
+        const fixtureProgress = sessionStorage.getItem("progress")
 
          if(sessionFixtureId === 'undefined') {
             return
@@ -1537,6 +1543,10 @@ const FixtureOdds = ({ setStartUpdate }) => {
             setProgress(prev => prev += 1)
             setUpdated(prev => !prev)   
             refetch()
+        }
+
+        if(fixtureProgress / 2 == fixtureLength) {
+            setIsUpdateComplete(true)
         }
     }
  
@@ -1561,7 +1571,7 @@ const FixtureOdds = ({ setStartUpdate }) => {
 
         update(sessionFixtureId, homeOdds, drawOdds, awayOdds)
 
-    }, [updated])
+    }, [updated, startUpdate])
 
     if(isLoading) {
         return <span>Loading</span>
@@ -1579,11 +1589,12 @@ const FixtureOdds = ({ setStartUpdate }) => {
 
     return (
         <Card>    
-            <Card.Body className="bg-dark text-center">
+            <Card.Body className="bg-info m-2 text-center">
+                {!isUpdateComplete && <h1>Update Complete!</h1>}
                 <h1>
                     {updated ? 
-                        <i className="bi bi-eye-slash text-danger"></i> : 
-                        <i className="bi bi-eye-fill text-warning"></i>
+                        <i className="bi bi-eye-slash text-dark"></i> : 
+                        <i className="bi bi-eye-fill text-primary"></i>
                     }
                 </h1>
             </Card.Body>
