@@ -5,7 +5,7 @@ const baseConfig = {
     pageExtensions: ['js', 'jsx', 'md', 'mdx'],
     images: {
       disableStaticImages: true,
-      domains: ['media.api-sports.io', 'www.pinaclebet.com'],
+      domains: ['media.api-sports.io', 'www.pinaclebet.com', 'ke.pinaclebet.com'],
     },
     webpack(config) {
         config.resolve.modules = [...config.resolve.modules, path.resolve('./')]

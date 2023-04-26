@@ -818,22 +818,6 @@ const BetCartFormElements = ({ betData }) => {
      
       }
   
-      const postBalanceAfterPlacing = async () => {
-        const res = await axios.post(`api/users/${uu_id.id}/balance/decrement`, {
-          'user_id': uu_id.id,
-          'amount': betAmount
-        } ,
-        {
-          headers: {
-            'x-sportsapp-key': configData.SPORTS_APP_KEY
-          }
-        })
-  
-        if(res.status === 200) {
-          refetch()
-        }
-      }
-  
       const setNewSessionStorage = () => {
         sessionStorage.clear()
         sessionStorage.setItem('session_id', Date.now())
@@ -869,11 +853,11 @@ const BetCartFormElements = ({ betData }) => {
         })
   
         if(res.status === 200) {
+          refetch()
           setLoading(false)
           setCongratulationModalOpen(true)
         }
   
-        postBalanceAfterPlacing()
         setNewSessionStorage()
      
       } 
@@ -884,8 +868,8 @@ const BetCartFormElements = ({ betData }) => {
   
       const linkBarRef = useRef();
       let possibleWin = res * betAmount
-      const deductions = possibleWin * configData.DEDUCTIONS_RATE
-      possibleWin = possibleWin - deductions
+  
+      
       return (
           <div 
           style={{ 
@@ -947,12 +931,7 @@ const BetCartFormElements = ({ betData }) => {
             </div>
            
           </div>
-          <div className='d-flex align-items-center justify-content-between'>
-            <Small>Deductions (Kes):</Small>
-            <Small className="fw-bold">
-              {Number(deductions).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </Small>
-          </div>
+        
            <div className='d-flex align-items-center justify-content-between mb-3'>
               <Small>Possible Payout (Kes):</Small>
               <Small className='fw-bold text-dark'>
@@ -1031,46 +1010,6 @@ const BalanceModal = ({ isModalOpen, closeMenu }) => {
         </Modal.Body>                            
      </Modal>
     )
-}
-
-const UserBalanceElement = () => {
-      const { uu_id } = AuthUser()   
-
-      const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(uu_id.id)
-      
-      if(error) {
-        return ''
-      }
-      if(isLoading) {
-        return ''
-      }
-      
-      const { amount } = data;
-    
-      return (
-        <>
-         { !!uu_id.id ? 
-          <div className='d-flex align-items-center justify-content-between mb-1'>
-            <Small>Balance (Kes):</Small>
-            <Small className='fw-bold'>
-              <FontAwesomeIcon 
-              icon={faRefresh} 
-              onClick={() => refetch()}
-              style={{ 
-                cursor: 'pointer',
-                paddingRight: 8, 
-                paddingLeft: 8,
-              }}
-              />
-               {amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </Small>
-          </div>
-          : ''
-        }
-        </>
-      )
-    
-     
 }
 
 const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {

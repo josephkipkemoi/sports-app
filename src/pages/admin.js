@@ -27,9 +27,10 @@ import {
     useGetAllUsersWhoMessagedAdminQuery, 
     useGetUserMessageByIdQuery } from "../hooks/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHeadset, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faWarning, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import Echo from "laravel-echo";
 import Pagination from '../components/Pagination';
+import { randomString } from "../hooks/generateRandomId";
 
 const StyledAdmin = styled.div`
     height: 100vh;
@@ -72,31 +73,11 @@ export default function Admin() {
     const [fixtureOddsLoading, setFixtureOddsLoading] = useState(false)
     const [fixtureOddsLoaded, setFixtureOddsLoaded] = useState(false)
     const [hideAdmin, setHideAdmin] = useState(true)
-  
-    const postFixtureIds = async () => {
-        setFixtureIdLoading(true)
-        const res = await axios.post('api/custom_fixture/post');
-        
-        if(res.status === 200) {
-            setFixtureIdLoading(false)
-            setFixtureLoaded(true)
-        }
-    }
-
-    const postFixtureOdds = async () => {
-        setFixtureOddsLoading(true)
-        const res = await axios.post('api/custom_fixture/odds');
-         
-        if(res.status === 200) {
-            setFixtureOddsLoaded(true)
-            setFixtureOddsLoading(false)
-        }
-    }
 
     const AdminLinkItems = (link, i) => {
         return (
-            <div>
-                <Link href={link.path} key={i}>
+            <div  key={i}>
+                <Link href={link.path}>
                     <a
                         itemProp="url"
                         className="text-decoration-none text-dark btn"
@@ -150,8 +131,6 @@ export default function Admin() {
             <div style={{ height: '100vh' }}>
             {tab === 'fixtures' && 
              <FixturesComponent 
-                postFixtureIds={postFixtureIds}
-                postFixtureOdds={postFixtureOdds}
                 fixtureIdLoading={fixtureIdLoading}
                 fixtureLoaded={fixtureLoaded}
                 fixtureOddsLoaded={fixtureOddsLoaded}
@@ -317,6 +296,8 @@ const JackpotComponent = () => {
 }
 
 const AddUpdateJackpotGame = () => {
+    const generateId = randomString()
+    const [error, setError] = useState(null)
     const [gameAdded, setGameAdded] = useState(false)
     const [game, setGame] = useState({
         market: null,
@@ -338,18 +319,27 @@ const AddUpdateJackpotGame = () => {
     }))
 
     const submitGame = async () => {
-        const res = await axios.post(`api/jackpots/markets/${jackpot_market_id}/games`, {
-            jackpot_market_id,
-            home_team,
-            away_team,
-            home_odds,
-            draw_odds,
-            away_odds,
-            kick_off_time
-        })
-        if (res.status == 201 ) {
-            setGameAdded(true)
+        try {
+            const res = await axios.post(`api/jackpots/markets/${jackpot_market_id}/games`, {
+                jackpot_market_id,
+                home_team,
+                away_team,
+                home_odds,
+                draw_odds,
+                away_odds,
+                kick_off_time,
+                jackpot_bet_id : generateId
+            })
+            if (res.status == 201 ) {
+                setGameAdded(true)
+                setError(null)
+            }
+        } catch (error) {
+            if(error.response.status == 400) {
+                setError(error.response.data.message)
+            }
         }
+      
     }
     const updateGame = () => {
 
@@ -361,6 +351,10 @@ const AddUpdateJackpotGame = () => {
         jackpot_market_id: e.value
     }))
 
+    useEffect(() => {
+
+    }, [gameAdded])
+    
     if (jpMarket.isLoading) {
         return <Spinner animation="grow" />
     }
@@ -371,17 +365,15 @@ const AddUpdateJackpotGame = () => {
         }
     })
 
-    // useEffect(() => {
-    //     const timeout = setTimeout(() => {
-    //         if(gameAdded) {
-    //             setGameAdded(false)
-    //         }
-    //     },1000)
-    //     return () => clearTimeout(timeout)
-    // }, [gameAdded])
     return (
         <div className="bg-primary">
             <h5 className="text-center fw-bold  p-2 text-white">Add/Update Games to {market}</h5>
+            {error && 
+            <p className="alert alert-danger">
+                <FontAwesomeIcon icon={faWarning} style={{ marginRight: 8 }}/>
+                {error}
+            </p>
+            }
             <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
                 <div>
                 <Small className="text-dark">Jackpot Market</Small>
@@ -475,6 +467,7 @@ const JackpotMarket = () => {
         market: '',
         market_prize: null,
         games_count: null,
+        min_stake: null
     })
     const [marketAdded, setMarketAdded] = useState(false)
 
@@ -482,11 +475,17 @@ const JackpotMarket = () => {
         setMarket(prev => ({...prev, [e.target.name]: e.target.value}))
     }
 
-    const postJpMarket = async () => {
-        const res = await axios.post("api/jackpots/markets", market)
-        if (res.status == 201) {
-            setMarketAdded(true)
-        } 
+    const postJpMarket =  () => {
+        try {
+            const res =  axios.post("api/jackpots/markets", market)
+
+            if (res.status == 201) {
+                setMarketAdded(true)
+            }  
+        } catch (error) {
+            console.error(error)
+        }
+      
     }
 
     useEffect(() => {
@@ -534,6 +533,13 @@ const JackpotMarket = () => {
                         placeholder="Market Games Count" 
                         onChange={handlechange}
                         name="games_count"
+                    />
+                    <input 
+                        className="form-control mt-2" 
+                        type="number" 
+                        placeholder="Minimum Stake" 
+                        onChange={handlechange}
+                        name="min_stake"
                     />
                 </div>
             </div>        
@@ -1247,18 +1253,10 @@ const UserProfileElement = ({ user_id, refetchData }) => {
         )
 }
 
-const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fixtureLoaded, fixtureOddsLoaded, fixtureOddsLoading }) => {
+const FixturesComponent = () => {
     const [startUpdate, setStartUpdate] = useState(false)
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [clicked, setClicked] = useState('')
-    const [historyUpdated, setHistoryUpdated] = useState(false)
-    const [primaryMessage, setPrimaryMessage] = useState('')
-    const [secondaryMessage, setSecondaryMessage] = useState('')
-    const [submitBtnText, setSubmitBtnText] = useState('')
-    const [fixtureRemoved, setFixtureRemoved] = useState(false)
-    const [gamesUpdated, setGamesUpdated] = useState(false)
-
-    const closeModal = () => setIsModalOpen(false)
+    const [gamesUpdateComplete, setGamesUpdateComplete] = useState(false)
+    const [isUpdateComplete,  setIsUpdateComplete] = useState(false)
 
     const handleUpdate = (e) => {
         if(e.target.innerText === 'Start') {
@@ -1269,63 +1267,23 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
         }
     }
 
-    const handleLost = async () => {
-        const res = await axios.patch('api/fixtures/carts')
-        
-        if(res.status === 200) {
-            setHistoryUpdated(true)
-            closeModal()
-            setTimeout(() => {
-                setHistoryUpdated(false)
-            }, 1500)
-        }
+    const updateFixture = async () => {
+        const res = await axios.post('api/admin/update/fixtures/odds')
+        return res.status
     }
 
-    const removeFixtures = async (e) => {
+    const removeFixtures = async () => {
       const res = await axios.delete('api/admin/fixtures/remove')
-
-      if(res.status === 200) {
-        setFixtureRemoved(true)
-        closeModal()
-        setTimeout(() => {
-            setFixtureRemoved(false)
-        }, 1500)
-      }
+      return res.status
     }
-
-    const openModal = (i) => {
-        if(i === 'history') {
-            setPrimaryMessage('Are you sure you want to update all history to LOST')
-            setSecondaryMessage('This action cannot be undone!')
-            setIsModalOpen(true)
-            setClicked(i)
-            setSubmitBtnText('Update')
-        }
-        if(i === 'fixture') {
-            setPrimaryMessage('Are you sure you want to remove all fixtures')
-            setSecondaryMessage('This action cannot be undone!')
-            setIsModalOpen(true)
-            setClicked(i)
-            setSubmitBtnText('Delete')
-        }
-        if(i === 'games') {
-            setPrimaryMessage('Are you sure you want to update all fixtures')
-            setSecondaryMessage('This action cannot be undone!')
-            setIsModalOpen(true)
-            setClicked(i)
-            setSubmitBtnText('Update')
-        }
-    }
-
-    const updateGame = async () => {
-        const res = await axios.post('api/admin/update/fixtures/odds');
-        
-        if(res.status === 200) {
-            setGamesUpdated(true)
-            closeModal()
-            setTimeout(() => {
-                setGamesUpdated(false)
-            }, 1500)
+ 
+    const updateGames = async () => {
+        const fixturesRemovedStatus = await removeFixtures()
+        if(fixturesRemovedStatus === 200) {
+            const updateFixturesStatus = await updateFixture()
+            if(updateFixturesStatus === 200) {
+                setGamesUpdateComplete(true)
+            }
         }
     }
 
@@ -1333,123 +1291,45 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
         <div className="p-3 card mt-2 bg-danger shadow-lg">
             <Card className="mb-2">
                 <Card.Body>
-                    <Col lg={12} md={12} sm={12}>
-                        <h3>Post Games</h3>
-                        <button className="btn btn-primary" onClick={() => openModal('games')}> 
-                           {gamesUpdated ? 'Games Updated' : 'Update Games'} 
-                        </button>
-                    </Col>
-                </Card.Body>
-                <Card.Body className="row">
-                    <Col lg={6} md={6} sm={12} className="text-center">
-                        <p>This action will update all bet history to LOST status</p>
-                        <button className="btn btn-danger" onClick={() => openModal('history')}>
-                            {historyUpdated ? 'Update Complete' : 'Update Lost'}  
-                        </button>
-                    </Col>
-                    <Col lg={6} md={6} sm={12} className="text-center">
-                        <p>This action will Delete all current fixtures/games</p>
-                        <Button variant="primary" type="submit" onClick={() => openModal('fixture')}>
-                              {fixtureRemoved ? 'Fixtures Deleted!' : 'Remove All'} 
-                        </Button>
-                    </Col>
-                    {clicked === 'history' && <AlertModalElement
-                        primaryMessage={primaryMessage}
-                        secondaryMessage={secondaryMessage}
-                        isModalOpen={isModalOpen}
-                        closeModal={closeModal}
-                        submitBtnText={submitBtnText}
-                        cancelBtnText="Cancel"
-                        action={handleLost}
+                    <div>
+                        {gamesUpdateComplete === false &&
+                            <div>
+                            <h4>Step 1 of 2</h4>
+                            <p>Update Fixture Games</p>
+                            <button 
+                                className="btn btn-primary shadow" 
+                                onClick={updateGames} 
+                                disabled={gamesUpdateComplete}
+                            >
+                                Update Games
+                            </button> 
+                            </div>
+                        }
+                        {gamesUpdateComplete &&
+                        <div>
+                          <h4>Step 2 of 2</h4>
+                          <p>Update Fixture Games Odds</p>
+                          <button className="btn btn-primary shadow" onClick={handleUpdate}>
+                          { startUpdate ? 'Close' : 'Start'}
+                          </button>
+                        </div>
+                        }
+                    </div>
+                    {gamesUpdateComplete && 
+                    <FixtureOdds
+                        setIsUpdateComplete={setIsUpdateComplete}
+                        setStartUpdate={setStartUpdate}
+                        startUpdate={startUpdate}
+                        isUpdateComplete={isUpdateComplete}
                     />}
-                    {clicked === 'fixture' && <AlertModalElement
-                        primaryMessage={primaryMessage}
-                        secondaryMessage={secondaryMessage}
-                        isModalOpen={isModalOpen}
-                        closeModal={closeModal}
-                        submitBtnText={submitBtnText}
-                        cancelBtnText="Cancel"
-                        action={removeFixtures}
-                    />}
-                    {clicked === 'games' && <AlertModalElement
-                            primaryMessage={primaryMessage}
-                            secondaryMessage={secondaryMessage}
-                            isModalOpen={isModalOpen}
-                            closeModal={closeModal}
-                            submitBtnText={submitBtnText}
-                            cancelBtnText="Cancel"
-                            action={updateGame}
-                        />
-                    }
-                        
                 </Card.Body>
             </Card>
-            <FixturesElement 
-            postFixtureIds={postFixtureIds}
-            postFixtureOdds={postFixtureOdds}
-            fixtureIdLoading={fixtureIdLoading}
-            fixtureOddsLoaded={fixtureOddsLoaded}
-            fixtureOddsLoading={fixtureOddsLoading}
-            />
-            <CustomFixture/>
-            <div className="card p-2 mt-4">
-                <div className="d-flex justify-content-center m-2">
-                    <button className="btn btn-primary btn-lg" onClick={handleUpdate}>
-                        { startUpdate ? 'Close' : 'Start'}
-                    </button>
-                </div>
-                {startUpdate ?  <FixtureOdds setStartUpdate={setStartUpdate}/> : '' }
-            </div>
-        
-            <ConsoleOutPut 
-            fixtureLoaded={fixtureLoaded}
-            fixtureOddsLoaded={fixtureOddsLoaded}
-            />
+
+            <CustomFixture/>                
         </div>
     )
 }
 
-const FixturesElement = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fixtureOddsLoaded, fixtureOddsLoading }) => {
-   
-    return (
-            <Row>
-                <Col sm="12" lg="6" md="6">
-                    <Card className="border-0 shadow">
-                        <Card.Header className="bg-primary">
-                           <h3 className="text-light fw-bold"> Fixture IDs</h3>
-                        </Card.Header>
-                        <Card.Body className="bg-light text-center">
-                            <h5 className="text-dark fw-bold">To Post Fixture IDS</h5>
-                            <div className="btn btn-danger mt-2">
-                                <Button variant="danger" onClick={postFixtureIds}>
-                                    { fixtureIdLoading ? 'loading...'  :  'Click Here'}
-                                </Button>
-                                <i className="bi bi-caret-right-fill"></i>
-                            </div>
-                         
-                        </Card.Body>
-                    </Card>
-                   
-                </Col>
-                <Col sm="12" lg="6" md="6">
-                <Card className="border-0 shadow">
-                    <Card.Header className="bg-primary">
-                        <h3 className="text-light fw-bold"> Fixture Odds</h3>
-                    </Card.Header>
-                    <Card.Body className="bg-light text-center">
-                        <h5 className="text-dark fw-bold">To post Fixture Odds</h5>
-                        <div className="btn btn-danger mt-2">
-                            <Button variant="danger" onClick={postFixtureOdds}>
-                            { fixtureOddsLoading ? 'loading...'  :  'Click Here'}
-                            </Button>
-                            <i className="bi bi-caret-right-fill"></i>
-                        </div>                     
-                    </Card.Body>
-                </Card>
-                </Col>
-            </Row>
-    )
-}
 const CustomFixture = () => {
     const [isUpdated, setIsUpdated] = useState(false);
     const [fixtureDetails, setFixtureDetails] = useState({
@@ -1587,7 +1467,7 @@ const CustomFixture = () => {
     )
 }
 
-const FixtureOdds = ({ setStartUpdate }) => {    
+const FixtureOdds = ({ setStartUpdate,setIsUpdateComplete,startUpdate,isUpdateComplete }) => {    
 
     const { data, isLoading, error, refetch } = useGetFixtureIdsWhereOddsNullQuery()
     const [ids, setIds] = useState(0)
@@ -1595,7 +1475,6 @@ const FixtureOdds = ({ setStartUpdate }) => {
     const [fixtureId, setFixtureId] = useState(0)
     const [maxLength, setMaxLength] = useState(null)
     const [progress, setProgress] = useState(0)
-    const [isUpdateComplete, setIsUpdateComplete] = useState(false)
 
     const [homeValues, setHomeValues] = useState({
         value: '',
@@ -1645,6 +1524,8 @@ const FixtureOdds = ({ setStartUpdate }) => {
     }
   
     const updateFixture = async (sessionFixtureId, home, draw ,away) => {       
+        const fixtureLength = sessionStorage.getItem("data_length")
+        const fixtureProgress = sessionStorage.getItem("progress")
 
          if(sessionFixtureId === 'undefined') {
             return
@@ -1663,12 +1544,15 @@ const FixtureOdds = ({ setStartUpdate }) => {
             setUpdated(prev => !prev)   
             refetch()
         }
+
+        if(fixtureProgress / 2 == fixtureLength) {
+            setIsUpdateComplete(true)
+        }
     }
  
     function update(sessionFixtureId, homeOdds, drawOdds, awayOdds) {
 
         if(Boolean(sessionFixtureId) === false) {
-            alert('Update complete')
             setStartUpdate(false)
         }
 
@@ -1687,7 +1571,7 @@ const FixtureOdds = ({ setStartUpdate }) => {
 
         update(sessionFixtureId, homeOdds, drawOdds, awayOdds)
 
-    }, [updated])
+    }, [updated, startUpdate])
 
     if(isLoading) {
         return <span>Loading</span>
@@ -1705,61 +1589,15 @@ const FixtureOdds = ({ setStartUpdate }) => {
 
     return (
         <Card>    
-            <Card.Body className="bg-dark text-center">
+            <Card.Body className="bg-info m-2 text-center">
+                {!isUpdateComplete && <h1>Update Complete!</h1>}
                 <h1>
                     {updated ? 
-                        <i className="bi bi-eye-slash text-danger"></i> : 
-                        <i className="bi bi-eye-fill text-warning"></i>
+                        <i className="bi bi-eye-slash text-dark"></i> : 
+                        <i className="bi bi-eye-fill text-primary"></i>
                     }
                 </h1>
             </Card.Body>
         </Card>
-    )
-}
-
-const ConsoleOutPut = ({ fixtureLoaded, fixtureOddsLoaded }) => {
-    const date = new Date()
-  
-    const NoActivity = () =>  <small className="fw-bold">No activity...</small>
-
-    const YesActivity = () => {
-        return (
-            <>
-                <small className="text-light d-block mt-2">
-                    Fixture IDs {fixtureLoaded ? 'loaded' : 'loading'} : {fixtureLoaded.toString()}
-                    {fixtureLoaded && <i className="bi bi-check2-circle text-warning" style={{ marginLeft: 10 }}></i>} 
-                </small>
-                <small className="text-light d-block mt-2">
-                    Fixture Odds {fixtureOddsLoaded ? 'loaded' : 'loading'} : {fixtureOddsLoaded.toString()}
-                    {fixtureOddsLoaded && <i className="bi bi-check2-circle text-warning" style={{ marginLeft: 10 }}></i>} 
-                </small>
-            </>
-        )
-    }
-    return (
-        <Card className="mt-3 shadow bg-dark">
-            <Card.Header>
-                <h2 className="fw-bold pt-2">Console OutPut</h2>
-            </Card.Header>
-            <hr/>
-            <Card.Body className="p-2 mb-5">
-                <Row>
-                    <Col lg="2" md="2" sm="2" className="text-end">
-                        <small>
-                            {date.getMonth()}/
-                            {date.getDay()}/
-                            {date.getFullYear() + ' '} 
-                            {date.getHours()}:
-                            {date.getMinutes()}
-                        </small>
-                    </Col>
-                    <Col lg="10" md="10" sm="10">
-                        <NoActivity/>
-                        <YesActivity/>
-                    </Col>
-                </Row>
-            </Card.Body>
-        </Card>
-      
     )
 }
