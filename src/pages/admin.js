@@ -518,38 +518,40 @@ const JackpotMarket = () => {
                         onChange={handlechange}
                         name="market"
                     />
-                </div>
-                <div className="col">
                     <input 
-                        className="form-control mt-2" 
+                        className="form-control m-2" 
                         type="number" 
                         placeholder="Add Jackpot Prize(KSHS)" 
                         onChange={handlechange}
                         name="market_prize"
                     />
                     <input 
-                        className="form-control mt-2" 
+                        className="form-control m-2" 
                         type="number" 
                         placeholder="Market Games Count" 
                         onChange={handlechange}
                         name="games_count"
                     />
                     <input 
-                        className="form-control mt-2" 
+                        className="form-control m-2 w-50" 
                         type="number" 
                         placeholder="Minimum Stake" 
                         onChange={handlechange}
                         name="min_stake"
                     />
+                <button 
+                    className="btn btn-primary w-100 p-2 mt-3 mb-3 shadow-sm rounded-0"
+                    onClick={postJpMarket}
+                    disabled={marketAdded}
+                >
+                    Add Jackpot Market
+                </button>
+                </div>
+                <div className="col">
+                    <UpdateJackpot/>
                 </div>
             </div>        
-            <button 
-                className="btn btn-primary w-100 p-2 mt-3 mb-3 shadow-sm rounded-0"
-                onClick={postJpMarket}
-                disabled={marketAdded}
-            >
-                Add Jackpot Market
-            </button>
+          
         </div>
     )
 }
@@ -1326,6 +1328,37 @@ const FixturesComponent = () => {
             </Card>
 
             <CustomFixture/>                
+        </div>
+    )
+}
+
+const UpdateJackpot = () => {
+    const [updated, setUpdated] = useState(false)
+    const [amount, setAmount] = useState(null)
+    const [id, setId] = useState(null)
+    const handleChange = (e) => {
+        setAmount(e.target.value)
+    } 
+    const handleId = (e) => {
+        setId(e.target.value)
+    }
+    const handleSubmit = async () => {
+        const res = await axios.patch(`api/jackpots/markets/${id}/patch`, {
+            market_prize: amount
+        });
+        if(res.status == 200) {
+            setUpdated(true)
+        }
+    }
+    return (
+        <div>
+            <h1>Update Prize</h1>
+            {updated && <h2>Prize Updated</h2>}
+            <input placeholder="Jackpot Market ID" onChange={handleId}/>
+            <input placeholder="Jackpot Prize" onChange={handleChange}/>
+            <button className="btn btn-primary" onClick={handleSubmit}>
+                Update
+            </button>
         </div>
     )
 }
