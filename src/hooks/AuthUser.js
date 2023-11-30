@@ -5,8 +5,10 @@ const AuthUser = () => {
         return {
             uu_id: ''
         }
+    } 
+    if(Boolean(JSON.parse(localStorage.getItem('uu_id')))) {
+        return JSON.parse(localStorage.getItem('uu_id'))
     }
-    return JSON.parse(localStorage.getItem('uu_id'))
 }
 
 export default AuthUser;

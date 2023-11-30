@@ -9,6 +9,8 @@ import { FacebookIconSvg, MailSvgIcon, SendSvgIcon, TelegramSvgIcon, TwitterSvgI
 import axios from "../lib/axios";
 import { Small, Span } from "./Html";
 import Echo from "laravel-echo";
+import { useGetAdminMessagesQuery, useGetUserMessageByIdQuery } from "../hooks/messages";
+import { Spinner } from "react-bootstrap";
 
 const StyleContact = styled.div`
     height: 100vh;
@@ -213,37 +215,51 @@ const StyleChatBox = styled.div`
 `
 const ChatBoxElement = ({ setCustomMsg }) => {
     const router = useRouter()
+    const [userId, setUserId] = useState(null)
 
+    const {data, error, isLoading, refetch } = useGetAdminMessagesQuery(!!userId && userId)
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+  
     const [chatMessage, setChatMessage] = useState([{
         message: 'Hey there! Welcome to Pinaclebet. What can we help you with today?',
         sender: ''
     }])
-    
+  
     useEffect(() => {
-        const userId = JSON.parse(localStorage.getItem('uu_id')).uu_id.id
+        const userId = JSON.parse(localStorage.getItem('uu_id')).uu_id.phone_number
+     
+        // window.addEventListener('load', (e) => {
 
-        window.addEventListener('load', (e) => {
+        //     Pusher.logToConsole = true
+        //     window.Echo = new Echo({
+        //         broadcaster: 'pusher',
+        //         wsHost: window.location.hostname,
+        //         key: 'b36bb776d85f37fdff66',
+        //         cluster: 'ap2',
+        //         forceTLS: true,
+        //         encrypted: true,
+        //         enableTransports: ['ws', 'wss'],
+        //         // disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming'],
+        //         // wssPort: '' Https port
+        //     })
 
-            Pusher.logToConsole = true
-            window.Echo = new Echo({
-                broadcaster: 'pusher',
-                wsHost: window.location.hostname,
-                key: 'b36bb776d85f37fdff66',
-                cluster: 'ap2',
-                forceTLS: true,
-                encrypted: true,
-                enableTransports: ['ws', 'wss'],
-                // disabledTransports: ['sockjs', 'xhr_polling', 'xhr_streaming'],
-                // wssPort: '' Https port
-            })
+        //     window.Echo.channel(`message-channel${userId}`)
+        //                 .listen('.message.new', function(e){
+        //             setChatMessage(prev => ([...prev, {message: e.message, sender: e.sender}]))
+        //     })
 
-            window.Echo.channel(`message-channel${userId}`)
-                        .listen('.message.new', function(e){
-                    setChatMessage(prev => ([...prev, {message: e.message, sender: e.sender}]))
-            })
+        // })
+        setUserId(userId)
 
-        })
-    }, [chatMessage, router.route])
+    }, [chatMessage, router.route, userId])
+
+    if(isLoading) {
+        return <Spinner animation="grow"/>
+    }
 
     const MessageElement = (d, i) => {
  
@@ -277,7 +293,7 @@ const ChatBoxElement = ({ setCustomMsg }) => {
 
     return (
         <StyleChatBox>
-            {chatMessage.map(MessageElement)}
+            {data.map(MessageElement)}
         </StyleChatBox>
     )
 }

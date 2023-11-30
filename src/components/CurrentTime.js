@@ -8,9 +8,19 @@ const StyleTimer = styled.div`
         font-weight: bold;
         margin-top: 2px;
         margin-left: 6px;
+        font-size: 14px;
+    }
+    .clock {
+        background: linear-gradient(-45deg, rgba(0,0,0,0.22), rgba(255,255,255,0.25));
+        border: none;
+        padding: .5rem;
+        border-radius: 12px;
+        box-shadow: 
+        3px 3px 5px 0 rgba(0, 0, 0, 0.25),
+        -2px -2px 3px 0 rgba(255, 255, 255, 0.3); 
     }
 `
-export default function CurrentTime() {
+export default function CurrentTime({ displayMode }) {
     const [hours, setHours] = useState(0)
     const [min, setMin] = useState(0)
     const [timer, setTimer] = useState(false)
@@ -28,9 +38,9 @@ export default function CurrentTime() {
     }, [timer])
     return (
         <StyleTimer>
-            <div className="d-flex align-items-center">
-                <FontAwesomeIcon icon={faClock} className="text-white" size="2x"/>
-                <span className="text-white">{`${String(hours).padStart(2, '0')}:${String(min).padStart(2, '0')}`}</span>
+            <div className={`d-flex align-items-center clock ${displayMode === 'dark-mode' ? 'text-white' : 'text-white'}`}>
+                <FontAwesomeIcon icon={faClock}  size="2x"/>
+                <span>{`${String(hours).padStart(2, '0')}:${String(min).padStart(2, '0')}`}</span>
             </div>         
         </StyleTimer>
     )

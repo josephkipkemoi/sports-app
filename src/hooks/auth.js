@@ -27,7 +27,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
             .then((d) => {
                localStorage.setItem('uu_id', JSON.stringify(d.data))
                setRegisterLoading(false)
-                window.location.pathname = '/'
+                router.push('/reg_success')
                 mutate()
             })
             .catch(e => {
@@ -113,7 +113,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
         }
         localStorage.removeItem('uu_id')
         localStorage.removeItem('share_code')
-        window.location.pathname = '/'
+        router.push('/')
     }
 
     useEffect(() => {

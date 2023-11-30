@@ -60,6 +60,7 @@ line-height: 30px;
 
 export const Span = styled('span')`
 line-height: 24px;
+font-size: 13px;
 `
 
 export const Small = styled('small')`

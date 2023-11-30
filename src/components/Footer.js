@@ -7,17 +7,17 @@ import styledComponents from "styled-components";
 import styled from "styled-components";
  
 const StyledFooter = styledComponents.div`
-    background-color: #191970;
-    color: #fff;
     width: 100%;
     padding-left: 12px;
+    padding-right: 12px;
+   
 `
 
 const StyledCopyright = styledComponents.span`
-    background-color: #000;
     text-align: center;
     padding: 6px;
     display: block;
+    padding-bottom: 5rem;
 `
 
 const StyledMenuHeader = styledComponents.div`
@@ -27,13 +27,8 @@ const StyledMenuHeader = styledComponents.div`
     line-height: 40px;
     position: relative;
     cursor: default;
-    color: #ddd;
 `
 const LinkFooter = styledComponents('footer')`
-.link {
-    padding-top: 6px;
-    padding-bottom: 6px;
-}
 .rated {
     display: block;
     border: 1px solid red;
@@ -45,19 +40,10 @@ const LinkFooter = styledComponents('footer')`
     color: #fff;
 }
 span {
-    color: #b5b5b5;
     display: block;
     padding-top: 6px;
     padding-bottom: 6px;
 }
-.link a{
-    text-decoration: none;
-    color: #b5b5b5;
-    transition: .3s;
- }
- .link a:hover {
-     color: #fff;
- }
  .icon {
      margin-left: 5px;
  }
@@ -65,7 +51,18 @@ span {
      cursor: pointer;
      transition: .3s;
  }
- .icon-parent:hover {
+ .link  {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+ .text-link-light-mode a {
+    text-decoration: none;
+    transition: .3s;
+    color: #000;
+ }
+ .text-link-dark-mode a {
+    text-decoration: none;
+    transition: .3s;
     color: #fff;
  }
 `
@@ -157,10 +154,10 @@ const socialLinks = [
         path: '/www.whatsapp.com/pageurl',
     }
 ]
-export default function Footer(){
+export default function Footer({ displayMode }){
 
     const HelpLinkItem = (link, i) => (
-        <div key={i} className="link">   
+        <div key={i} className={`link ${displayMode === 'light-mode' ? 'text-link-light-mode' : 'text-link-dark-mode'}`}>   
              <Link key={i} href={link.path} prefetch={false} >
                 <a
                     itemProp="url"                    
@@ -172,7 +169,7 @@ export default function Footer(){
     )
 
     const ScoreLinkItem = (link, i) => (
-        <div key={i} className="link">
+        <div key={i} className={`link ${displayMode === 'light-mode' ? 'text-link-light-mode' : 'text-link-dark-mode'}`}>
             <Link key={i} href={link.path} prefetch={false}> 
                 <a
                     itemProp="url"
@@ -184,7 +181,7 @@ export default function Footer(){
     )
 
     const PromotionLinkItem = (link, i) => (
-        <div key={i} className="link">
+        <div key={i} className={`link ${displayMode === 'light-mode' ? 'text-link-light-mode' : 'text-link-dark-mode'}`}>
             <Link key={i} href={link.path} prefetch={false}>
                 <a
                     itemProp="url"
@@ -196,7 +193,7 @@ export default function Footer(){
     )
 
     const SocialLinkItem = (link, i) => (
-        <div key={i} className="link">
+        <div key={i} className={`link ${displayMode === 'light-mode' ? 'text-link-light-mode' : 'text-link-dark-mode'}`}>
             <Link key={i} href={link.path} prefetch={false}>
                 <a 
                     itemProp="url"
@@ -209,68 +206,70 @@ export default function Footer(){
     )
 
     return (
-    <StyledFooter>
-        <div className="p-2 container">
-            <div className="d-flex">
-                <div className="w-100">
-                    <StyledMenuHeader>
-                        Help
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        {helpLinks.map(HelpLinkItem)}
-                    </LinkFooter>
-                    <StyledMenuHeader>
-                        Social
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        {socialLinks.map(SocialLinkItem)}
-                    </LinkFooter>
+        <>
+            <StyledFooter>
+            <div className="p-2 container">
+                <div className="d-flex">
+                    <div className={`w-100 ${displayMode === 'dark-mode' ? 'text-white' : 'text-dark'}`}>
+                        <StyledMenuHeader>
+                            Help
+                        </StyledMenuHeader>
+                        <LinkFooter>
+                            {helpLinks.map(HelpLinkItem)}
+                        </LinkFooter>
+                        <StyledMenuHeader>
+                            Social
+                        </StyledMenuHeader>
+                        <LinkFooter>
+                            {socialLinks.map(SocialLinkItem)}
+                        </LinkFooter>
+                    </div>
+                    <div className={`w-100 ${displayMode === 'dark-mode' ? 'text-white' : 'text-dark'}`}>
+                        <StyledMenuHeader>
+                            Settings
+                        </StyledMenuHeader>
+                        <LinkFooter>
+                            <span className="icon-parent">
+                                Language
+                                <i className="bi bi-chevron-down icon"></i>
+                            </span>
+                            <span className="icon-parent">
+                                Odds Display
+                                <i className="bi bi-chevron-down icon"></i>
+                            </span>
+                        </LinkFooter>
+                        <StyledMenuHeader>
+                            Scores & Results
+                        </StyledMenuHeader>
+                        <LinkFooter>
+                            {scoreLinks.map(ScoreLinkItem)}
+                        </LinkFooter>
+                        <StyledMenuHeader>
+                            Legal & Compliance
+                        </StyledMenuHeader>
+                        <LinkFooter>
+                            <span className="rated rounded">18+</span>
+                            <span>
+                                This forum is open only to persons over the age of 18 years. 
+                                Gambling may have adverse effects if not taken in moderation.
+                            </span>
+                        </LinkFooter>              
+                        
+                        <StyledMenuHeader>
+                            Promotions
+                        </StyledMenuHeader>
+                        <LinkFooter>
+                            {promotionLinks.map(PromotionLinkItem)}
+                        </LinkFooter>                 
+                    </div>
                 </div>
-                <div className="w-100">
-                    <StyledMenuHeader>
-                        Settings
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        <span className="icon-parent">
-                            Language
-                            <i className="bi bi-chevron-down icon"></i>
-                        </span>
-                        <span className="icon-parent">
-                            Odds Display
-                            <i className="bi bi-chevron-down icon"></i>
-                        </span>
-                    </LinkFooter>
-                    <StyledMenuHeader>
-                        Scores & Results
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        {scoreLinks.map(ScoreLinkItem)}
-                    </LinkFooter>
-                    <StyledMenuHeader>
-                        Legal & Compliance
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        <span className="rated rounded">18+</span>
-                        <span>
-                            This forum is open only to persons over the age of 18 years. 
-                            Gambling may have adverse effects if not taken in moderation.
-                        </span>
-                    </LinkFooter>              
-                    
-                    <StyledMenuHeader>
-                        Promotions
-                    </StyledMenuHeader>
-                    <LinkFooter>
-                        {promotionLinks.map(PromotionLinkItem)}
-                    </LinkFooter>                 
-                </div>
-
-            </div>
-        </div>
-        <StyledCopyright>      
-           <span>Copyright &copy; 2022 - All Rights Reserved &reg;</span>
+            </div>  
+        </StyledFooter> 
+        <StyledCopyright className="bg-dark text-white shadow-sm">      
+           <span>Copyright &copy; 2022 - All Rights Reserved &reg; Cynkem Sports</span>
            <span className="d-block">Version: 1</span>
         </StyledCopyright>
-    </StyledFooter> 
+        </>
+    
     )
 }

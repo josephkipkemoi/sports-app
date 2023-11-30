@@ -26,8 +26,8 @@ export const HistoryApi = createApi({
         getBetSessionFixtures: builder.query({
             query: ({ userId, pid }) => `${userId}/sessions/${pid}/history`
         }),
-        getMegaJackpotHistory: builder.query({
-            query: ({ user, market }) => `jackpot/${user}/history?jp=${market}`
+        getJackpotHistory: builder.query({
+            query: ({ user }) => `jackpots/users/${user}/results`
         })
     })
 })
@@ -39,5 +39,5 @@ export const {
     useGetUnsettledHistoryBetslipQuery,
     useRemoveSingleHistoryBetslipQuery,
     useGetBetSessionFixturesQuery,
-    useGetMegaJackpotHistoryQuery,
+    useGetJackpotHistoryQuery,
 } = HistoryApi

@@ -9,7 +9,7 @@ export const AdminApi = createApi({
     }), 
     endpoints: (builder) => ({
         getAllUsers: builder.query({
-            query: () => `api/admin/users`
+            query: (page) => `api/admin/users?page=${page}`
         }),
         getAdminUserBalanceById: builder.query({
             query: (user_id) => `api/admin/users/${user_id}/profile`

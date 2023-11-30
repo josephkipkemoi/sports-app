@@ -5,12 +5,11 @@ import configData from '../../config.json';
 import { H5 } from "./Html";
 
 const StyleCustomerInfo = styled.div`
-  background-color: #fff;
   padding: 12px;
 `
-export default function CustomerInfo() {
+export default function CustomerInfo({ displayMode }) {
     return (
-        <StyleCustomerInfo>
+        <StyleCustomerInfo className={` ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-white text-dark'}`}>
          <MpesaInfo/>
          <ContactSupport/>
          <AddedFeatures/>     
@@ -22,64 +21,59 @@ export default function CustomerInfo() {
 const StyleMpesaInfo = styled.div`
  h6 {
   text-align: center;
-  color: #fff;
   letter-spacing: 2px;
+ }
+ h5 {
+  margin: 0;
+  padding: 0;
  }
  span {
   line-height: 24px;
-  color: #001041;
   letter-spacing: 2px;
   font-weight: 700;
  }
- .header {
-  background-color: #001041;
- }
- .mpesa-card {
-  background-color: #ebeded;
- }
-
 `
 const MpesaInfo = () => {
     return (
       <StyleMpesaInfo>
-        <Card className=' mt-3 rounded shadow border-0'>
-          <Card.Header className='header'>
+        <div className="mt-3 rounded shadow border-0 p-3">
+          <div>
             <h6 className='fw-bold'>PAYBILL NUMBERS</h6>
-          </Card.Header>
-          <Card.Body className="mpesa-card">
-          <div className='d-flex justify-content-between'>
-            <span>MPESA</span>
-            <span className='fw-bold'>4075207</span>
-          </div>  
-          </Card.Body>
-        </Card>    
+          </div>
+          <hr/>
+          <div className='d-flex justify-content-between align-items-center'>
+            <span>MPESA PAYBILL</span>
+            <h5 className='fw-bold'>{configData.MPESA_PAYBILL_NUMBER}</h5>
+          </div>
+        </div>
       </StyleMpesaInfo>
     )
   }
 
-  const ContactSupport = () => {
+const ContactSupport = () => {
     return (
       <StyleMpesaInfo>
-          <Card className='bg-white mt-3 rounded shadow border-0'>
-          <Card.Header className='text-center header'>
+        <div className='mt-3 rounded shadow border-0 p-3'>
+          <div>
             <h6 className='fw-bold'>CUSTOMER CARE</h6>
-          </Card.Header>
-          <Card.Body>
+          </div>
+          <hr/>
+          <div>
           <div className='d-flex flex-column align-items-center text-center'>
             <span>We offer 24/7 customer care attention to {configData.APP_NAME} players</span>
-            <div className='d-flex text-white'>
+            <div className='d-flex'>
             <i className="bi bi-telephone" style={{ marginRight: 10 }}></i>
             <span className='fw-bold'>        
               0763-388-846
             </span>
             </div>
-            <div className='d-flex text-white'>
+            <div className='d-flex'>
               <i className="bi bi-envelope-open" style={{ marginRight: 10 }}></i>
               <span><b className='fw-bold'>customercare@pinaclebet.com</b></span>
             </div>
           </div>  
-          </Card.Body>
-        </Card>    
+          </div>
+        </div>
       </StyleMpesaInfo>
     )
   }
@@ -90,16 +84,11 @@ const StyledFeatures = styled.div`
   padding: 8px;
 }
 h5 {
-  color: #001041;
   font-weight: 700;
 }
 h6{
-  color: #001041;
   font-weight: 700;
  }
-small, p{
-  color: #001041; 
- } 
 svg {
   margin-right: 4px;
 }
