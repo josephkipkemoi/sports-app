@@ -17,10 +17,10 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
     }
     )
 
-    const csrf = () => axios.get('/sanctum/csrf-cookie')
+    // const csrf = () => axios.get('/sanctum/csrf-cookie')
 
     const register = async ({ setErrors, setRegisterLoading, ...props }) => {
-        await csrf()
+        // await csrf()
         setErrors([])
         axios
             .post('api/register', props)
@@ -34,7 +34,8 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
                 if(e.response.status === 500) {
                     setErrors(['Duplicate mobile number detected, please log in to continue'])
                 } else if(e.status !== 422) {
-                    setErrors(Object.values(e.response.data.errors).flat())
+                    console.log(e)
+                    // setErrors(Object.values(e.response.data.errors).flat())
                 }
                 setRegisterLoading(false)
             })
@@ -42,7 +43,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
 
 
     const login = async ({ setErrors, setIsLoading, setIsAuth, ...props }) => {
-        await csrf()
+        // await csrf()
          
         setErrors([])
         setIsLoading(true)
@@ -65,7 +66,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
     }
 
     const forgotPassword = async ({ setErrors, setStatus, email }) => {
-        await csrf()
+        // await csrf()
 
         setErrors([])
         setStatus(null)
@@ -81,7 +82,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
     }
 
     const resetPassword = async ({ setErrors, setStatus, ...props }) => {
-        await csrf()
+        // await csrf()
 
         setErrors([])
         setStatus(null)
@@ -103,7 +104,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
     }
 
     const logout = async () => {
-        await csrf()
+        // await csrf()
         if (! error) {
             await axios
                     .post('api/logout')

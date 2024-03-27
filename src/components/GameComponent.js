@@ -57,7 +57,7 @@ const StyleGameComponent = styled.div`
 export default function GameComponent({ displayMode }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
-    const { uu_id } = AuthUser()
+    const  uu_id  = 1
     const router = useRouter()
    
     const fetchSharedFixtureIds =  () => {
@@ -219,17 +219,17 @@ export default function GameComponent({ displayMode }) {
     if(error) {
       return <span>Error</span>
     }
-    
-    useEffect(() => {
-      updateFixtureIds()
-    }, [])
 
     if(isLoading) {       
       return <div className="d-flex justify-content-center mt-5 pt-5 mb-5 pb-5">
         <CustomSpinner/>
       </div> 
     }
- 
+     
+    useEffect(() => {
+      updateFixtureIds()
+    }, [])
+
     const sendBetslip = (e)  => {
   
       const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');

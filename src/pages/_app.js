@@ -91,18 +91,18 @@ export default function MyApp({ Component, pageProps }) {
             localStorage.setItem('display-mode', 'light-mode')
         }
      
-        // if('serviceWorker' in navigator) {
-        //     // Wait for the load event not to block other work
-        //     window.addEventListener('load', async () => {
-        //       // try to register the service worker
-        //       try {
-        //           const reg = await navigator.serviceWorker.register('https://www.pinaclebet.com/service-worker.js')
-        //           console.log('Service worker registered', reg)
-        //       } catch (err) {
-        //         console.log('Service worker registration failed!', err)
-        //       }
-        //     })
-        //   }
+        if('serviceWorker' in navigator) {
+            // Wait for the load event not to block other work
+            window.addEventListener('load', async () => {
+              // try to register the service worker
+              try {
+                  const reg = await navigator.serviceWorker.register('https://www.pinaclebet.com/service-worker.js')
+                  console.log('Service worker registered', reg)
+              } catch (err) {
+                console.log('Service worker registration failed!', err)
+              }
+            })
+          }
     }, [])
     
     
@@ -134,6 +134,7 @@ export default function MyApp({ Component, pageProps }) {
                         </StyleLoader>                        
                     </div>
                     }
+            
                 </Hydrate>
             </QueryClientProvider>       
             </ThemeProvider>
