@@ -188,9 +188,9 @@ const MpesaComponent = ({ displayMode }) => {
                     <h5 className="fw-bold">
                         ACCOUNT NO:
                     </h5>
-                    <h4 className="fw-bold">
-                        07-XXX-XXX
-                    </h4>
+                    <h1 className="fw-bold pay-bill">
+                        170918
+                    </h1>
                     <DepositModal mpesaOpen={mpesaOpen} closeMpesaModal={closeMpesaModal}/>
                 </StyleMpesaPaybill>               
             </Card.Footer>

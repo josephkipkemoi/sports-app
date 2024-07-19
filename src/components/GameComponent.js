@@ -57,7 +57,7 @@ const StyleGameComponent = styled.div`
 export default function GameComponent({ displayMode }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
-    const  uu_id  = 1
+    const  {uu_id}  = AuthUser()
     const router = useRouter()
    
     const fetchSharedFixtureIds =  () => {
@@ -117,7 +117,8 @@ export default function GameComponent({ displayMode }) {
       }
 
     }
- 
+    
+
     const MoreFixtureMarket = (name, i) => {
 
       const OddsMarket = (odds, ii) => {     
@@ -219,6 +220,12 @@ export default function GameComponent({ displayMode }) {
     if(error) {
       return <span>Error</span>
     }
+    
+    // Please correct this bug!
+    useEffect(() => {
+      updateFixtureIds()
+    }, [])
+
 
     if(isLoading) {       
       return <div className="d-flex justify-content-center mt-5 pt-5 mb-5 pb-5">
@@ -226,9 +233,6 @@ export default function GameComponent({ displayMode }) {
       </div> 
     }
      
-    useEffect(() => {
-      updateFixtureIds()
-    }, [])
 
     const sendBetslip = (e)  => {
   
@@ -262,6 +266,7 @@ export default function GameComponent({ displayMode }) {
       setId(prev => prev.concat(fixtureId))
 
     }
+  
 
     return (
       <StyleGameComponent className={`${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>

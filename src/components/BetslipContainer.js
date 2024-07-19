@@ -395,7 +395,7 @@ const CartElements = (link, i) => {
     })
   }
 
-  const data = []
+  const data = fetchIds()?.filter(v => !!v)
  
   const megaJackpotIds = [...new Set(megaJackpotId)]
   const jackpotFiveIds = [...new Set(fiveJackpotId)]
@@ -469,7 +469,7 @@ const CartElements = (link, i) => {
  
   return (
     <StyleBetslip>
-      {/* <JackpotBetCart 
+      <JackpotBetCart 
         market={market} 
         setMegaJackpotId={setMegaJackpotId}
         setFiveJackpotId={setFiveJackpotId}
@@ -509,7 +509,7 @@ const CartElements = (link, i) => {
       <MobileNavComponent 
         length={data?.length}
         openSlip={openMobileBetslip}
-      /> */}
+      />
       </StyleBetslip>
     )
   }
@@ -544,7 +544,7 @@ const JackpotBetCart = ({
  
   return (
     <>
-    {/* {mj_length > 0 &&  <JackpotCart
+    {mj_length > 0 &&  <JackpotCart
         market={"Mega Jackpot"}   
         jackpotGames={megaJackpotGames} 
         length={mj_length}
@@ -556,7 +556,7 @@ const JackpotBetCart = ({
         jackpotGames={fiveJackpotGames} 
         length={fj_length}
         setFiveJackpotId={setFiveJackpotId}
-      />} */}
+      />}
 
     </>
   )
