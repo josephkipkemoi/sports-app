@@ -38,6 +38,7 @@ const GlobalStyles = createGlobalStyle`
  }
  ::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
   }
   ::-webkit-scrollbar-track {
     background: #edebeb;
@@ -84,18 +85,24 @@ export default function MyApp({ Component, pageProps }) {
 
     useEffect(() => {
         setLoading(true)
-        // if('serviceWorker' in navigator) {
-        //     // Wait for the load event not to block other work
-        //     window.addEventListener('load', async () => {
-        //       // try to register the service worker
-        //       try {
-        //           const reg = await navigator.serviceWorker.register('https://www.pinaclebet.com/service-worker.js')
-        //           console.log('Service worker registered', reg)
-        //       } catch (err) {
-        //         console.log('Service worker registration failed!', err)
-        //       }
-        //     })
-        //   }
+        const displayMode = localStorage.getItem('display-mode')
+
+        if(Boolean(displayMode) === false) {
+            localStorage.setItem('display-mode', 'light-mode')
+        }
+     
+        if('serviceWorker' in navigator) {
+            // Wait for the load event not to block other work
+            window.addEventListener('load', async () => {
+              // try to register the service worker
+              try {
+                  const reg = await navigator.serviceWorker.register('https://www.pinaclebet.com/service-worker.js')
+                  console.log('Service worker registered', reg)
+              } catch (err) {
+                console.log('Service worker registration failed!', err)
+              }
+            })
+          }
     }, [])
     
     
@@ -104,27 +111,11 @@ export default function MyApp({ Component, pageProps }) {
                 <Head title="Best Sports App in E. Africa">
                     <meta charset="utf-8" />
                     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
-                
-
                 </Head>
-                {/* Add Google Tag Manager
-                    <Script
-                    dangerouslySetInnerHTML={{
-                    __html: `
-                            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.defer=true;j.src=
-                                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-                                })(window,document,'script','dataLayer','GTM-PPH2PX');
-                            `,
-                    }}
-                /> */}
 
-            {/* Twitter API 
-            <Script src="https://platform.twitter.com/widgets.js" async defer /> */}
             <Script src="https://js.pusher.com/7.2/pusher.min.js"/>
             <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"/>
+           
             <GlobalStyles/>
             <QueryClientProvider client={queryClient}>
                 <Hydrate state={pageProps.dehydratedState}>
@@ -142,9 +133,8 @@ export default function MyApp({ Component, pageProps }) {
                             <Loader/> 
                         </StyleLoader>                        
                     </div>
-            
                     }
-
+            
                 </Hydrate>
             </QueryClientProvider>       
             </ThemeProvider>

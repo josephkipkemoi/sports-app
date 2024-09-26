@@ -27,13 +27,14 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
             .then((d) => {
                localStorage.setItem('uu_id', JSON.stringify(d.data))
                setRegisterLoading(false)
-                window.location.pathname = '/'
+                router.push('/reg_success')
                 mutate()
             })
             .catch(e => {
                 if(e.response.status === 500) {
                     setErrors(['Duplicate mobile number detected, please log in to continue'])
                 } else if(e.status !== 422) {
+                    console.log(e)
                     setErrors(Object.values(e.response.data.errors).flat())
                 }
                 setRegisterLoading(false)
@@ -113,7 +114,7 @@ const useAuth = ({ middleware, redirectIfAuthenticated, redirectIfNotAuthenticat
         }
         localStorage.removeItem('uu_id')
         localStorage.removeItem('share_code')
-        window.location.pathname = '/'
+        router.push('/')
     }
 
     useEffect(() => {

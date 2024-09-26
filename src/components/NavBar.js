@@ -18,6 +18,7 @@ import NotificationComponent from "./NotificationComponent";
 import { useGetUnreadNotificationsQuery } from "../hooks/notifications";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadset } from "@fortawesome/free-solid-svg-icons";
+
 const StyledTopRightNav = styledComponents.div`
 position: sticky;
 top: 0;
@@ -36,9 +37,7 @@ z-index: 2;
     right: 10.5px; 
     font-weight: 350;
 }
-nav {
-    background-color: #fff;
-}
+
 nav a {
     color: #001041;
     transition: .3s;
@@ -47,33 +46,53 @@ nav a:hover, a:active {
     color: #191970;
 }
 .nav-links-mobile a {
-    color: #001041;
     text-decoration: none;
     text-transform: uppercase;
     font-size: 14px;
+    margin-top: .25rem;
+    margin-bottom: .5rem;
 }
-.nav-links-mobile a:nth-child(1) {
-    color: #001041;
-    padding: 10px 15px;
+ 
+.nav-links-mobile a:nth-child(1) { 
+    margin-right: 1rem;
 }
-button {
-    color: #001041;
-    padding: 10px 15px;
-    font-size: 14px;
+.custom-btn:nth-child(1) {
+    color: #000;
+}
+.custom-btn-join {
+    background-color: #191970;
+    box-shadow: 
+    3px 3px 4px 0 rgba(0, 0, 0, 0.25),
+    -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
     border: none;
-    border-radius: 6px;
-    margin-right: 1px;  
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    color: #000;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.custom-btn {
     background-color: #ebeded;
+    box-shadow: 
+      3px 3px 4px 0 rgba(0, 0, 0, 0.25),
+      -2px -2px 3px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    border: none;
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+    color: #000;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
-.nav-links-mobile a:nth-child(2) {
-    padding: 10px 15px;
-    background-color: #1affff;
-    border-radius: 20px;
-    font-weight: 700;
-    margin-left: 12px;
-}
+
 .mobile-join {
-    margin-left: 6px;
+    margin-left: 8px;
+    font-size: 14px;
 }
 @media screen and (max-width: 992px) {
     .right-nav-link a{
@@ -82,24 +101,11 @@ button {
 }
 @media screen and (max-width: 992px) {
     .nav-links-mobile a {
-        color: #001041;
         text-decoration: none;
         text-transform: uppercase;
         font-size: 14px;
     }
-    .nav-links-mobile a:nth-child(1) {
-        color: #001041;
-        padding: 10px 15px;
-    }
-    .nav-links-mobile a:nth-child(2) {
-        padding: 10px 15px;
-        background-color: #1affff;
-        border-radius: 20px;
-        font-weight: 700;
-        margin-left: 4px;
-    }
     nav {
-        background-color: #fff;
         border-bottom: none;
         position: sticky;
         width: 100%;
@@ -114,6 +120,7 @@ button {
         display: none;
     }
 }
+ 
 `
 
 const StyleBottomNavBar = styledComponents.div`
@@ -138,13 +145,14 @@ const StyleBottomNavBar = styledComponents.div`
    .time {
     color: #fff;
    }
-    nav {
-        background-color: #126e51;
-    }
     .nav-link  {
         margin-left: 24px;
     }
- 
+    @media screen and (max-width: 280px) {
+        .col-mobile {
+            display: grid;
+        }
+    } 
     @media screen and (max-width: 576px) {      
        .time {
           width: 30%;
@@ -153,12 +161,7 @@ const StyleBottomNavBar = styledComponents.div`
         width: 60%;
        }
     }
-    @media screen and (max-width: 992px) {
-        nav {
-            background-color: #191970;
-            border-top: none;
-        }
-    }  
+ 
 `
 
 const topNavLinks = [
@@ -197,6 +200,20 @@ const topNavLinks = [
 export default function NavBar({ login }) {
     const user = AuthUser()
     const { logout } = useAuth()
+    const [displayMode, setDisplayMode] = useState('')
+
+    useEffect(() => {
+        setDisplayMode(localStorage.getItem('display-mode'))
+
+        window.addEventListener('click', (e) => {
+            if(e.target.getAttribute('display') === 'toggle-off' || 
+                e.target.getAttribute('display') === 'toggle-on'
+            ) {
+                setDisplayMode(localStorage.getItem('display-mode'))
+            };      
+        })
+    }, [displayMode])
+
     const TopNavLinkElements = (link, i) => (        
         <div itemProp="name" key={i} className="nav-item">        
             <Link key={i} href={link.path} prefetch={false} >
@@ -215,9 +232,9 @@ export default function NavBar({ login }) {
 
     const AuthenticatedLinks = () => {
         return (
-                <div className="nav-links-mobile d-flex align-items-center">
+                <div className="d-flex align-items-center log-out">
                         <button
-                            className="d-flex align-items-center shadow-sm"
+                            className="d-flex align-items-center custom-btn"
                             onClick={logout}
                         >
                           <i className="bi bi-box-arrow-left"></i>
@@ -229,23 +246,23 @@ export default function NavBar({ login }) {
 
     const UnAuthenticatedLinks = () => {
         return (
-            <div className="nav-links-mobile d-flex align-items-center">                
-                <Link href="/login">
-                        <a
-                            itemProp="url"
-                            className="d-flex align-items-center"
-                        >
-                            <i className="bi bi-arrow-right-circle"></i>
-                            <span className="mobile-join">Login</span>                                        
-                        </a>
-                    </Link>
+            <div className="nav-links-mobile d-flex ">  
                     <Link href="/register">
                         <a
                             itemProp="url"
-                            className="d-flex align-items-center"
+                            className="d-flex align-items-center btn btn-info custom-btn "
                         >
-                            <i className="bi bi-person-plus"></i>
-                            <span className="mobile-join">Join</span>
+                                <i className="bi bi-person-plus"></i>
+                                <span className="mobile-join">Join</span>
+                        </a>
+                    </Link>
+                    <Link href="/login">
+                        <a
+                            itemProp="url"
+                            className="d-flex align-items-center btn custom-btn-join text-white"
+                        >
+                            <i className="bi bi-arrow-right-circle"></i>
+                            <span className="mobile-join">Login</span> 
                         </a>
                     </Link>
             </div>
@@ -254,39 +271,36 @@ export default function NavBar({ login }) {
     return (
         <>
         <StyledTopRightNav className="shadow-lg">
-            <nav id="main-nav">
-                    <div className="d-flex justify-content-between align-items-center p-2">
-                        <div className="col-mobile">
+            <nav id="main-nav" className={`${displayMode === 'dark-mode' ? 'bg-dark' : 'bg-light'}`}>
+                    <div 
+                    className={`d-flex justify-content-between align-items-center p-2`}
+                    >
+                        <div>
                             <Link href="/">
                                 <a className="navbar-brand" itemProp="url">
-                                    <Logo/>
+                                    <Logo displayMode={displayMode}/>
                                 </a>
                             </Link>
                         </div>
-            
-                        {Boolean(user?.uu_id) ? <AuthenticatedLinks/> : <UnAuthenticatedLinks/>}
 
+                        <div className="col-mobile">
+                            {Boolean(user?.uu_id) ? <AuthenticatedLinks/> : <UnAuthenticatedLinks/>}
+                        </div>                        
                     </div>
             </nav>
-            <BottomNavBar logout={logout} login={login} user={user}/>
+
+            <BottomNavBar 
+                logout={logout} 
+                login={login} 
+                user={user}
+                displayMode={displayMode}
+            />
 
         </StyledTopRightNav>
         </>
     )
 }
 
-const midnavLinks = [
-    {
-        name: 'Sports',
-        path: '/soccer',
-        class: 'sports'
-    },
-    {
-        name: 'Live Games',
-        path: '/live?fixture=all',
-        class: 'live-games'
-    },
-]
 
 const unauthLinks = [
     {
@@ -325,7 +339,7 @@ display: flex;
   }
 `
  
-export const BottomNavBar = ({ login, user }) => {
+export const BottomNavBar = ({ login, user, displayMode }) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [isDepositModalOpen, setDepositModalOpen] = useState(false)
     const [profileOpen, setProfileOpen] = useState(0)
@@ -510,16 +524,14 @@ export const BottomNavBar = ({ login, user }) => {
     return (
         <StyleBottomNavBar>  
         <nav 
-        className="pt-2 pb-2 d-flex align-items-center justify-content-between" 
+        className=
+        {`pt-2 pb-2 d-flex align-items-center justify-content-between ${displayMode === 'dark-mode' ? 'dark-mode' : 'light-nav-mode'}` }
         ref={linkBarRef}
         style={{ paddingRight: 8, paddingLeft: 8 }}
         >
-            <CurrentTime/>
+            <CurrentTime displayMode={displayMode}/>
          
-            <div>
-                {midnavLinks.map(MidNavLinkItems)}
-            </div>
-            <NotificationComponent user={user}/>
+            <NotificationComponent user={user} displayMode={displayMode}/>
         </nav>
     
              <Modal show={isModalOpen} className="mt-5 pt-5" modalid="modal-ref">

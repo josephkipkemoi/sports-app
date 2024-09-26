@@ -84,7 +84,7 @@ const StyleEyeIcon = styled.div`
     
     const { register } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: '/'
+        redirectIfAuthenticated: '/reg_success'
     })
     
     const [numberValidationMessage, setNumberValidationMessage] = useState('')

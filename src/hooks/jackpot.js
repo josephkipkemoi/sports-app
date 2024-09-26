@@ -10,10 +10,18 @@ export const JackpotApi = createApi({
     endpoints: (builder) => ({
         getJackpotPrizeWins: builder.query({
             query: () => 'api/jackpot/prize'
+        }),
+        getJackpotMarket: builder.query({
+            query: () => 'api/jackpots/markets/view'
+        }),
+        getJackpotMarketGames: builder.query({
+            query: (market_id) => `api/jackpots/${market_id}/games`
         })
     })
 })
 
 export const {
     useGetJackpotPrizeWinsQuery,
+    useGetJackpotMarketQuery,
+    useGetJackpotMarketGamesQuery,
 } = JackpotApi

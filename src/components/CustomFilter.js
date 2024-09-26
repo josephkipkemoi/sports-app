@@ -6,6 +6,9 @@ import GameComponent from './GameComponent';
 import  { 
   faSoccerBall,
   faBars,
+  faRefresh,
+  faPrint,
+  faSearch,
 }  from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -21,59 +24,27 @@ button {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
 }
- 
-@media screen and (min-width: 990px) {
-  .custom-search {
-    display: none !important;
-
-  }
-}
-`
-const StyleButton = styled.div`
-button {
-  background: none;
-  border: none;
-}
-button:hover {
-  color: #fff;
-}
 `
 
 const StyleCustomFilter = styled.div`
-display: flex;
-align-items: center;
-padding: 10px 15px;
-background-color: #191970;
+padding: .7rem;
+background: #191970;
 position: static;
-.header-one {
-  width: 40%;
-}
-.header-two {
-  width: 40%;
-}
-.header-three {
-  width: 20%;
-}
-@media screen and (max-width: 992px) {
-  .header-one {
-    width: 100%;
-  }
-  .header-two {
-     display: none;
-  }
-  .header-three {
-    width: 60px;
-  }
-}
- h5 {
-  margin: 0;
-  padding: 0;
-  color: #fff;
-  text-transform: uppercase;
- }
 
+.custom-filter {
+  margin-left: .5rem;
+  margin-right: .5rem;
+}
+ .icon {
+  background: linear-gradient(-45deg, rgba(0,0,0,0.22), rgba(255,255,255,0.25));
+  padding: .75rem;
+  box-shadow: 
+  2px 2px 3px 0 rgba(0, 0, 0, 0.25),
+  -1px -1px 2px 0 rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+ }
 `
-export default function CustomFilter({ heading }) {
+export default function CustomFilter({ displayMode }) {
     const [searchTerm, setSearchTerm] = useState('')
     const [searchResults, setSearchResults] = useState([])
     const [isSearchLoading, setIsSearchLoading] = useState(false)
@@ -93,38 +64,29 @@ export default function CustomFilter({ heading }) {
     }
     return (
       <>
-      <div>
-        <StyleCustomFilter >
-          <div className="header-one d-flex align-items-center">
-            <FontAwesomeIcon className="fa-lg text-white" icon={faSoccerBall} />
-            <h5 className='fw-bold mx-auto'>{heading}</h5>
-          </div>
-          <div className="header-two">
-            <StyleButton className='d-flex align-items-center'>
-              <button className='btn' onClick={() => window.print()}>
-                <i className="bi bi-printer"  style={{ color: '#ffffff' }}></i>
-              </button>        
-              <button className='background-none'>
-                <i className="bi bi-arrow-clockwise p-1" style={{ color: '#ffffff' }}></i>
-                <small style={{ color: '#ffffff', letterSpacing: '1px' }}>Refresh</small>
-              </button>
-            </StyleButton> 
-          </div>
-          <div className="d-flex align-items-center">
-            <SearchComponent 
-              onsubmit={onsubmit} 
-              onchange={onchange} 
-              customClass="search-comp"
-            />  
-            <FontAwesomeIcon icon={faBars} className="text-white" size="lg" style={{ marginLeft: 8 }}/> 
+        <StyleCustomFilter className={` ${displayMode === 'dark-mode' && 'bg-dark'}`}>
+          <div className={`d-flex align-items-center justify-content-between custom-filter`}>
+              <FontAwesomeIcon className=" text-white icon" icon={faSoccerBall} size="lg"/>
+              <FontAwesomeIcon icon={faPrint} className="text-white icon" size="lg"/>
+              <FontAwesomeIcon icon={faRefresh} className="text-white icon" size="lg"/>
+              <SearchComponent 
+                onsubmit={onsubmit} 
+                onchange={onchange} 
+                customClass="search-comp"
+              />  
+              <FontAwesomeIcon 
+                icon={faBars} 
+                className="text-white icon" 
+                size="lg" 
+                style={{ marginLeft: 8 }}
+                onClick={() => ''}
+              /> 
           </div>
         </StyleCustomFilter>
-      </div>
     
-       {isSearchLoading ? <Spinner animation='grow' /> :  <SearchResults data={searchResults}/>}
+      {isSearchLoading ? <Spinner animation='grow' /> :  <SearchResults data={searchResults}/>}
   
-      </>
-       
+    </>
     )
 }
 
@@ -141,9 +103,10 @@ export const SearchComponent = ({ onsubmit, onchange }) => {
             aria-label="Search"
             id="searchInpt"
             /> */}
-            <button id="searchBtn" className='btn d-flex align-items-center border-0' onClick={onsubmit}>        
+            {/* <button id="searchBtn" className='btn d-flex align-items-center border-0' onClick={onsubmit}>        
               <i className="bi bi-search" style={{ color: '#ffffff' }}></i>
-            </button>
+            </button> */}
+            <FontAwesomeIcon icon={faSearch} className="text-white icon" size="lg"/>
       </div>
          
     </StyleSearch>
@@ -154,7 +117,7 @@ const SearchResults = ({ data }) => {
 
     return (
       <>
-         <GameComponent data={data}/>
+         {/* <GameComponent data={data}/> */}
       </>
     )
   }

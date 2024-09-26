@@ -8,6 +8,11 @@ import AuthUser from "../hooks/AuthUser";
 import { useRouter } from "next/router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
+import  Spinner  from "react-bootstrap/Spinner";
+import { useGetV1CustomFixtureQuery } from "../hooks/fixture";
+import { CustomSpinner } from "./HtmlElements";
+import Pagination from '../components/Pagination';
+
 const StyleFavorites = styled.i`
   i {
     opacity: .8;
@@ -22,58 +27,39 @@ const StyleFavorites = styled.i`
 `
 const StyleGameComponent = styled.div`
   small {
-    color: #001041;
+    // color: #001041;
     font-weight: 700;
     opacity: .8;
   }
   span {
-    color: #001041;
+    // color: #001041;
   }
   button {
-    background: #e3f1fd;
-    color: #001041 !important;
+    align-items: center;
+    background: linear-gradient(-45deg, #1affff, #1affff);
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15),
+    -1px -1px 2px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    border: 0;
+    display: flex;  
+    justify-content: center; 
+    letter-spacing: 1px;
+    color: #2562bd !important;
   }
- 
+  .active {
+    background: linear-gradient(-45deg, #191970, #191970);
+    color: #fff !important;
+  }
+  button:hover {
+    color: #fff;
+  }
 `
-export default function GameComponent({ data }) {
+export default function GameComponent({ displayMode }) {
     const [id, setId] = useState([])
     const fixIds = [...new Set(id)]
-    const { uu_id } = AuthUser()
+    const  {uu_id}  = AuthUser()
     const router = useRouter()
-
-    const sendBetslip = (e)  => {
-  
-      const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
-      const awayTeam =  e.target.getAttribute('away_team') || localStorage.getItem('away_team');
-      const odds = e.target.getAttribute('odds');
-      const picked = e.target.getAttribute('picked');
-      const fixtureId = Number(e.target.getAttribute('fixtureid')) || Number(localStorage.getItem('fixture_id'));
-      const session_id = sessionStorage.getItem('session_id')
-      const market_id = e.target.getAttribute('market_id')
-      
-      if(market_id) {
-        const fixture = data.filter(g => g.fixture_id == fixtureId)
-        let more_market = JSON.parse(fixture[0].odds)[market_id].name
-        localStorage.setItem('more_market', more_market)
-      }   
-
-      const market = e.target.getAttribute('market') || localStorage.getItem('more_market'); 
-
-      const cart = {
-        fixture_id: fixtureId,
-        session_id: session_id,
-        betslip_teams: homeTeam + ' v ' + awayTeam,
-        betslip_market: market,
-        betslip_picked: picked,
-        betslip_odds: odds 
-      }
-      
-      sessionStorage.setItem(fixtureId, JSON.stringify(cart))
-
-      setId(prev => prev.concat(fixtureId))
-
-    }
-
+   
     const fetchSharedFixtureIds =  () => {
       const shareCode = sessionStorage.getItem('share_code')
     
@@ -131,16 +117,17 @@ export default function GameComponent({ data }) {
       }
 
     }
- 
+    
+
     const MoreFixtureMarket = (name, i) => {
 
       const OddsMarket = (odds, ii) => {     
  
         return (
           <React.Fragment key={ii+i+odds.odd}>         
-                <div className='d-sm-flex m-1 btn btn-light btn-sm' style={{ width: '30%', padding: 0, margin: 0}}>               
-                  <button 
-                    className=' text-white w-100 flex-wrap p-2'   
+                <div className='d-sm-flex m-1 mt-3 mb-3 btn-sm text-white text-center' style={{ width: '30%', padding: 0, margin: 0}}>               
+                  <span 
+                    className={`w-100 flex-wrap p-2 ${displayMode === 'light-mode' && 'text-dark'} `}
                     id="fix-btn"
                     odds={odds.odd} 
                     market_id={i} 
@@ -149,9 +136,9 @@ export default function GameComponent({ data }) {
                     style={{ background: 'none', border: 'none' }}
                   >
                     {odds.value}                 
-                  </button>
+                  </span>
                   <button 
-                     className=' text-white w-100 flex-wrap p-2'   
+                     className={`w-100 flex-wrap p-2 ${displayMode === 'light-mode' && 'text-dark'} `} 
                      id="fix-btn"
                      odds={odds.odd} 
                      market_id={i} 
@@ -169,20 +156,23 @@ export default function GameComponent({ data }) {
       return ( 
         <React.Fragment key={i+name.name}>
               <div 
-                className=' w-100 p-2 fw-bold d-flex flex-row align-items-center'
+                className
+                ={`w-100 p-2 fw-bold d-flex flex-row align-items-center rounded
+                 ${displayMode === 'dark-mode' && 'bg-secondary'}
+                `}
                 style={{ lineHeight: '30px', backgroundColor: '#fff' }}
               >
                 <i className="bi bi-star-fill"></i>
                 <small className=' mt-1' style={{ marginLeft: 10, letterSpacing: 2 }}>{name.name}</small>
               </div>
               <div className='d-flex justify-content-between flex-wrap'>
-                {name.values.map(OddsMarket)}    
+                {name.values.map(OddsMarket)}   
                 {name.values.length % 3 !== 0 &&  
                 <button disabled className="btn btn-light m-1" style={{ width: '30%', padding: 0, margin: 0}}>
                   <FontAwesomeIcon icon={faLock} />
                 </button>}            
               </div>   
-        </React.Fragment>
+        </React.Fragment> 
       )
     }
 
@@ -224,27 +214,75 @@ export default function GameComponent({ data }) {
       btn[i].classList.add('active')
     }
 
+    const [pageNumber, setPageNumber] = useState(1)
+    const { data, isLoading, error } = useGetV1CustomFixtureQuery(pageNumber)
+
+    if(error) {
+      return <span>Error</span>
+    }
     
+    // Please correct this bug!
     useEffect(() => {
       updateFixtureIds()
     }, [])
- 
+
+
+    if(isLoading) {       
+      return <div className="d-flex justify-content-center mt-5 pt-5 mb-5 pb-5">
+        <CustomSpinner/>
+      </div> 
+    }
+     
+
+    const sendBetslip = (e)  => {
+  
+      const homeTeam = e.target.getAttribute('home_team') || localStorage.getItem('home_team');
+      const awayTeam =  e.target.getAttribute('away_team') || localStorage.getItem('away_team');
+      const odds = e.target.getAttribute('odds');
+      const picked = e.target.getAttribute('picked');
+      const fixtureId = Number(e.target.getAttribute('fixtureid')) || Number(localStorage.getItem('fixture_id'));
+      const session_id = sessionStorage.getItem('session_id')
+      const market_id = e.target.getAttribute('market_id')
+      
+      if(market_id) {
+        const fixture = data.data.filter(g => g.fixture_id == fixtureId)
+        let more_market = JSON.parse(fixture[0].odds)[market_id].name
+        localStorage.setItem('more_market', more_market)
+      }   
+
+      const market = e.target.getAttribute('market') || localStorage.getItem('more_market'); 
+
+      const cart = {
+        fixture_id: fixtureId,
+        session_id: session_id,
+        betslip_teams: homeTeam + ' v ' + awayTeam,
+        betslip_market: market,
+        betslip_picked: picked,
+        betslip_odds: odds 
+      }
+      
+      sessionStorage.setItem(fixtureId, JSON.stringify(cart))
+
+      setId(prev => prev.concat(fixtureId))
+
+    }
+  
+
     return (
-      <StyleGameComponent>
-         <Row className="custom-grid">  
-        {data.map((innerData,index) => {
-          const oddsData = JSON.parse(innerData.odds)
- 
+      <StyleGameComponent className={`${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}>
+         <Row className="custom-grid" style={{ margin: 0 }}>   
+        {data.data.map((innerData,index) => {
+          const oddsData = JSON.parse(innerData.odds) 
           return (
             <React.Fragment key={index + innerData.fixture_date}>
             <Col 
             lg={8} 
             sm={8} 
-            className="card custom-grid-box-main p-2" 
-            style={{ borderRight: '0px', border: 'none', background: 'none' }}
+            className={`card p-2 ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-white text-dark'}`}
+            style={{ borderRight: '0px', border: 'none', marginTop: 0, paddingTop: 0, marginBottom: 0 }}
             >  
       
-              <Row style={{ marginLeft: 2 }} className="d-flex align-items-center">
+              <Row style={{ marginLeft: 2, margin: 0   }} className="d-flex align-items-center">
               <h6 className=' text-mute' style={{ letterSpacing: '1px' }}> 
                 {innerData.flag ?
                     <img 
@@ -265,7 +303,7 @@ export default function GameComponent({ data }) {
                     <Col className='d-inline-flex'>
                       <StyleFavorites>
                         <i 
-                          className={`bi bi-star-fill ${innerData.favorite_active ? 'text-warning' : 'text-dark'}`}
+                          className={`bi bi-star-fill ${innerData.favorite_active ? 'text-warning' : 'text-secondary'}`}
                           onClick={() => updateFavorite(innerData.fixture_id, innerData.favorite_active)}                      
                         ></i>
                       </StyleFavorites>
@@ -279,18 +317,25 @@ export default function GameComponent({ data }) {
                   </Row>                 
               </Row>                     
             </Col>
-            <Col lg={4} sm={4} className="card d-flex flex-row active-btn" style={{ background: '#fff', borderLeft: '0px', border: 'none' }}>
-                
+            <Col 
+              lg={4} 
+              sm={4} 
+              className=
+              {`card d-flex flex-row active-btn 
+              ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}`}
+              style={{ background: '#F0F8FF', borderLeft: '0px', border: 'none' }}
+            >
+               
               {oddsData?.map((odd) => {         
    
                 return odd.id === 1 && odd.values.map((val, i) => {
                   return (
-                     <div key={i} className='text-center mb-3 w-100 m-1'>
-                        <small className='header text-center'>{val.value}</small>  
+                     <div key={i} className='text-center mb-3 w-100 m-1 '>
+                        <small className=' text-center'>{val.value}</small>  
                         <div onClick={() => activatBtn(index,i)}>                        
                           <button 
                             odds={val.odd} 
-                            className='btn btn-sm w-100 active-btn-btn p-2'
+                            className='w-100 active-btn-btn p-2'
                             id="fix-btn"
                             btn_id={i}
                             home_team={innerData.home} 
@@ -299,6 +344,7 @@ export default function GameComponent({ data }) {
                             picked={val.value}
                             fixtureid={innerData.fixture_id}
                             onClick={sendBetslip}  
+                            disabled={!innerData.fixture_active}
                           >
                             {val.odd}                  
                           </button>   
@@ -312,10 +358,10 @@ export default function GameComponent({ data }) {
 
                 <Small 
                   onClick={() => displayMoreMarkets(index, innerData.home, innerData.away, innerData.fixture_id)}
-                  className="text-dark fw-bold d-flex flex-column mt-3 p-2"                    
+                  className="text-secondary fw-bold d-flex flex-column mt-3 p-2"                    
                 >
                     <i className="bi bi-plus d-flex align-items-center" style={{ height: 20, marginTop: '2px' }}>
-                    {oddsData?.length || 42} 
+                    {oddsData?.length === 1 ? 42 : oddsData?.length } 
                     </i>    
                     <i className="bi bi-caret-down-fill" style={{ marginTop: '-7px' }}></i>    
                      
@@ -324,22 +370,32 @@ export default function GameComponent({ data }) {
               </div>
                
             </Col>
-            <div className='more-market' style={{ display: 'none' }}>
-              <hr className='text-secondary'/>
-              <div className='fw-bold text-center bg-light p-2 rounded' style={{ letterSpacing: 2 }}>
-                <span className="text-dark">More Markets</span>
+            <div className='more-market ' style={{ display: 'none' }}>
+              <hr className='text-light'/>
+              <div 
+              className=
+              {`fw-bold text-center p-2 rounded
+              ${displayMode === 'dark-mode' ? 'bg-dark text-white' : 'bg-light text-dark'}
+              `} 
+              style={{ letterSpacing: 2 }}
+              >
+                <span>More Markets</span>
               </div>
               {oddsData?.map(MoreFixtureMarket)}
-            </div>
-
-            <hr className='text-secondary'/>
-            
+            </div>            
           </React.Fragment>
           )
           
         })}
+        
+        <Pagination 
+          data={data}
+          setPageNumber={setPageNumber}
+         />
+
       </Row>
-      </StyleGameComponent>
-     
+      </StyleGameComponent>     
     )
 }
+
+ 

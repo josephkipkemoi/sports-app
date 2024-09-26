@@ -19,33 +19,40 @@ import {
 } from "../hooks/admin";
 import { useGetBalanceByUserIdQuery } from "../hooks/balance";
 import { PhoneSvgIcon } from "../components/Svg";
-import { useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
-import { Modal } from "react-bootstrap";
+import { useGetJackpotMarketQuery, useGetJackpotPrizeWinsQuery } from "../hooks/jackpot";
+import { Container, Modal, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { useGetFixtureIdsWhereOddsNullQuery } from "../hooks/fixture";
-import { ProgressBarElement } from "../components/HtmlElements";
+import { AlertModalElement, ErrorElement, ProgressBarElement } from "../components/HtmlElements";
 import {  
     useGetAllUsersWhoMessagedAdminQuery, 
     useGetUserMessageByIdQuery } from "../hooks/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faHeadset } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faWarning, faBan, faRefresh, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import Echo from "laravel-echo";
+import Pagination from '../components/Pagination';
+import { randomString } from "../hooks/generateRandomId";
 
 const StyledAdmin = styled.div`
     height: 100vh;
     overflow-y: scroll;
+    h1 {
+        letter-spacing: 2px;
+        margin: 0;
+        padding: 0;
+    }
 `
 
 const adminLinks = [
     {
-        name: 'User Profiles',
+        name: 'Users',
         path: 'admin?tab=users'
     },
     {
-        name: 'Fixtures & Odds',
+        name: 'Fixtures',
         path: 'admin?tab=fixtures'
     },
     {
-        name: 'Customer Feedback',
+        name: 'Feedback',
         path: 'admin?tab=feedback'
     },
     {
@@ -53,7 +60,7 @@ const adminLinks = [
         path: 'admin?tab=jackpot'
     },
     {
-        name: 'Live Games',
+        name: 'Live',
         path: 'admin?tab=live'
     }
 ]
@@ -65,82 +72,77 @@ export default function Admin() {
     const [fixtureLoaded, setFixtureLoaded] = useState(false)
     const [fixtureOddsLoading, setFixtureOddsLoading] = useState(false)
     const [fixtureOddsLoaded, setFixtureOddsLoaded] = useState(false)
-    const [auth, setAuth] = useState('')
     const [hideAdmin, setHideAdmin] = useState(true)
-
-    const postFixtureIds = async () => {
-        setFixtureIdLoading(true)
-        const res = await axios.post('api/custom_fixture/post');
-        
-        if(res.status === 200) {
-            setFixtureIdLoading(false)
-            setFixtureLoaded(true)
-        }
-    }
-
-    const postFixtureOdds = async () => {
-        setFixtureOddsLoading(true)
-        const res = await axios.post('api/custom_fixture/odds');
-         
-        if(res.status === 200) {
-            setFixtureOddsLoaded(true)
-            setFixtureOddsLoading(false)
-        }
-    }
 
     const AdminLinkItems = (link, i) => {
         return (
-            <Link href={link.path} key={i}>
-                <a
-                    itemProp="url"
-                    className="text-decoration-none text-dark p-3 btn"
-                >
-                    {link.name}
-                </a>
-            </Link>
+            <div  key={i}>
+                <Link href={link.path}>
+                    <a
+                        itemProp="url"
+                        className="text-decoration-none text-dark btn"
+                    >
+                        {link.name}
+                    </a>
+                </Link>
+            </div>
+           
         )
     }
- 
-    const authuser = (e) => {
-        setAuth(e.target.value)
-    }
 
-    const submitauth = () => {
-        if(auth === '32959035') {
+    const getUser = () => {
+        const user = JSON.parse(localStorage.getItem('uu_id'))
+   
+        if(user.uu_id.phone_number === 254700545727 || process.env.NODE_ENV === 'development') {
             setHideAdmin(false)
         }
     }
+
+    useEffect(() => {
+       getUser()
+    }, [])
     
     return (
-        <StyledAdmin className="p-3 container bg-danger">
-            <div className="text-center p-2">
-                <h1>
-                    <i className="bi bi-headset" style={{ marginRight: 5 }}></i>
-                    Command Center
-                </h1>
-                <input type="text" className="bg-secondary" onChange={authuser}/>
-                <button onClick={submitauth}>Auth</button>
+        <StyledAdmin className="p-3 container bg-primary">
+
+            {hideAdmin ? '' :  
+            <>
+            <div className="text-center p-2 bg-light rounded-pill shadow-lg mb-3">
+                <h1 className="fw-bold text-dark d-flex justify-content-center align-items-center">
+                    <i className="bi bi-headset" style={{ marginRight: 5}}></i>
+                     Welcome
+                    <i className="bi bi-emoji-sunglasses" style={{ marginLeft: 5 }}></i>
+                </h1> 
             </div>
-
-            {hideAdmin ? '' :  <nav className="bg-light p-3 shadow-lg rounded">
-                {adminLinks.map(AdminLinkItems)}
-            </nav>}
+           <Navbar bg="light" expand="lg" className="rounded">
+                <Container>
+                    <Navbar.Brand href="#home">Tabs</Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                    <Nav className="me-auto">
+                        {adminLinks.map(AdminLinkItems)}
+                    </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>
+            </>
+           }
        
-
+            <div style={{ height: '100vh' }}>
             {tab === 'fixtures' && 
              <FixturesComponent 
-             postFixtureIds={postFixtureIds}
-             postFixtureOdds={postFixtureOdds}
-             fixtureIdLoading={fixtureIdLoading}
-             fixtureLoaded={fixtureLoaded}
-             fixtureOddsLoaded={fixtureOddsLoaded}
-             fixtureOddsLoading={fixtureOddsLoading}
+                fixtureIdLoading={fixtureIdLoading}
+                fixtureLoaded={fixtureLoaded}
+                fixtureOddsLoaded={fixtureOddsLoaded}
+                fixtureOddsLoading={fixtureOddsLoading}
              />
              }
             {tab === 'users' && <UsersProfileComponent/>}
             {tab === 'feedback' && <CustomerFeedback/>}
             {tab === 'jackpot' && <JackpotComponent/>}
             {tab === 'live' && <LiveGamesComponent/>}
+            </div>
+         
         </StyledAdmin>
     )
 }
@@ -248,115 +250,9 @@ const JackpotComponent = () => {
             <Card.Body className="px-4">
                 <Row className="gx-2">
                     <div className="mb-3">
-                        <UpdateJackpotPrize/>
+                        <JackpotMarket/>
                     </div>
-                   
-                   
-                    <h5 className="text-center fw-bold bg-primary p-2 text-white">Add/Update Games to  {fields.jp_market}</h5>
-                    <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
-                        <div >
-                            <Small className="text-dark">Jackpot Market</Small>
-                            <Select 
-                                className="mb-2" 
-                                options={jackpot_options} 
-                                onChange={handleMarketField} 
-                                name="jp_market" 
-                            />                      
-                            <hr className="text-white"/>
-                            <Small className="text-dark">Select ID to Update</Small>
-                            <Select 
-                                options={ fields.jp_market === 'Mega Jackpot' ? mega_jackpot_id_options : five_jackpot_id_options}
-                                onChange={updateJackpotId}
-                            />
-                        </div>
-                    </Col>
-                    <Col className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
-                        <div >
-                            <Small className="text-dark">
-                                Games Added: 
-                                {fields.jp_market === "Mega Jackpot" ? megaJackpotData.data.length : fiveJackpotData.data.length}
-                            </Small>
-                            <div className="d-flex">
-                                <input 
-                                    type="text" 
-                                    onChange={handleField} 
-                                    name="jp_home" 
-                                    placeholder="Home Team" 
-                                    className="form-control m-1"
-                                />
-                                <input 
-                                    type="text" 
-                                    onChange={handleField}
-                                    name="jp_away" 
-                                    placeholder="Away Team" 
-                                    className="form-control m-1"
-                                />
-                            </div>
-                            <div className="d-flex">
-                                <InputNumber 
-                                    onChange={handleField} 
-                                    name="jp_home_odds"  
-                                    placeholder="Home Odds" 
-                                    className="form-control m-1"
-                                />
-                                <InputNumber 
-                                    onChange={handleField} 
-                                    name="jp_draw_odds" 
-                                    placeholder="Draw Odds" 
-                                    className="form-control m-1"
-                                />
-                                <InputNumber 
-                                    onChange={handleField} 
-                                    name="jp_away_odds" 
-                                    placeholder="Away Odds" 
-                                    className="form-control m-1"
-                                />
-                                <input 
-                                    onChange={handleField} 
-                                    name="jp_time" 
-                                    type="datetime-local" 
-                                    className="form-control m-1"
-                                />      
-                            </div>
-                            <div>
-                                <button 
-                                    className="btn btn-primary m-1" 
-                                    onClick={submitGame}
-                                    disabled={
-                                        (fields.jp_market === 'Mega Jackpot' && megaJackpotData.data.length === 10 ) ||
-                                        (fields.jp_market === 'Five Jackpot' && fiveJackpotData.data.length === 5 ) 
-                                    }
-                                >
-                                    Add Game
-                                </button>
-                                <button
-                                className="btn btn-warning m-1" 
-                                onClick={updateGame}
-                                disabled={
-                                    (fields.jp_market === 'Mega Jackpot' && megaJackpotData.data.length < 10 ) ||
-                                    (fields.jp_market === 'Five Jackpot' && fiveJackpotData.data.length < 5 ) 
-                                }
-                                >
-                                    Update Game
-                                </button>
-                                <button 
-                                className="btn btn-danger m-1"
-                                onClick={activateJackpotMarket}
-                                >
-                                    Activate Jackpot
-                                </button>
-                                <button 
-                                className="btn btn-danger m-1"
-                                onClick={deactivateJackpotMarket}
-                                >
-                                    Deactivate Jackpot
-                                </button>
-                            </div>
-                            <div>
-
-                            </div>
-                        </div>
-                    </Col>
+                    <AddUpdateJackpotGame/>
                 </Row>
               
                 <hr/>
@@ -394,101 +290,269 @@ const JackpotComponent = () => {
                     </div>
                 </Col>
                 </div>
-               
             </Card.Body>           
         </Card>
     )
 }
 
-const UpdateJackpotPrize = () => {
-    const { data, isLoading, error } = useGetJackpotPrizeWinsQuery()
-    const [isModalOpen, setIsModalOpen] = useState(false)
+const AddUpdateJackpotGame = () => {
+    const generateId = randomString()
+    const [error, setError] = useState(null)
+    const [gameAdded, setGameAdded] = useState(false)
+    const [game, setGame] = useState({
+        market: null,
+        jackpot_market_id: null,
+        home_team: '',
+        away_team: '',
+        home_odds: null,
+        draw_odds: null,
+        away_odds: null,
+        kick_off_time: null
+    })
 
-    const [balance, setBalance] = useState(0)
-    const [market, setMarket] = useState('')
-    const [jackpotPrize, setJackpotPrize] = useState(0)
+    const { market, jackpot_market_id, home_team, away_team, home_odds, draw_odds, away_odds, kick_off_time } = game
+    const jpMarket = useGetJackpotMarketQuery()
 
-    if(isLoading) {
-        return <Spinner animation="grow"/>
-    }
+    const handleField = (e) =>  setGame(prev => ({
+        ...prev, 
+        [e.target.name]: e.target.value
+    }))
 
-    if(error) {
-        return <span>Error</span>
-    }
-    const [megaMarket, fiveMarket] = data.data
-
-    const handleJpMarket = ({ value }) => {
-       setMarket(value)
-       if(value === megaMarket.market) {
-            setBalance(megaMarket.jackpot_prize)
-       }
-       if(value === fiveMarket.market) {
-        setBalance(fiveMarket.jackpot_prize)
+    const submitGame = async () => {
+        try {
+            const res = await axios.post(`api/jackpots/markets/${jackpot_market_id}/games`, {
+                jackpot_market_id,
+                home_team,
+                away_team,
+                home_odds,
+                draw_odds,
+                away_odds,
+                kick_off_time,
+                jackpot_bet_id : generateId
+            })
+            if (res.status == 201 ) {
+                setGameAdded(true)
+                setError(null)
+            }
+        } catch (error) {
+            if(error.response.status == 400) {
+                setError(error.response.data.message)
+            }
         }
+      
+    }
+    const updateGame = () => {
+
     }
 
-    const handleJpPrize = e => setJackpotPrize(e.target.value)
+    const handleMarket = (e) => setGame(prev => ({
+        ...prev, 
+        market: e.label,
+        jackpot_market_id: e.value
+    }))
 
-    const cancelJp = () => setIsModalOpen(false)
+    useEffect(() => {
 
-    const handleUpdate = async () => {
-        await axios.post('api/admin/jackpot/prize', {
-            market: market,
-            jackpot_prize: jackpotPrize
-        })
-        cancelJp()
+    }, [gameAdded])
+    
+    if (jpMarket.isLoading) {
+        return <Spinner animation="grow" />
     }
+    const jackpotMarkets = jpMarket?.data?.map(d => {
+        return {
+            value: d.market_id,
+            label: d.market
+        }
+    })
 
     return (
-        <React.Fragment>
-         <h5 className="text-center fw-bold bg-primary p-2 text-white">Update {market} Jackpot Prize</h5>
-         <h6 className="fw-bold">Current Jackpot Prize: {balance}</h6>
-            <Col className="d-sm-flex">
-                <Select
-                    options={jackpot_options}
-                    onChange={handleJpMarket}
-                    className="w-50 m-1"
-                />
-                <InputNumber 
-                    className="form-control m-1" 
-                    placeholder="Enter Amount"
-                    onChange={handleJpPrize}
-                />
-                <button 
-                    className="btn btn-primary m-1"
-                    onClick={() => setIsModalOpen(true)}
-                >
-                    Submit
-                </button>
+        <div className="bg-primary">
+            <h5 className="text-center fw-bold  p-2 text-white">Add/Update Games to {market}</h5>
+            {error && 
+            <p className="alert alert-danger">
+                <FontAwesomeIcon icon={faWarning} style={{ marginRight: 8 }}/>
+                {error}
+            </p>
+            }
+            <Col lg="2" className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
+                <div>
+                <Small className="text-dark">Jackpot Market</Small>
+                {gameAdded && <span className="text-danger fw-bold">Game Added</span>}
+                <Select 
+                    className="mb-2" 
+                    options={jackpotMarkets} 
+                    onChange={handleMarket} 
+                    name="market" 
+                />                      
+                <hr className="text-white"/>
+                <Small className="text-dark">Select ID to Update</Small>
+                    <Select 
+                        // options={ fields.jp_market === 'Mega Jackpot' ? mega_jackpot_id_options : five_jackpot_id_options}
+                        // onChange={updateJackpotId}
+                    />
+                </div>
             </Col>
-            <Modal show={isModalOpen}>
-                <Modal.Body>
-                    <h2 className="alert alert-danger">
-                        <i className="bi bi-exclamation-circle"></i>
-                        Are you sure you want to update {market} prize?
-                    </h2>
-                    <h3>
-                        New {market} prize 
-                    </h3>
-                    <h4>
-                        KES  {(Number(jackpotPrize)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                    </h4>
+            <Col className="p-2 rounded shadow bg-info" style={{ border: '1px solid lightgray' }}>
+                        <div>
+                            <Small className="text-dark">
+                                Games Added: 
+                                {/* {fields.jp_market === "Mega Jackpot" ? megaJackpotData.data.length : fiveJackpotData.data.length} */}
+                            </Small>
+                            <div className="d-flex">
+                                <input 
+                                    type="text" 
+                                    onChange={handleField} 
+                                    name="home_team" 
+                                    placeholder="Home Team" 
+                                    className="form-control m-1"
+                                />
+                                <input 
+                                    type="text" 
+                                    onChange={handleField}
+                                    name="away_team" 
+                                    placeholder="Away Team" 
+                                    className="form-control m-1"
+                                />
+                            </div>
+                            <div className="d-flex">
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="home_odds"  
+                                    placeholder="Home Odds" 
+                                    className="form-control m-1"
+                                />
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="draw_odds" 
+                                    placeholder="Draw Odds" 
+                                    className="form-control m-1"
+                                />
+                                <InputNumber 
+                                    onChange={handleField} 
+                                    name="away_odds" 
+                                    placeholder="Away Odds" 
+                                    className="form-control m-1"
+                                />
+                                <input 
+                                    onChange={handleField} 
+                                    name="kick_off_time" 
+                                    type="datetime-local" 
+                                    className="form-control m-1"
+                                />      
+                            </div>
+                            <div>
+                                <button 
+                                    className="btn btn-primary m-1" 
+                                    onClick={submitGame}
+                                >
+                                    Add Game
+                                </button>
+                                <button
+                                    className="btn btn-warning m-1" 
+                                    onClick={updateGame}
+                                >
+                                    Update Game
+                                </button>                              
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+            </Col>
+        </div>
+    )
+}
+const JackpotMarket = () => {
+    const [market, setMarket] = useState({
+        market_id: null,
+        market: '',
+        market_prize: null,
+        games_count: null,
+        min_stake: null
+    })
+    const [marketAdded, setMarketAdded] = useState(false)
 
-                    <button 
-                        className="btn btn-danger w-50"
-                        onClick={cancelJp}
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        className="btn btn-primary w-50"
-                        onClick={handleUpdate}
-                    >
-                        Update
-                    </button>
-                </Modal.Body>
-            </Modal>
-        </React.Fragment>
+    const handlechange = (e) => {
+        setMarket(prev => ({...prev, [e.target.name]: e.target.value}))
+    }
+
+    const postJpMarket =  () => {
+        try {
+            const res =  axios.post("api/jackpots/markets", market)
+
+            if (res.status == 201) {
+                setMarketAdded(true)
+            }  
+        } catch (error) {
+            console.error(error)
+        }
+      
+    }
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if(marketAdded == true) {
+                setMarketAdded(false)
+            }
+        }, 2000)
+        return () => clearTimeout(timer)
+    }, [marketAdded])
+
+    return (
+        <div className="bg-danger p-2 shadow rounded">
+            {marketAdded && <span className="alert alert-info">{market.market} Added</span>}
+            <div className="row">
+                <h6 className="fw-bold text-white text-center m-3">
+                    Fill form to add Jackpot Market
+                </h6>
+                <div className="col">
+                    <input 
+                        className="form-control m-2" 
+                        type="number" 
+                        placeholder="Jackpot Market ID" 
+                        onChange={handlechange}
+                        name="market_id"
+                    />
+                    <input 
+                        className="form-control m-2" 
+                        placeholder="Add Jackpot Market" 
+                        onChange={handlechange}
+                        name="market"
+                    />
+                    <input 
+                        className="form-control m-2" 
+                        type="number" 
+                        placeholder="Add Jackpot Prize(KSHS)" 
+                        onChange={handlechange}
+                        name="market_prize"
+                    />
+                    <input 
+                        className="form-control m-2" 
+                        type="number" 
+                        placeholder="Market Games Count" 
+                        onChange={handlechange}
+                        name="games_count"
+                    />
+                    <input 
+                        className="form-control m-2 w-50" 
+                        type="number" 
+                        placeholder="Minimum Stake" 
+                        onChange={handlechange}
+                        name="min_stake"
+                    />
+                <button 
+                    className="btn btn-primary w-100 p-2 mt-3 mb-3 shadow-sm rounded-0"
+                    onClick={postJpMarket}
+                    disabled={marketAdded}
+                >
+                    Add Jackpot Market
+                </button>
+                </div>
+                <div className="col">
+                    <UpdateJackpot/>
+                </div>
+            </div>        
+          
+        </div>
     )
 }
 
@@ -504,12 +568,14 @@ const CustomerFeedback = () => {
     if(error) {
         return <span>Error</span>
     }
-    useEffect(() => {
-        // setUserId(JSON.parse(localStorage.getItem('uu_id')).uu_id.id)
-    }, [])
+
     if(isLoading) {
         return <Spinner animation="grow"/>
     }
+    // useEffect(() => {
+        // setUserId(JSON.parse(localStorage.getItem('uu_id')).uu_id.id)
+    // }, [])
+   
 
     const handleInput = (e) => {
         setMessage(e.target.value)
@@ -523,7 +589,6 @@ const CustomerFeedback = () => {
             original_message: originalMessage,
             user_id: userId
         })
-        // console.log(res)
     }
 
     const MessageItems = (link, i) => {
@@ -532,8 +597,7 @@ const CustomerFeedback = () => {
             <React.Fragment key={i}>
                 <div className=" m-1 d-flex flex-row">                    
                     <PhoneSvgIcon width="16" height="16"/>
-                    <p>{link.message}</p>
-                        {/* <small className="text-dark">
+                        <small className="text-dark">
                             {link.phone_number}
                         </small>
                                                    
@@ -548,7 +612,7 @@ const CustomerFeedback = () => {
                         <div>
                             <textarea className="form-control" onChange={handleInput}/>
                             <button className="btn btn-primary" onClick={() => submitMessage(link.message, link.phone_number)}>Reply</button>
-                        </div> */}
+                        </div>
                 </div>    
                 <hr/>        
             </React.Fragment>
@@ -572,9 +636,7 @@ const CustomerFeedback = () => {
 
     // sessionStorage.setItem('timestamps',JSON.stringify(Array.from(timesArr)))
 
-    // console.log(sessionStorage.getItem(Array.from(timesArr)) )
     // Array.from(timesArr).map(MessageItems)
-    // console.log(data.messages.length)
     return (
         <Card className="mt-2"> 
             <Card.Header className="bg-primary text-light">
@@ -592,6 +654,7 @@ const CustomerFeedback = () => {
                     {/* <Col> */}
 
                     {/* </Col> */}
+                    {/* {data.map(MessageItems)} */}
                 </Row>
             </Card.Body>
         </Card>
@@ -599,6 +662,9 @@ const CustomerFeedback = () => {
 }
 
 const UsersContactCustomerCare = () => {
+
+    const [userNum, setUserNum] = useState(null)
+    const [userId, setUserId] = useState(null)
 
     const { data, isLoading, error, refetch } = useGetAllUsersWhoMessagedAdminQuery()
 
@@ -617,6 +683,10 @@ const UsersContactCustomerCare = () => {
             <div 
                 key={i} 
                 className={`d-flex justify-content-between align-items-center btn btn-light p-2 m-1 rounded-pill`}
+                onClick={() => {
+                    setUserNum(n.phone_number)
+                    setUserId(n.id)
+                }}
             >
                 <FontAwesomeIcon 
                 icon={faUser} 
@@ -639,56 +709,94 @@ const UsersContactCustomerCare = () => {
                         {data.data.map(UsersElements)}
                     </div>
                 </Col>       
-                <Col lg={9} md={8} sm={8}>
-                    <MessageComponent />
+                <Col lg={9} md={8} sm={8}>  
+                    <MessageComponent user={userNum} id={userId}/>
                 </Col>
         </>
     )
 }
 
-const MessageComponent = () => {
+const MessageComponent = ({ user, id }) => {
     const [chatMessage, setChatMessage] = useState([])
     const [sender, setSender] = useState('')
 
     const [formDetails, setFormDetails] = useState({
         message: '',
-        user_id: '',
-        phone_number: ''
+        user_id: user,
+        phone_number: user
     })
 
+    const {data, error, isLoading, refetch } = useGetUserMessageByIdQuery(user)
+
+    if(error) {
+        return <span>Error</span>
+    }
+
+   
     const handleText = (e) => {
-        setFormDetails(prev => ({...prev, message : e.target.value }))
+        setFormDetails(prev => ({...prev, message : e.target.value, user_id: id, phone_number: user }))
     }
 
     const submitMessage = async () => {
         const res = await axios.post('api/admin/users/message', formDetails)
     }
 
-    useEffect(() => {   
+    const MessageItems = (link, i) => {
+ 
+        return (
+           <React.Fragment key={i}>
+               <div className=" m-1 d-flex flex-row">                    
+                   <PhoneSvgIcon width="16" height="16"/>
+                       <small className="text-dark">
+                           {link.phone_number}
+                       </small>
+                                                  
+                      <div id="example-collapse-text" className="card p-2 shadow" style={{ marginLeft: 15 }}>
+                           <span>
+                               {link.name} | {link.email}
+                           </span> 
+                           <p>
+                               {link.message}
+                           </p> 
+                       </div>
+                       {/* <div>
+                           <textarea className="form-control" onChange={'handleInput'}/>
+                           <button className="btn btn-primary" onClick={() => submitMessage(link.message, link.phone_number)}>Reply</button>
+                       </div> */}
+               </div>    
+               <hr/>        
+           </React.Fragment>
+       )
+   }
+
+    // useEffect(() => {   
         
-        window.Echo = new Echo({
-            broadcaster: 'pusher',
-            key: 'b36bb776d85f37fdff66',
-            cluster: 'ap2'
-        })
+    //     window.Echo = new Echo({
+    //         broadcaster: 'pusher',
+    //         key: 'b36bb776d85f37fdff66',
+    //         cluster: 'ap2'
+    //     })
 
-        window.Echo.channel(`admin-channel`)
-                    .listen('.message.new', function(data){
-                        setChatMessage((prev) =>  [...prev, data.message])
-                            setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
-                            setSender(data.sender)
-        })
+    //     window.Echo.channel(`admin-channel`)
+    //                 .listen('.message.new', function(data){
+    //                     setChatMessage((prev) =>  [...prev, data.message])
+    //                         setFormDetails(prev => ({...prev, user_id: data.user_id, phone_number: data.user.phone_number }))
+    //                         setSender(data.sender)
+    //     })
+    // setFormDetails(prev => ({...prev, phone_number: user }))
+    // }, [])   
+
+    if(isLoading) {
+        return <Spinner animation="grow"/>
+    }
     
-    }, [])   
-
     return (
         <Card>
             <Card.Header><h4 className="text-dark">Inbox</h4></Card.Header>            
             <div style={{ minHeight: 120 }}>
-                {chatMessage.length > 0 && chatMessage.map((d,i) => {
-                    return (
-                        <Card.Body key={i} style={{ margin: 0, padding: 0 }}>                        
-                                <div key={i} className="d-flex align-items-end mb-4">
+       
+                        <Card.Body  style={{ margin: 0, padding: 0 }}>                        
+                                {/* <div key={i} className="d-flex align-items-end mb-4">
                                     {sender === 'CustomerCareAgent' ? <FontAwesomeIcon 
                                             icon={faHeadset} 
                                             className="text-white bg-info p-2 rounded-circle" 
@@ -708,11 +816,11 @@ const MessageComponent = () => {
                                         <span className="text-white">{d}</span>
                                         </div>
                                     </div>
-                                </div>
+                                </div> */}
+                                {data.map(MessageItems)}
                           
-                        </Card.Body>                    )
-                    }
-                    )}  
+                        </Card.Body>                    
+            
             </div> 
                     <Card.Footer>
                         <textarea onChange={handleText}  placeholder="Write message here..." className="form-control"></textarea>
@@ -725,8 +833,9 @@ const MessageComponent = () => {
 const UsersProfileComponent = () => {
 
     const [userId, setUserId] = useState(null)
+    const [pageNumber, setPageNumber] = useState(1)
 
-    const { data, isLoading, error, refetch } = useGetAllUsersQuery()
+    const { data, isLoading, error, refetch } = useGetAllUsersQuery(pageNumber)
 
     if(error) {
         return <span>Error...</span>
@@ -735,8 +844,8 @@ const UsersProfileComponent = () => {
     if(isLoading) {
         return <Spinner animation="grow"/>
     }
- 
-    const options =  data.users.map(n => {
+
+    const options =  data.data.data.map(n => {
         return {
             user_id: n.id,
             value: n.phone_number,
@@ -745,43 +854,78 @@ const UsersProfileComponent = () => {
     })
 
     const selectUser = (e) => {
-        const user_id = e.user_id
+        const user_id = (e?.user_id || e?.target?.getAttribute('ui'))
         setUserId(user_id)
     }
-
+ 
+    const UserNumElements = (l,i) => {
+        return (
+            <div className="d-flex align-items-center">
+                {i+1}
+                <button className="btn btn-primary w-100 m-1" onClick={selectUser} ui={l.id} style={{ letterSpacing: '2px' }}>{l.phone_number}</button>
+            </div>           
+        )
+    }
     return (
-        <Card className="mt-2 bg-danger ">
-                <Card.Body className="bg-light rounded ">
+        <Card className="mt-2 bg-danger">
+                <Card.Body className="bg-light rounded">
                     <div className="d-sm-flex">
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-primary text-white">Users</Card.Header>
-                            <Card.Body><h4>{data.users.length}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 rounded bg-primary">
+                            <Card.Header className="bg-primary text-white rounded border-0 m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Users</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-primary text-white rounded"><h1>{data.count}</h1></Card.Body>
                         </Card>                    
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-success text-white">Average</Card.Header>
-                            <Card.Body><h4>{Number(data.avg).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-success rounded">
+                            <Card.Header className="bg-success text-white m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Average</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-success text-white rounded"><h1>Kes {Number(data.avg).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-dark text-white">Pending</Card.Header>
-                            <Card.Body><h4>{Number(data.notPlaced).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-dark">
+                            <Card.Header className="bg-dark text-white  m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Pending</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-dark text-white rounded"><h1>Kes {Number(data.notPlaced).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-warning text-dark">Total Amount</Card.Header>
-                            <Card.Body><h4>{Number(data.wagers).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-warning">
+                            <Card.Header className="bg-warning text-white  m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Total Amount</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-warning text-white rounded"><h1>Kes {Number(data.wagers).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
-                        <Card className="w-100 m-2 shadow border-0">
-                            <Card.Header className="bg-danger text-white">Grand Total</Card.Header>
-                            <Card.Body><h4>{Number(data.grandTotal).toLocaleString(undefined, {})}</h4></Card.Body>
+                        <Card className="w-100 m-2 shadow border-0 bg-danger">
+                            <Card.Header className="bg-danger text-white  m-0 text-center">
+                                <h3 style={{ margin: 0, padding: 0 }}>Grand Total</h3>
+                            </Card.Header>
+                            <hr className="m-0 p-0 text-light" />
+                            <Card.Body className="text-center bg-danger text-white rounded"><h1>Kes {Number(data.grandTotal).toLocaleString(undefined, {})}</h1></Card.Body>
                         </Card>
                     </div>
-                    <Row className="shadow m-2 p-2 rounded mx-auto">                        
+                    <Row className="shadow-sm m-2 p-2 rounded mx-auto">                        
                         <Col sm="12" md="3" lg="3" className="p-3">               
-                            <button className="btn btn-primary m-2" onClick={refetch}>Reload</button>                                 
+                            <button className="btn btn-dark m-2 w-100" onClick={refetch}>
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
+                                Reload
+                            </button>                 
                             <h5 className="text-dark fw-bold">Select User</h5>
                             <Select options={options} className="text-dark" onChange={selectUser}/>    
+
+                            {data.data.data.map(UserNumElements)}
+                             <div className="d-flex mt-3" style={{ overflow: 'scroll' }}>
+                                <Pagination 
+                                    data={data.data} 
+                                    setPageNumber={setPageNumber}
+                                />
+                             </div>
+                            
                         </Col>
                         <Col sm="12" md="9" lg="8" className="shadow m-2 p-3">
-                            <UserProfileElement user_id={userId}/>
+                            <UserProfileElement user_id={userId} refetchData={refetch}/>
                         </Col>
                     </Row>
                 </Card.Body> 
@@ -870,36 +1014,59 @@ const UserBetHistoryElement = ({ data }) => {
         )
     }
     return (
-        <>
-            <h4 className="text-dark fw-bold mb-3">Bet History</h4>
-            <table className="table ">
-                <thead className="thead-dark">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Odds</th>
-                        <th scope="col">Payout</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Change Status</th>
-                        <th scope="col">Update Status</th>
-                        <th scope="col">Outcome</th>
-                        <th scope="col">Update Outcome</th>
-                    </tr>
-                </thead>
-                <tbody >
-                    {data.map(BetHistoryElements)}
-                </tbody>
-            </table>
-        </>
+        <Card className="border-0">
+            <Card.Header className="bg-dark text-white d-flex align-items-center justify-content-between">
+                <h4 className="fw-bold">Bet History</h4>
+                <button className="btn btn-light m-2" onClick={() => refetch()}>
+                    <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>
+                    Update History
+                </button>
+            </Card.Header>
+            <Card.Body>
+                <table className="table bg-primary rounded shadow text-white">
+                    <thead className="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Odds</th>
+                            <th scope="col">Payout</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Change Status</th>
+                            <th scope="col">Update Status</th>
+                            <th scope="col">Outcome</th>
+                            <th scope="col">Update Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        {data.map(BetHistoryElements)}
+                    </tbody>
+                </table>
+            </Card.Body>         
+        </Card>
     )
 }
 
-const UserProfileElement = ({ user_id }) => {
+const StyleUserElement = styled.div`
+    h4 {
+        margin: 0;
+        padding: 0;
+    }
+    h5 {
+        margin: 0;
+        padding: 0;
+        color: #fff;
+        font-weight: bold; 
+    }
+`
 
-        const { data, error, isLoading } = useGetAdminUserBalanceByIdQuery(user_id)
+const UserProfileElement = ({ user_id, refetchData }) => {
+  
+        const { data, error, isLoading, refetch } = useGetAdminUserBalanceByIdQuery(user_id)
         const userBalance = useGetBalanceByUserIdQuery(user_id)
         const [newUserBalance, setNewUserBalance] = useState(0)
+        const [bonus, setBonus] = useState(0)
         const [isBalanceUpdated, setIsBalanceUpdated] = useState(false)
+        const [isModalOpen, setIsModalOpen] = useState(false)
         // const [newNum, setNewNum] = useState('')
 
         if(isLoading) { 
@@ -907,7 +1074,7 @@ const UserProfileElement = ({ user_id }) => {
         }
     
         if(error) {
-            return <span>Error</span>
+            return <ErrorElement message="Select User to Continue"/>
         }
  
         const { user_profile, history_profile } = data
@@ -922,7 +1089,21 @@ const UserProfileElement = ({ user_id }) => {
 
             if(res.status === 200) {
                 setIsBalanceUpdated(true)
+                userBalance.refetch()
+                setNewUserBalance(0)
+                setTimeout(() => {
+                    setIsBalanceUpdated(false)
+                }, 1000)
+             
             }
+        }
+
+        const updateBalanceDecrement = async () => {
+            const amount = Number(newUserBalance) 
+            const res = await axios.patch(`api/users/${user_id}/balance/decrement_user`, {
+                amount,
+                user_id,
+            });
         }
 
         const changeBalance = (e) => {
@@ -934,52 +1115,150 @@ const UserProfileElement = ({ user_id }) => {
         //         user_id,
         //         phone_number: Number(newNum)
         //     })
-        //     console.log(res)
         // }
+        const handleRemove = () => {
+            setIsModalOpen(true)
+        }
 
+        const closeModal = () => {
+            setIsModalOpen(false)
+        }
+
+        const removeUser = async (i) => {
+           const res = await axios.delete(`api/admin/users/delete?id=${i}`)
+ 
+           if(res.status === 200) {
+            refetchData()
+            closeModal()
+           }
+        }
+
+        const updateBonus = async () => {
+            const newBonus = Number(bonus)
+            const res = await axios.patch(`api/admin/users/${user_id}/bonus`, {
+                bonus: newBonus,
+            });
+        }
+
+        const handleBonus = (e) => {
+            setBonus(e.target.value)
+        }
         return (
-            <>
-            <h4 className="text-dark fw-bold mb-3">User Profile</h4>
+            <StyleUserElement className="card border-0">
+                <Card.Header className=" bg-dark d-flex justify-content-between align-items-center">
+                    <h4 className="text-white fw-bold " style={{ margin: 0, padding: 0 }}>
+                        User Profile
+                    </h4>
+                    <button className="btn btn-danger m-2" onClick={handleRemove}>
+                        <FontAwesomeIcon icon={faBan} style={{ marginRight: 8 }}/>
+                        Remove User
+                    </button>
+                </Card.Header>
+                <Card.Body className="row gy-2 gx-2">
+                    <Col lg={6} md={6} sm={12} className="bg-secondary p-3 rounded shadow">
+                        <div className="d-flex flex-column align-items-center justify-content-between">
                             <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="32" 
-                            height="32" 
-                            fill="currentColor" 
-                            className="bi bi-person-circle text-dark mb-3" 
-                            viewBox="0 0 16 16"
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="64" 
+                                height="64" 
+                                fill="currentColor" 
+                                className="bi bi-person-circle text-white mb-3" 
+                                viewBox="0 0 16 16"
                             >
                                 <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                                 <path fillRule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
                             </svg> 
-                            <div className="text-dark d-flex flex-column ">
-                                <span className="mb-3">Residence: {country_residence}</span>
-                                <span className="mb-3">Number: {phone_number}</span>
-                                {/* <div>
-                                    <InputNumber onChange={(e) => setNewNum(e.target.value)} className="form-control" placeholder="New Number" />
-                                    <button className="btn btn-primary" onClick={handleUserUpdate}>Update</button>
-                                </div>                              */}
-                                <span className="mb-3">Email: {email}</span>
-                                <div className="d-flex align-items-center mb-3">
-                                    <label htmlFor="balance">Balance: </label>
-                                    <InputNumber 
+                            <h5 className="m-1">Number: {phone_number}</h5>
+                            <h5 className="m-1">Current Balance Kes: {userBalance?.data?.amount}</h5>
+                            <h5 className="m-1">Bonus Balance Kes: {userBalance?.data?.bonus}</h5>
+                            <h5 className="m-1">
+                                Total Kes: {Number(data.total_donation).toLocaleString(undefined)}
+                            </h5>
+                        </div>
+                    </Col>
+                    <Col lg={6} md={6} sm={12} className="bg-light">
+                    <div className="bg-dark p-3 rounded shadow d-flex flex-column">
+                        <label htmlFor="bonus" className="text-white">Bonus: </label>
+                            <div className="d-flex align-items-center mb-3">
+                                <InputNumber 
+                                    id="bonus" 
+                                    className="form-control d-block w-100" 
+                                    placeholder={0} 
+                                    style={{ maxWidth: 120 }}
+                                    onChange={handleBonus}
+                                    value={bonus}
+                                />                                 
+                            </div>
+                            <button className="btn btn-light" onClick={updateBonus}>
+                                {isBalanceUpdated ?  
+                                <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 8 }}/> :
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
+                               
+                                {isBalanceUpdated ? 'Bonus Updated' : 'Update Bonus'}  
+                            </button>  
+                    <hr className="text-light"/>
+                        <div className="text-dark d-flex flex-column align-items-center">
+                            <label htmlFor="balance" className="text-white">Balance: </label>
+                            <div className="d-flex align-items-center mb-3">
+                                <InputNumber 
                                     id="balance" 
-                                    className="form-control" 
-                                    placeholder={userBalance?.data?.amount} 
+                                    className="form-control d-block w-100" 
+                                    placeholder={0} 
                                     style={{ maxWidth: 120 }}
                                     onChange={changeBalance}
-                                    />
-                                    <button className="btn btn-danger" onClick={updateBalance}>
-                                      {isBalanceUpdated ? 'Updated' : 'Update'}  
-                                    </button>
-                                </div>                         
-                            </div>   
-                            <UserBetHistoryElement data={history_profile}/>
-            </>
+                                    value={newUserBalance}
+                                />                                 
+                            </div>
+                            <button className="btn btn-light" onClick={updateBalance} disabled={isBalanceUpdated}>
+                                {isBalanceUpdated ?  
+                                <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 8 }}/> :
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
+                               
+                                {isBalanceUpdated ? 'Balance Updated' : 'Update Balance'}  
+                            </button>  
+                            <label htmlFor="balance" className="text-white">Balance: </label>
+                            <div className="d-flex align-items-center mb-3">
+                                <InputNumber 
+                                    id="balance" 
+                                    className="form-control d-block w-100" 
+                                    placeholder={0} 
+                                    style={{ maxWidth: 120 }}
+                                    onChange={changeBalance}
+                                    value={newUserBalance}
+                                />                                 
+                            </div>
+                            <button className="btn btn-light" onClick={updateBalanceDecrement} disabled={isBalanceUpdated}>
+                                {isBalanceUpdated ?  
+                                <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 8 }}/> :
+                                <FontAwesomeIcon icon={faRefresh} style={{ marginRight: 8 }}/>}
+                               
+                                {'Decrement'}  
+                            </button>                     
+                        </div>  
+                     </div>
+                    </Col>
+                </Card.Body>
+               
+                <UserBetHistoryElement data={history_profile}/>                            
+                
+                <AlertModalElement
+                    isModalOpen={isModalOpen}
+                    closeModal={closeModal}
+                    primaryMessage="Are you sure you want to delete this user"
+                    secondaryMessage="This action CANNOT be undone!"
+                    submitBtnText="Delete"
+                    cancelBtnText="Cancel"
+                    cartId={user_id}
+                    action={removeUser}
+                />
+            </StyleUserElement>
         )
 }
 
-const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fixtureLoaded, fixtureOddsLoaded, fixtureOddsLoading }) => {
+const FixturesComponent = () => {
     const [startUpdate, setStartUpdate] = useState(false)
+    const [gamesUpdateComplete, setGamesUpdateComplete] = useState(false)
+    const [isUpdateComplete,  setIsUpdateComplete] = useState(false)
 
     const handleUpdate = (e) => {
         if(e.target.innerText === 'Start') {
@@ -990,85 +1269,100 @@ const FixturesComponent = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, 
         }
     }
 
-    const handleLost = async () => {
-        const res = await axios.patch('api/fixtures/carts')
-        console.log(res)
+    const updateFixture = async () => {
+        const res = await axios.post('api/admin/update/fixtures/odds')
+        return res.status
+    }
+
+    const removeFixtures = async () => {
+      const res = await axios.delete('api/admin/fixtures/remove')
+      return res.status
+    }
+ 
+    const updateGames = async () => {
+        const fixturesRemovedStatus = await removeFixtures()
+        if(fixturesRemovedStatus === 200) {
+            const updateFixturesStatus = await updateFixture()
+            if(updateFixturesStatus === 200) {
+                setGamesUpdateComplete(true)
+            }
+        }
     }
 
     return (
         <div className="p-3 card mt-2 bg-danger shadow-lg">
             <Card className="mb-2">
                 <Card.Body>
-                 <button className="btn btn-danger" onClick={handleLost}>Update Lost
-                    </button>
+                    <div>
+                        {gamesUpdateComplete === false &&
+                            <div>
+                            <h4>Step 1 of 2</h4>
+                            <p>Update Fixture Games</p>
+                            <button 
+                                className="btn btn-primary shadow" 
+                                onClick={updateGames} 
+                                disabled={gamesUpdateComplete}
+                            >
+                                Update Games
+                            </button> 
+                            </div>
+                        }
+                        {gamesUpdateComplete &&
+                        <div>
+                          <h4>Step 2 of 2</h4>
+                          <p>Update Fixture Games Odds</p>
+                          <button className="btn btn-primary shadow" onClick={handleUpdate}>
+                          { startUpdate ? 'Close' : 'Start'}
+                          </button>
+                        </div>
+                        }
+                    </div>
+                    {gamesUpdateComplete && 
+                    <FixtureOdds
+                        setIsUpdateComplete={setIsUpdateComplete}
+                        setStartUpdate={setStartUpdate}
+                        startUpdate={startUpdate}
+                        isUpdateComplete={isUpdateComplete}
+                    />}
                 </Card.Body>
             </Card>
-            <FixturesElement 
-            postFixtureIds={postFixtureIds}
-            postFixtureOdds={postFixtureOdds}
-            fixtureIdLoading={fixtureIdLoading}
-            fixtureOddsLoaded={fixtureOddsLoaded}
-            fixtureOddsLoading={fixtureOddsLoading}
-            />
-            <CustomFixture/>
-            <div className="card p-2 mt-4">
-                <div className="d-flex justify-content-center m-2">
-                    <button className="btn btn-primary btn-lg" onClick={handleUpdate}>
-                        { startUpdate ? 'Close' : 'Start'}
-                    </button>
-                </div>
-                {startUpdate ?  <FixtureOdds setStartUpdate={setStartUpdate}/> : '' }
-            </div>
-        
-            <ConsoleOutPut 
-            fixtureLoaded={fixtureLoaded}
-            fixtureOddsLoaded={fixtureOddsLoaded}
-            />
+
+            <CustomFixture/>                
         </div>
     )
 }
 
-const FixturesElement = ({ postFixtureIds, postFixtureOdds, fixtureIdLoading, fixtureOddsLoaded, fixtureOddsLoading }) => {
-   
+const UpdateJackpot = () => {
+    const [updated, setUpdated] = useState(false)
+    const [amount, setAmount] = useState(null)
+    const [id, setId] = useState(null)
+    const handleChange = (e) => {
+        setAmount(e.target.value)
+    } 
+    const handleId = (e) => {
+        setId(e.target.value)
+    }
+    const handleSubmit = async () => {
+        const res = await axios.patch(`api/jackpots/markets/${id}/patch`, {
+            market_prize: amount
+        });
+        if(res.status == 200) {
+            setUpdated(true)
+        }
+    }
     return (
-            <Row>
-                <Col sm="12" lg="6" md="6">
-                    <Card className="border-0 shadow">
-                        <Card.Header className="bg-primary">
-                           <h3 className="text-light fw-bold"> Fixture IDs</h3>
-                        </Card.Header>
-                        <Card.Body className="bg-light text-center">
-                            <h5 className="text-dark fw-bold">To Post Fixture IDS</h5>
-                            <div className="btn btn-danger mt-2">
-                                <Button variant="danger" onClick={postFixtureIds}>
-                                    { fixtureIdLoading ? 'loading...'  :  'Click Here'}
-                                </Button>
-                                <i className="bi bi-caret-right-fill"></i>
-                            </div>
-                         
-                        </Card.Body>
-                    </Card>
-                   
-                </Col>
-                <Col sm="12" lg="6" md="6">
-                <Card className="border-0 shadow">
-                    <Card.Header className="bg-primary">
-                        <h3 className="text-light fw-bold"> Fixture Odds</h3>
-                    </Card.Header>
-                    <Card.Body className="bg-light text-center">
-                        <h5 className="text-dark fw-bold">To post Fixture Odds</h5>
-                        <div className="btn btn-danger mt-2">
-                            <Button variant="danger" onClick={postFixtureOdds}>
-                            { fixtureOddsLoading ? 'loading...'  :  'Click Here'}
-                            </Button>
-                            <i className="bi bi-caret-right-fill"></i>
-                        </div>                     
-                    </Card.Body>
-                </Card>
-                </Col>
-            </Row>
+        <div>
+            <h1>Update Prize</h1>
+            {updated && <h2>Prize Updated</h2>}
+            <input placeholder="Jackpot Market ID" onChange={handleId}/>
+            <input placeholder="Jackpot Prize" onChange={handleChange}/>
+            <button className="btn btn-primary" onClick={handleSubmit}>
+                Update
+            </button>
+        </div>
     )
 }
+
 const CustomFixture = () => {
     const [isUpdated, setIsUpdated] = useState(false);
     const [fixtureDetails, setFixtureDetails] = useState({
@@ -1118,11 +1412,7 @@ const CustomFixture = () => {
 
     const onselect = (e) => setFixtureDetails(prev => ({...prev, fixture_id: e.value})) 
 
-    const removeFixtures = async (e) => {
-        e.preventDefault()
-       await axios.delete('api/admin/fixtures/remove')
-
-    }
+   
     return (
         <Card className="mt-4 border-0 bg-danger shadow">
             <Card.Header className="bg-primary">
@@ -1194,9 +1484,7 @@ const CustomFixture = () => {
                         </Col>
                       
                         <div className="d-flex justify-content-center">
-                            <Button variant="primary" type="submit" onClick={removeFixtures}>
-                               Remove All
-                            </Button>
+                           
                             <Button variant="primary" type="submit" onClick={submitFixture}>
                               {isUpdated  ? 'Added' : ' Add Fixture'} 
                             </Button>
@@ -1212,7 +1500,7 @@ const CustomFixture = () => {
     )
 }
 
-const FixtureOdds = ({ setStartUpdate }) => {    
+const FixtureOdds = ({ setStartUpdate,setIsUpdateComplete,startUpdate,isUpdateComplete }) => {    
 
     const { data, isLoading, error, refetch } = useGetFixtureIdsWhereOddsNullQuery()
     const [ids, setIds] = useState(0)
@@ -1220,7 +1508,6 @@ const FixtureOdds = ({ setStartUpdate }) => {
     const [fixtureId, setFixtureId] = useState(0)
     const [maxLength, setMaxLength] = useState(null)
     const [progress, setProgress] = useState(0)
-    const [isUpdateComplete, setIsUpdateComplete] = useState(false)
 
     const [homeValues, setHomeValues] = useState({
         value: '',
@@ -1270,6 +1557,8 @@ const FixtureOdds = ({ setStartUpdate }) => {
     }
   
     const updateFixture = async (sessionFixtureId, home, draw ,away) => {       
+        const fixtureLength = sessionStorage.getItem("data_length")
+        const fixtureProgress = sessionStorage.getItem("progress")
 
          if(sessionFixtureId === 'undefined') {
             return
@@ -1288,13 +1577,15 @@ const FixtureOdds = ({ setStartUpdate }) => {
             setUpdated(prev => !prev)   
             refetch()
         }
+
+        if(fixtureProgress / 2 == fixtureLength) {
+            setIsUpdateComplete(true)
+        }
     }
  
     function update(sessionFixtureId, homeOdds, drawOdds, awayOdds) {
 
-
         if(Boolean(sessionFixtureId) === false) {
-            alert('Update complete')
             setStartUpdate(false)
         }
 
@@ -1311,19 +1602,9 @@ const FixtureOdds = ({ setStartUpdate }) => {
         const drawOdds = sessionStorage.getItem('update_draw')
         const awayOdds = sessionStorage.getItem('update_away')
 
-        const time = setTimeout(() => {
-            update(sessionFixtureId, homeOdds, drawOdds, awayOdds)
-        }, 350)
+        update(sessionFixtureId, homeOdds, drawOdds, awayOdds)
 
-        if(Number(dataLength) === Number(progress)) {
-            sessionStorage.removeItem('data_length')
-            sessionStorage.removeItem('progress')
-            setIsUpdateComplete(true)
-            return clearTimeout(time)
-        }
-         return () => clearTimeout(time)        
-    
-    }, [updated])
+    }, [updated, startUpdate])
 
     if(isLoading) {
         return <span>Loading</span>
@@ -1341,57 +1622,15 @@ const FixtureOdds = ({ setStartUpdate }) => {
 
     return (
         <Card>    
-            <Card.Body>
-                <h6>{maxLength}</h6>
-             {isUpdateComplete ? <h5>update complete!</h5> : <ProgressBarElement now={progress} max={maxLength}/>}
+            <Card.Body className="bg-info m-2 text-center">
+                {!isUpdateComplete && <h1>Update Complete!</h1>}
+                <h1>
+                    {updated ? 
+                        <i className="bi bi-eye-slash text-dark"></i> : 
+                        <i className="bi bi-eye-fill text-primary"></i>
+                    }
+                </h1>
             </Card.Body>
         </Card>
-    )
-}
-
-const ConsoleOutPut = ({ fixtureLoaded, fixtureOddsLoaded }) => {
-    const date = new Date()
-  
-    const NoActivity = () =>  <small className="fw-bold">No activity...</small>
-
-    const YesActivity = () => {
-        return (
-            <>
-                <small className="text-light d-block mt-2">
-                    Fixture IDs {fixtureLoaded ? 'loaded' : 'loading'} : {fixtureLoaded.toString()}
-                    {fixtureLoaded && <i className="bi bi-check2-circle text-warning" style={{ marginLeft: 10 }}></i>} 
-                </small>
-                <small className="text-light d-block mt-2">
-                    Fixture Odds {fixtureOddsLoaded ? 'loaded' : 'loading'} : {fixtureOddsLoaded.toString()}
-                    {fixtureOddsLoaded && <i className="bi bi-check2-circle text-warning" style={{ marginLeft: 10 }}></i>} 
-                </small>
-            </>
-        )
-    }
-    return (
-        <Card className="mt-3 shadow bg-dark">
-            <Card.Header>
-                <h2 className="fw-bold pt-2">Console OutPut</h2>
-            </Card.Header>
-            <hr/>
-            <Card.Body className="p-2 mb-5">
-                <Row>
-                    <Col lg="2" md="2" sm="2" className="text-end">
-                        <small>
-                            {date.getMonth()}/
-                            {date.getDay()}/
-                            {date.getFullYear() + ' '} 
-                            {date.getHours()}:
-                            {date.getMinutes()}
-                        </small>
-                    </Col>
-                    <Col lg="10" md="10" sm="10">
-                        <NoActivity/>
-                        <YesActivity/>
-                    </Col>
-                </Row>
-            </Card.Body>
-        </Card>
-      
     )
 }

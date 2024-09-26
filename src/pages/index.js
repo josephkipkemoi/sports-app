@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import axios from '../lib/axios';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Row  from 'react-bootstrap/Row';
 import Col  from 'react-bootstrap/Col';
@@ -12,6 +11,7 @@ import CustomFilter from '../components/CustomFilter';
 import BetslipContainer  from '../components/BetslipContainer';
 import Tooltip from '../components/Tooltip';
 import CustomAds from '../components/CustomAds';
+import JackpotContainer from '../components/JackpotContainer';
 
 const ThemedBody = styled('div')`
  background-color: #424242;
@@ -63,7 +63,8 @@ background-color: #ebeded;
   .custom-grid {
     display: flex;
     flex-wrap: wrap;
-    padding: 12px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
  
   .custom-grid-hide {
@@ -78,72 +79,81 @@ const StyledMain = styled.div`
 background: #424242;
 `
 
-function App({ data }) {
-   
-  useEffect(() => {
+function App() {
+  const [displayMode, setDisplayMode] = useState('')
 
+  useEffect(() => {
+   
     const currentSession = sessionStorage.getItem('session_id')
 
     if(!!currentSession === false) {
       sessionStorage.setItem('session_id', Date.now())
     }  
 
+    setDisplayMode(localStorage.getItem('display-mode'))
+    window.addEventListener('click', (e) => {
+        if(e.target.getAttribute('display') === 'toggle-off' || 
+            e.target.getAttribute('display') === 'toggle-on'
+        ) {
+            setDisplayMode(localStorage.getItem('display-mode'))
+        };      
+    })
+
   },[])
  
   return (
-    <ThemedBody>
-            <main id="main">
-              <Row className='px-2'>
-                  <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
-                   <StyledMain>
-                   <TopNavBar/>
-                   <CustomAds/>
-                   <CustomFilter heading="Highlights"/>
+    <>
+     <ThemedBody>
+     <TopNavBar/>
+     <main id="main">
+       <Row>
+           <Col lg={9} md={12} sm={12} style={{ padding: 0 }}>
+            <StyledMain>
+        
+            <CustomAds/>
+            <CustomFilter displayMode={displayMode} />
 
-                   <StyleGameData>
-                 
-                     <div style={{ position:  'relative' }}>
-                      <Tooltip 
-                        message="To view all available markets for each game Click here"
-                        number={1}
-                        top={0}
-                        right={50}
-                        caret_position="right"
-                      /> 
+            <StyleGameData style={{ display: 'block' }}>
+          
+              <div style={{ position:  'relative' }}>
+               <Tooltip 
+                 message="To view all available markets for each game Click here"
+                 number={1}
+                 top={0}
+                 right={50}
+                 caret_position="right"
+               /> 
 
-                      <GameComponent data={data} />
+               <GameComponent displayMode={displayMode}/>
 
-                     </div>
-                     
-                   </StyleGameData>   
-                   </StyledMain>  
-                                                                                                                                      
-                  </Col>
-                  
-                  <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>    
-                   
-                    <BetslipContainer />
-                    <CustomerInfo />
-
-                  </Col>
-
-              </Row>
-            </main>
+              </div>
             
-            <Support/>  
+            </StyleGameData> 
 
-    </ThemedBody>
+           
+            <JackpotContainer/>
+
+            </StyledMain>  
+                                                                                                                               
+           </Col>
+           
+           <Col lg={3} md={12} sm={12} style={{ paddingLeft: 0 }}>    
+            
+             <BetslipContainer displayMode={displayMode}/>
+             <CustomerInfo displayMode={displayMode}/>
+
+           </Col>
+
+       </Row>
+     </main>
+     
+     <Support/>  
+
+</ThemedBody>
+   
+    </>
+    
   );
-}
-
-export async function getServerSideProps(context) {
-  const data = await axios.get('api/custom_fixture')
-
-  return {
-    props: {
-      data: data.data.fixtures
-    }, // will be passed to the page component as props
-  }
 }
 
 export default App;

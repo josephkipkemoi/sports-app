@@ -13,7 +13,7 @@ import {
     H5, InputNumber, Small, Span, 
  } from '../components/Html';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import  { faShare }  from "@fortawesome/free-solid-svg-icons";
+import  { faShare, faCertificate }  from "@fortawesome/free-solid-svg-icons";
 import Link from 'next/link';
 import configData from '../../config.json';
 import  Modal  from 'react-bootstrap/Modal';
@@ -27,6 +27,9 @@ import MobileNavComponent from "./MobileNavComponent";
 import useAuth from "../hooks/auth";
 import AuthUser from "../hooks/AuthUser";
 import { randomString } from "../hooks/generateRandomId";
+import { CongratulationModal } from "./HtmlElements";
+import UserBalance from "./UserBalance";
+import OffersModal from "./OffersModal";
 
 const StyleShareContainer = styled.div`
 .h6-close {
@@ -46,55 +49,7 @@ const StyleShareContainer = styled.div`
   opacity: .71;
 }
 `
-const StyleStars = styled.div`
-.custom-1 {
-  position: absolute;
-  margin-top: 20px;
-  margin-left: 40px;
-}
-.custom-2 {
-  position: absolute;
-  margin-top: 60px;
-  left: 70px;
-} 
-.custom-2-1 {
-  position: absolute;
-  margin-top: 20px;
-  right: -30px;
-} 
-.custom-3 {
-  position: absolute;
-  margin-top: 5px;
-  right: 10px;
-} 
-.custom-4 {
-  position: absolute;
-  margin-top: 15px;
-  right: -60px;
-} 
-.balloon-1 {
-  position: absolute;
-  margin-top: 0px;
-  right: 50px;
-}
-.balloon-2 {
-  position: absolute;
-  margin-top: 60px;
-  right: -80px;
-}
-`
-const StyleCongratulationsModalMidMenu = styled.div`
-h1,h2 {
-  line-height: 42px;
-}
-a {
-  line-height: 32px;
-}
-.small-position {
-  margin-top: 2px;
-  font-size: 14px;
-}
-`
+
 const StlyeInputClipboard = styled.div`
   input {
     border-top-right-radius: 0px;
@@ -290,7 +245,7 @@ const BetslipCartHeader = ({ length }) => {
       return (
         <div 
         className='d-flex align-items-center justify-content-between p-2 shadow-sm' 
-        style={{ backgroundColor: '#001041', color: '#fff', borderTopLeftRadius: '6px', borderTopRightRadius: '6px'}} 
+        style={{ backgroundColor: '#001041', color: '#fff', borderTopLeftRadius: '0px', borderTopRightRadius: '0px'}} 
         onClick={openMobileBetslip}
         slip="active"
         >
@@ -304,7 +259,7 @@ const BetslipCartHeader = ({ length }) => {
             <i className="bi bi-chevron-double-up mobile-down" slip="active" id="cart-header-su" style={{ marginRight: 5 }}></i> :   
             <i className="bi bi-chevron-double-down mobile-down" id="cart-header-sd" style={{ marginRight: 5 }}></i>
             }
-            <p className='fw-bold' id="cart-header-multi" slip="active" style={{ margin: 0, letterSpacing: '1px' }}>  Multi Bet ({length})</p>
+            <h6 className='fw-bold' id="cart-header-multi" slip="active" style={{ margin: 0, letterSpacing: '1px', padding: 0 }}>  Multi Bet ({length})</h6>
           </div>
           :
           <div className='d-flex align-items-center' slip="active">      
@@ -312,15 +267,15 @@ const BetslipCartHeader = ({ length }) => {
             <i className="bi bi-chevron-double-up mobile-down"  slip="active" id="cart-header-mu" style={{ marginRight: 5 }}></i> :   
             <i className="bi bi-chevron-double-down mobile-down"  slip="active" id="cart-header-md" style={{ marginRight: 5 }}></i>
             }
-            <p className='fw-bold' id="cart-header-single"  slip="active" style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({length})</p> 
+            <h6 className='fw-bold' id="cart-header-single"  slip="active" style={{ margin: 0, letterSpacing: 1 }}>Single Bet ({length})</h6> 
           </div>
           } 
         
         </div>
           }
-            <div className='btn btn-light btn-sm text-dark shadow-sm' share_code="share_code"  onClick={toggleShareBtn}>
+            <div className='btn btn-sm rounded-pill text-white shadow-sm' share_code="share_code"  onClick={toggleShareBtn}>
               <FontAwesomeIcon icon={faShare} style={{ marginRight: '5px' }} share_code="share_code"/>
-              <small className='text-dark fw-bold share-btn' share_code="share_code" >Share</small>
+              <small className='text-white fw-bold share-btn' share_code="share_code" >Share</small>
             </div>  
         </div>
       )
@@ -524,7 +479,7 @@ const CartElements = (link, i) => {
         fiveJackpotGames={fiveJackpotGames}
       /> 
     <StyleBetCart 
-    className='betcart-mb card bg-light shadow pb-2' 
+    className='betcart-mb card bg-light shadow pb-4' 
     >
         <ShareContainer 
         isModalOpen={modalOpen} 
@@ -666,7 +621,7 @@ const JackpotCart = ({ market, jackpotGames, length, setMegaJackpotId, setFiveJa
     }
 
   }
- 
+  const { uu_id } = AuthUser()   
   return (
     <StyleJackpotCart className={`bg-${market === 'Mega Jackpot' ? 'dark' : 'dark'} mt-1 rounded shadow mb-2`}>
       <div className="d-flex justify-content-between align-items-center mb-3 bg-secondary p-1 mg-header" style={{ margin: 0, padding: 0 }}>
@@ -813,10 +768,12 @@ const BetCartFormElements = ({ betData }) => {
     const [isCongratulationModalOpen, setCongratulationModalOpen] = useState(false)
     const [loading, setLoading] = useState(null)
     const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false)
+    const [isOfferModalOpen, setIsOfferModalOpen] = useState(false)
     const [betAmount, setBetAmount] = useState(configData.MINIMUM_DEPOSIT_AMOUNT);
     const closeCongratulationsMenu = () => setCongratulationModalOpen(false)
     const closeMenu = () => setIsBalanceModalOpen(false)
-  
+    const closeOffer = () => setIsOfferModalOpen(false)
+
     const incrementBetAmount = () => setBetAmount(prev => prev += configData.INCREMENT_DECREMENT_AMOUNT)
     
     const { uu_id } = AuthUser()
@@ -836,21 +793,29 @@ const BetCartFormElements = ({ betData }) => {
       const removeBetslipCart = () => {
         sessionStorage.clear()
       }
-  
-      const postBalanceAfterPlacing = async () => {
-        const res = await axios.post(`api/users/${uu_id.id}/balance/decrement`, {
-          'user_id': uu_id.id,
-          'amount': betAmount
-        } ,
-        {
-          headers: {
-            'x-sportsapp-key': configData.SPORTS_APP_KEY
-          }
+
+      const postBonusBalanceAfterPlacing = async (cart_id,possible_payout,betAmount,cart ) => {
+        const res = await axios.post('api/users/fixtures/cart', {
+          cart_id,
+          possible_payout,
+          cart,
+          bet_amount: betAmount,
+          user_id: uu_id.id
         })
   
         if(res.status === 200) {
+          setLoading(false)
+          setCongratulationModalOpen(true)
+        }
+
+        const balance_response = await axios.post(`api/users/${uu_id.id}/bonus`, {
+          bonus: betAmount
+        });
+
+        if(balance_response.status === 200) {
           refetch()
         }
+     
       }
   
       const setNewSessionStorage = () => {
@@ -862,16 +827,23 @@ const BetCartFormElements = ({ betData }) => {
         setLoading(true)
   
         const balanceAfterPlacing = data.amount - betAmount
-    
-        if(data.amount < betAmount || balanceAfterPlacing < 0) {
+        const bonusAfterPlacing = data.bonus - betAmount
+        const cart_id = randomString()
+        const possible_payout = Math.floor(possibleWin)
+
+        if( data.amount < betAmount || balanceAfterPlacing < 0 ) {
+            if(data.bonus < betAmount || bonusAfterPlacing < 0) {
+              setIsBalanceModalOpen(true)
+              setLoading(false)
+             } else {
+              return postBonusBalanceAfterPlacing(cart_id, possible_payout, betAmount, JSON.stringify(betData))
+             }
+
           setIsBalanceModalOpen(true)
           setLoading(false)
           return
         }   
         
-        const cart_id = randomString()
-        const possible_payout = Math.floor(possibleWin)
-  
         const res = await axios.post('api/users/fixtures/cart', {
           cart_id,
           possible_payout,
@@ -881,11 +853,11 @@ const BetCartFormElements = ({ betData }) => {
         })
   
         if(res.status === 200) {
+          refetch()
           setLoading(false)
           setCongratulationModalOpen(true)
         }
   
-        postBalanceAfterPlacing()
         setNewSessionStorage()
      
       } 
@@ -896,8 +868,8 @@ const BetCartFormElements = ({ betData }) => {
   
       const linkBarRef = useRef();
       let possibleWin = res * betAmount
-      const deductions = possibleWin * configData.DEDUCTIONS_RATE
-      possibleWin = possibleWin - deductions
+  
+      
       return (
           <div 
           style={{ 
@@ -917,8 +889,27 @@ const BetCartFormElements = ({ betData }) => {
                 </Small>
            </div>
           }
-         
-          <UserBalanceElement />
+          <div>
+              <div className="d-flex align-items-center justify-content-between">
+                <Small>Balance</Small>
+                <UserBalance user_id={uu_id?.id} type="regular" />
+              </div>
+              <div className="d-flex align-items-center justify-content-between">
+                <Small>Bonus</Small>
+
+                <div className="d-flex align-items-center">
+                  <FontAwesomeIcon 
+                    icon={faCertificate} 
+                    className="text-danger" 
+                    size="lg" 
+                    style={{ marginRight: 3, cursor: 'pointer' }}
+                    onClick={() => setIsOfferModalOpen(true)}
+                  />
+                  <UserBalance user_id={uu_id?.id} type="bonus" />
+                </div>
+              </div>
+          </div>
+          
            {betData?.length !== 0 &&
            <>
            <div className='d-flex align-items-center justify-content-between mb-1'>
@@ -940,12 +931,7 @@ const BetCartFormElements = ({ betData }) => {
             </div>
            
           </div>
-          <div className='d-flex align-items-center justify-content-between'>
-            <Small>Deductions (Kes):</Small>
-            <Small className="fw-bold">
-              {Number(deductions).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </Small>
-          </div>
+        
            <div className='d-flex align-items-center justify-content-between mb-3'>
               <Small>Possible Payout (Kes):</Small>
               <Small className='fw-bold text-dark'>
@@ -954,23 +940,23 @@ const BetCartFormElements = ({ betData }) => {
           </div>
             <div className="d-flex mb-2">           
                 <button 
-                  className='btn btn-danger shadow-sm m-1 text-light w-100 d-flex justify-content-center align-items-center' 
+                  className='btn btn-danger rounded-pill shadow-sm m-1 text-light w-100 d-flex justify-content-center align-items-center' 
                   id="close-btn"
                   onClick={() => removeBetslipCart()}
                   style={{ letterSpacing: 1 }}
                 >      
-                <FontAwesomeIcon icon={faTimesCircle} style={{ marginRight: 6 }}/>          
+                <FontAwesomeIcon size="1x" icon={faTimesCircle} style={{ marginRight: 6 }}/>          
                   Clear Slip
                 </button>
 
                 <button 
                 ref={linkBarRef}      
                 disabled={loading || !uu_id.id}
-                className='btn btn-light shadow-sm m-1 text-dark w-100 d-flex justify-content-center align-items-center'
+                className='btn btn-light rounded-pill shadow-sm m-1 text-dark w-100 d-flex justify-content-center align-items-center'
                 style={{ letterSpacing: 1 }}
                 onClick={() => postBetslipCart()}
                 >
-                  <FontAwesomeIcon icon={faCheckCircle} style={{ marginRight: 6 }} className="text-success"/> 
+                   <i className="bi bi-hand-index-thumb" style={{ marginRight: 6 }}></i>
                   {loading ? 
                   <Spinner
                   animation="grow"
@@ -992,7 +978,8 @@ const BetCartFormElements = ({ betData }) => {
             market="Bet"
           />
           <BalanceModal isModalOpen={isBalanceModalOpen} closeMenu={closeMenu}/>
-          </div>
+          <OffersModal isModalOpen={isOfferModalOpen} closeMenu={closeOffer} />
+        </div>
       )
 }
 
@@ -1023,140 +1010,6 @@ const BalanceModal = ({ isModalOpen, closeMenu }) => {
         </Modal.Body>                            
      </Modal>
     )
-}
-
-const UserBalanceElement = () => {
-      const { uu_id } = AuthUser()   
-
-      const { data, error, isLoading, refetch } = useGetBalanceByUserIdQuery(uu_id.id)
-      
-      if(error) {
-        return ''
-      }
-      if(isLoading) {
-        return ''
-      }
-      
-      const { amount } = data;
-    
-      return (
-        <>
-         { !!uu_id.id ? 
-          <div className='d-flex align-items-center justify-content-between mb-1'>
-            <Small>Balance (Kes):</Small>
-            <Small className='fw-bold'>
-              <FontAwesomeIcon 
-              icon={faRefresh} 
-              onClick={() => refetch()}
-              style={{ 
-                cursor: 'pointer',
-                paddingRight: 8, 
-                paddingLeft: 8,
-              }}
-              />
-               {amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </Small>
-          </div>
-          : ''
-        }
-        </>
-      )
-    
-     
-}
-
-const CongratulationModal = ({ isModalOpen, closeModal, historyRoute, market }) => {
-
-    const Stars = () => {
-      return (
-        <div className='d-flex justify-content-center mt-3' style={{ position: 'absolute', width: '50%' }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light" viewBox="0 0 16 16">
-            <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-stars text-warning custom-1" viewBox="0 0 16 16">
-            <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-balloon-fill text-warning" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8.48 10.901C11.211 10.227 13 7.837 13 5A5 5 0 0 0 3 5c0 2.837 1.789 5.227 4.52 5.901l-.244.487a.25.25 0 1 0 .448.224l.04-.08c.009.17.024.315.051.45.068.344.208.622.448 1.102l.013.028c.212.422.182.85.05 1.246-.135.402-.366.751-.534 1.003a.25.25 0 0 0 .416.278l.004-.007c.166-.248.431-.646.588-1.115.16-.479.212-1.051-.076-1.629-.258-.515-.365-.732-.419-1.004a2.376 2.376 0 0 1-.037-.289l.008.017a.25.25 0 1 0 .448-.224l-.244-.487ZM4.352 3.356a4.004 4.004 0 0 1 3.15-2.325C7.774.997 8 1.224 8 1.5c0 .276-.226.496-.498.542-.95.162-1.749.78-2.173 1.617a.595.595 0 0 1-.52.341c-.346 0-.599-.329-.457-.644Z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-balloon-fill text-warning balloon-1" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8.48 10.901C11.211 10.227 13 7.837 13 5A5 5 0 0 0 3 5c0 2.837 1.789 5.227 4.52 5.901l-.244.487a.25.25 0 1 0 .448.224l.04-.08c.009.17.024.315.051.45.068.344.208.622.448 1.102l.013.028c.212.422.182.85.05 1.246-.135.402-.366.751-.534 1.003a.25.25 0 0 0 .416.278l.004-.007c.166-.248.431-.646.588-1.115.16-.479.212-1.051-.076-1.629-.258-.515-.365-.732-.419-1.004a2.376 2.376 0 0 1-.037-.289l.008.017a.25.25 0 1 0 .448-.224l-.244-.487ZM4.352 3.356a4.004 4.004 0 0 1 3.15-2.325C7.774.997 8 1.224 8 1.5c0 .276-.226.496-.498.542-.95.162-1.749.78-2.173 1.617a.595.595 0 0 1-.52.341c-.346 0-.599-.329-.457-.644Z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-balloon-fill text-warning balloon-2" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8.48 10.901C11.211 10.227 13 7.837 13 5A5 5 0 0 0 3 5c0 2.837 1.789 5.227 4.52 5.901l-.244.487a.25.25 0 1 0 .448.224l.04-.08c.009.17.024.315.051.45.068.344.208.622.448 1.102l.013.028c.212.422.182.85.05 1.246-.135.402-.366.751-.534 1.003a.25.25 0 0 0 .416.278l.004-.007c.166-.248.431-.646.588-1.115.16-.479.212-1.051-.076-1.629-.258-.515-.365-.732-.419-1.004a2.376 2.376 0 0 1-.037-.289l.008.017a.25.25 0 1 0 .448-.224l-.244-.487ZM4.352 3.356a4.004 4.004 0 0 1 3.15-2.325C7.774.997 8 1.224 8 1.5c0 .276-.226.496-.498.542-.95.162-1.749.78-2.173 1.617a.595.595 0 0 1-.52.341c-.346 0-.599-.329-.457-.644Z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light custom-2" viewBox="0 0 16 16">
-            <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-warning custom-2-1" viewBox="0 0 16 16">
-            <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light custom-3" viewBox="0 0 16 16">
-            <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-stars text-light custom-4" viewBox="0 0 16 16">
-            <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z"/>
-          </svg>
-        </div>
-      )
-    }
-      return (
-        <Modal show={isModalOpen} className="mt-5">
-        <Modal.Body modalId="modal-ref" className="p-4 bg-primary rounded" >
-          <Span 
-          modalId="modal-ref" 
-          className='fw-bold p-2 d-block mb-2 float-end' 
-          onClick={closeModal} 
-          style={{ cursor: 'pointer', width: 32 }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-x-circle-fill text-light" viewBox="0 0 16 16">
-              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
-            </svg>
-          </Span>  
-          <StyleStars>
-            <Stars/>
-          </StyleStars>
-          <div className='d-flex justify-content-center mt-5 pt-4 w-100' style={{ zIndex: 2 }}>
-              <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="104" height="104" 
-              fill="currentColor" 
-              className="bi bi-trophy-fill text-warning " 
-              viewBox="0 0 16 16">
-                <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935z"/>
-              </svg>
-            </div>
-          <StyleCongratulationsModalMidMenu className='text-center mt-3 mb-3'>
-            <h1 modalId="modal-ref" className='fw-bold text-light'>Congratulations!</h1>
-            <h3 className='mt-2 mb-4 text-light'>
-              {market} placed successfully!
-            </h3>
-            <div className='d-flex'>
-              <Link href='#'>
-                <a
-                  itemProp='url'
-                  className='btn btn-light w-100 mt-2 m-1 shadow-lg d-flex justify-content-center'
-                >
-                  <i className="bi bi-share" style={{ marginRight: 5 }}></i>
-                  <small className='small-position'>Share</small>
-                </a>
-                </Link>
-                <Link href={historyRoute}>
-                <a
-                  itemProp='url'
-                  className='btn btn-warning w-100 mt-2 m-1 shadow-lg d-flex justify-content-center'
-                >
-                  <i className="bi bi-card-list" style={{ marginRight: 5 }}></i>
-                  <small className='small-position'>View Bet</small>               
-                </a>
-            </Link>
-            </div>
-          
-          </StyleCongratulationsModalMidMenu>
-        
-        </Modal.Body>                            
-     </Modal>
-      )
 }
 
 const ShareContainer = ({ isModalOpen, toggleShareBtn, share_code }) => {
