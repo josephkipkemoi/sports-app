@@ -59,7 +59,7 @@ const CarouselComponent = () => {
                     >
                         <h4 className="text-center fw-bold mb-2">PAYBILL: {config.MPESA_PAYBILL_NUMBER}</h4>
                         <h4 className="text-center fw-bold w-100 rounded">
-                            ACCT. NO: 07-XXX-XXX
+                            ACCT. NO: 170918
                         </h4>
                     </div>
                 </div>              
